@@ -1293,14 +1293,6 @@ export default async function StrategyLabPage() {
       <style>{dashboardCss}</style>
       <TopBar history={history} />
       <BestPickHero history={history} />
-      <GlobalSummary history={history} />
-
-      <section className="fundsGrid">
-        <FundCard history={history} theme={WABABA_THEME} />
-        <FundCard history={history} theme={AI_THEME} />
-      </section>
-
-      <ComparisonSection history={history} />
 
       <section className="candidatesGrid">
         <CandidateSection
@@ -1316,6 +1308,15 @@ export default async function StrategyLabPage() {
           theme={AI_THEME}
         />
       </section>
+
+      <GlobalSummary history={history} />
+
+      <section className="fundsGrid">
+        <FundCard history={history} theme={WABABA_THEME} />
+        <FundCard history={history} theme={AI_THEME} />
+      </section>
+
+      <ComparisonSection history={history} />
 
       <PhilosophySection />
 
