@@ -787,26 +787,31 @@ function ComparisonSection({ history }: { history: AnyRecord }) {
           ai={ai.totalProfitRate ?? 0}
         />
       </div>
-      <div className="compareTableCard">
-        <table className="compareTable">
-          <thead>
-            <tr>
-              <th>구분</th>
-              <th style={{ color: WABABA_THEME.primary }}>와바바 펀드</th>
-              <th style={{ color: AI_THEME.primary }}>와바바 AI 펀드</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(([label, a, b]) => (
-              <tr key={label}>
-                <td>{label}</td>
-                <td>{a}</td>
-                <td>{b}</td>
+      <details className="comparisonDetails">
+        <summary className="comparisonSummary">
+          펀드별 상세 비교 보기
+        </summary>
+        <div className="compareTableCard">
+          <table className="compareTable">
+            <thead>
+              <tr>
+                <th>구분</th>
+                <th style={{ color: WABABA_THEME.primary }}>와바바 펀드</th>
+                <th style={{ color: AI_THEME.primary }}>와바바 AI 펀드</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {rows.map(([label, a, b]) => (
+                <tr key={label}>
+                  <td>{label}</td>
+                  <td>{a}</td>
+                  <td>{b}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </section>
   );
 }
@@ -1550,7 +1555,15 @@ const dashboardCss = `
   .miniStatIcon { width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 950; }
   .miniStatLabel { color: #64748b; font-size: 12px; font-weight: 900; }
   .miniStatValue { color: #0f172a; font-size: 15px; font-weight: 950; margin-top: 2px; }
-  .comparisonSection { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 22px; min-width: 0; }
+  .comparisonSection { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 22px; min-width: 0; }
+  .comparisonDetails { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 6px 16px; min-width: 0; }
+  .comparisonDetails[open] { padding: 6px 16px 14px; }
+  .comparisonDetails > .compareTableCard { margin-top: 10px; box-shadow: none; border: 1px solid #eef2f7; padding: 14px; }
+  .comparisonSummary { cursor: pointer; color: #475569; font-size: 13px; font-weight: 950; padding: 8px 0; list-style: none; user-select: none; line-height: 1.5; }
+  .comparisonSummary::-webkit-details-marker { display: none; }
+  .comparisonSummary::marker { display: none; content: ""; }
+  .comparisonSummary::before { content: "▸"; display: inline-block; margin-right: 8px; color: #94a3b8; transition: transform 0.18s; }
+  .comparisonDetails[open] > .comparisonSummary::before { transform: rotate(90deg); }
   .chartCard, .compareTableCard, .candidateCard, .philosophyBox, .systemBox, .actionPanel { min-width: 0; max-width: 100%; overflow: hidden; background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04); }
   .sectionTitle { font-size: 18px; font-weight: 950; color: #0f172a; margin-bottom: 12px; }
   .chartTitle { color: #334155; font-size: 14px; font-weight: 950; margin-bottom: 10px; }
