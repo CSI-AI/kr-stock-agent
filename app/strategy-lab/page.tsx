@@ -1318,7 +1318,10 @@ export default async function StrategyLabPage() {
 
       <ComparisonSection history={history} />
 
-      <PhilosophySection />
+      <details className="philosophyDetails">
+        <summary className="philosophySummary">운용 원칙 보기</summary>
+        <PhilosophySection />
+      </details>
 
       <section className="actionPanel">
         <div>
@@ -1556,6 +1559,14 @@ const dashboardCss = `
   .rankCircle { display: inline-flex !important; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; font-weight: 950; margin: 0 !important; }
   .stars { color: #f59e0b !important; font-size: 15px !important; letter-spacing: 1px; margin: 0 !important; }
   .bottomGrid { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; margin-bottom: 18px; min-width: 0; }
+  .philosophyDetails { margin-bottom: 18px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 6px 16px; }
+  .philosophyDetails[open] { padding: 6px 16px 14px; }
+  .philosophyDetails > .bottomGrid { margin-top: 10px; margin-bottom: 0; }
+  .philosophySummary { cursor: pointer; color: #475569; font-size: 14px; font-weight: 950; padding: 8px 0; list-style: none; user-select: none; }
+  .philosophySummary::-webkit-details-marker { display: none; }
+  .philosophySummary::marker { display: none; content: ""; }
+  .philosophySummary::before { content: "▸"; display: inline-block; margin-right: 8px; color: #94a3b8; transition: transform 0.18s; }
+  .philosophyDetails[open] > .philosophySummary::before { transform: rotate(90deg); }
   .philosophyBox { background: linear-gradient(135deg, #fffbeb 0%, #fff 100%); border-color: #fde68a; }
   .philosophyColumns { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   .philosophyColumns h4 { margin: 0 0 8px; font-size: 15px; font-weight: 950; }
