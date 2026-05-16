@@ -619,60 +619,133 @@ function HoldingTable({
     return <div className="emptyHolding">아직 보유 종목이 없습니다.</div>;
   }
 
+  const rows = positions.map((position, index) => {
+    const name = getName(position);
+    const code = getCode(position);
+    const quantity = getNumber(position.quantity);
+    const buyPrice = getNumber(position.buyPrice);
+    const currentPrice = getNumber(position.currentPrice);
+    const buyAmount = getPositionBuyAmount(position);
+    const evalAmount = getPositionAmount(position);
+    const profitAmount = getPositionProfitAmount(position);
+    const profitRate = getPositionProfitRate(position);
+    const weight = getPositionWeight(position, totalAsset);
+    const holdingDays = getHoldingDays(position);
+    return {
+      key: `${theme.key}-${code}-${index}`,
+      name,
+      code,
+      quantity,
+      buyPrice,
+      currentPrice,
+      buyAmount,
+      evalAmount,
+      profitAmount,
+      profitRate,
+      weight,
+      holdingDays,
+    };
+  });
+
   return (
-    <div className="holdingTableWrap">
-      <table className="holdingTable">
-        <thead>
-          <tr>
-            <th>종목명</th>
-            <th>수량</th>
-            <th>평균단가</th>
-            <th>총매수금액</th>
-            <th>현재가</th>
-            <th>현재금액</th>
-            <th>평가손익</th>
-            <th>수익률</th>
-            <th>비중</th>
-            <th>보유기간</th>
-          </tr>
-        </thead>
-        <tbody>
-          {positions.map((position, index) => {
-            const name = getName(position);
-            const code = getCode(position);
-            const quantity = getNumber(position.quantity);
-            const buyPrice = getNumber(position.buyPrice);
-            const currentPrice = getNumber(position.currentPrice);
-            const buyAmount = getPositionBuyAmount(position);
-            const evalAmount = getPositionAmount(position);
-            const profitRate = getPositionProfitRate(position);
-            const weight = getPositionWeight(position, totalAsset);
-            const holdingDays = getHoldingDays(position);
-            return (
-              <tr key={`${theme.key}-${code}-${index}`}>
+    <>
+      <div className="holdingTableWrap">
+        <table className="holdingTable">
+          <thead>
+            <tr>
+              <th>종목명</th>
+              <th>수량</th>
+              <th>평균단가</th>
+              <th>총매수금액</th>
+              <th>현재가</th>
+              <th>현재금액</th>
+              <th>평가손익</th>
+              <th>수익률</th>
+              <th>비중</th>
+              <th>보유기간</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.key}>
                 <td>
-                  <b>{name}</b>
-                  <span>{code}</span>
+                  <b>{r.name}</b>
+                  <span>{r.code}</span>
                 </td>
-                <td>{formatNumber(quantity, 0)}주</td>
-                <td>{formatKrw(buyPrice)}</td>
-                <td>{formatKrw(buyAmount)}</td>
-                <td>{formatKrw(currentPrice)}</td>
-                <td>{formatKrw(evalAmount)}</td>
-                <td style={{ color: toneColor(getPositionProfitAmount(position)) }}>
-                  {formatKrw(getPositionProfitAmount(position))}
+                <td>{formatNumber(r.quantity, 0)}주</td>
+                <td>{formatKrw(r.buyPrice)}</td>
+                <td>{formatKrw(r.buyAmount)}</td>
+                <td>{formatKrw(r.currentPrice)}</td>
+                <td>{formatKrw(r.evalAmount)}</td>
+                <td style={{ color: toneColor(r.profitAmount) }}>
+                  {formatKrw(r.profitAmount)}
                 </td>
-                <td style={{ color: toneColor(profitRate) }}>
-                  {formatPercent(profitRate)}
+                <td style={{ color: toneColor(r.profitRate) }}>
+                  {formatPercent(r.profitRate)}
                 </td>
-                <td>{formatPercent(weight, 1)}</td>
-                <td>{holdingDays}</td>
+                <td>{formatPercent(r.weight, 1)}</td>
+                <td>{r.holdingDays}</td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="holdingCardList">
+        {rows.map((r) => (
+          <div key={r.key} className="holdingCard">
+            <div className="holdingCardHeader">
+              <div className="holdingCardName">
+                <b>{r.name}</b>
+                <span>{r.code}</span>
+              </div>
+              <div className="holdingCardProfit">
+                <div
+                  className="holdingCardProfitRate"
+                  style={{ color: toneColor(r.profitRate) }}
+                >
+                  {formatPercent(r.profitRate)}
+                </div>
+                <div
+                  className="holdingCardProfitAmount"
+                  style={{ color: toneColor(r.profitAmount) }}
+                >
+                  {formatKrw(r.profitAmount)}
+                </div>
+              </div>
+            </div>
+            <div className="holdingCardRow">
+              <div className="holdingCardField">
+                <span>수량</span>
+                <b>{formatNumber(r.quantity, 0)}주</b>
+              </div>
+              <div className="holdingCardField">
+                <span>평균단가</span>
+                <b>{formatKrw(r.buyPrice)}</b>
+              </div>
+              <div className="holdingCardField">
+                <span>현재가</span>
+                <b>{formatKrw(r.currentPrice)}</b>
+              </div>
+            </div>
+            <div className="holdingCardRow">
+              <div className="holdingCardField">
+                <span>평가금액</span>
+                <b>{formatKrw(r.evalAmount)}</b>
+              </div>
+              <div className="holdingCardField">
+                <span>비중</span>
+                <b>{formatPercent(r.weight, 1)}</b>
+              </div>
+              <div className="holdingCardField">
+                <span>보유기간</span>
+                <b>{r.holdingDays}</b>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -826,6 +899,102 @@ function SimpleLineChart({ wababa, ai }: { wababa: number; ai: number }) {
   );
 }
 
+function BestPickHero({ history }: { history: AnyRecord }) {
+  const finalBest = getObject(history.finalBestPick);
+  if (Object.keys(finalBest).length === 0) return null;
+
+  const name = getName(finalBest);
+  const code = getCode(finalBest);
+  const investmentReport = getObject(finalBest.investmentReport);
+  const decisionEngine = getObject(finalBest.decisionEngine);
+  const headline =
+    getString(investmentReport.fact) ||
+    getString(finalBest.companySummary) ||
+    getString(finalBest.growthStory) ||
+    getString(finalBest.rankReason) ||
+    "성장성과 밸류를 함께 점검";
+  const whyText =
+    getString(investmentReport.decision) ||
+    getString(investmentReport.businessImpact);
+  const valuationText = getString(investmentReport.valuation);
+  const riskSummary = getString(finalBest.riskSummary);
+  const buyTrigger = getString(decisionEngine.buyTrigger);
+  const confidence = getNumber(decisionEngine.confidence);
+  const score =
+    getNumber(finalBest.aiFundScore) ??
+    getNumber(finalBest.finalBestScore) ??
+    getNumber(finalBest.score);
+  const per = getNumber(finalBest.per) ?? getNumber(finalBest.PER);
+  const pbr = getNumber(finalBest.pbr) ?? getNumber(finalBest.PBR);
+  const roe = getNumber(finalBest.roe) ?? getNumber(finalBest.ROE);
+
+  return (
+    <section className="bestHero">
+      <div className="bestHeroHeader">
+        <div className="bestHeroTitleRow">
+          <span className="bestHeroBadge">⭐ 오늘의 종합 BEST</span>
+          <span className="bestHeroName">
+            {name}
+            {code ? <em>{code}</em> : null}
+          </span>
+        </div>
+        <div className="bestHeroMeta">
+          {confidence !== null ? (
+            <span className="bestHeroConfidence">신뢰도 {confidence}%</span>
+          ) : null}
+          {score !== null ? (
+            <span className="bestHeroScore">스코어 {formatNumber(score, 0)}</span>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="bestHeroHeadline">
+        {headline.length > 110 ? `${headline.slice(0, 110)}…` : headline}
+      </div>
+
+      {whyText ? (
+        <div className="bestHeroWhy">
+          <b>왜 지금</b>{" "}
+          {whyText.length > 130 ? `${whyText.slice(0, 130)}…` : whyText}
+        </div>
+      ) : null}
+
+      <div className="bestHeroSubRow">
+        {valuationText ? (
+          <div className="bestHeroValuation">
+            <b>밸류</b>{" "}
+            {valuationText.length > 90
+              ? `${valuationText.slice(0, 90)}…`
+              : valuationText}
+          </div>
+        ) : null}
+        {riskSummary ? (
+          <div className="bestHeroRisk">
+            ⚠ {riskSummary.length > 70 ? `${riskSummary.slice(0, 70)}…` : riskSummary}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="bestHeroMetricsRow">
+        {buyTrigger ? (
+          <span className="bestHeroBuyTrigger">
+            {buyTrigger.length > 30 ? `${buyTrigger.slice(0, 30)}…` : buyTrigger}
+          </span>
+        ) : null}
+        {per !== null ? (
+          <span className="bestHeroMetricBadge">PER {formatNumber(per, 1)}배</span>
+        ) : null}
+        {pbr !== null ? (
+          <span className="bestHeroMetricBadge">PBR {formatNumber(pbr, 1)}배</span>
+        ) : null}
+        {roe !== null ? (
+          <span className="bestHeroMetricBadge">ROE {formatPercent(roe, 1)}</span>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 function CandidateSection({
   title,
   subtitle,
@@ -855,164 +1024,151 @@ function CandidateSection({
           {theme.key === "ai" ? "와바바 AI 기준" : "와바바 기준"}
         </span>
       </div>
-      <div className="candidateTableWrap">
-        <table className="candidateTable">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>종목명</th>
-              <th>핵심 포인트</th>
-              <th>매수단가</th>
-              <th>현재가</th>
-              <th>투자 매력도</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.slice(0, 5).map((item, index) => {
-              const name = getName(item);
-              const code = getCode(item);
-              const investmentReport = getObject(item.investmentReport);
-              const decisionEngine = getObject(item.decisionEngine);
-              const fact =
-                getString(investmentReport.fact) ||
-                getString(item.companySummary) ||
-                getString(item.growthStory) ||
-                getString(item.rankReason) ||
-                "성장성과 밸류를 함께 점검";
-              const buyTrigger = getString(decisionEngine.buyTrigger);
-              const riskSummary = getString(item.riskSummary);
-              const confidence = getNumber(decisionEngine.confidence);
-              const per = getNumber(item.per) ?? getNumber(item.PER);
-              const pbr = getNumber(item.pbr) ?? getNumber(item.PBR);
-              const roe = getNumber(item.roe) ?? getNumber(item.ROE);
-              const divYield =
-                getNumber(item.dividendYield) ?? getNumber(item.divYield);
-              const opMargin =
-                getNumber(item.ebitMargin) ?? getNumber(item.opMargin);
-              const valuationText = getString(investmentReport.valuation);
-              const businessImpactText = getString(
-                investmentReport.businessImpact,
-              );
-              const decisionText = getString(investmentReport.decision);
-              const judgmentText = decisionText || businessImpactText;
-              const hasAnyMetric =
-                per !== null ||
-                pbr !== null ||
-                roe !== null ||
-                divYield !== null ||
-                opMargin !== null;
-              const price =
-                getNumber(item.price) ?? getNumber(item.currentPrice);
-              const buyPrice =
-                getNumber(getObject(item.positionSizing).firstBuyPrice) ??
-                price;
-              const score =
-                getNumber(item.aiFundScore) ??
-                getNumber(item.finalBestScore) ??
-                getNumber(item.score) ??
-                0;
-              const stars = Math.max(3, Math.min(5, Math.round(score / 20)));
-              return (
-                <tr key={`${title}-${code}-${index}`}>
-                  <td>
-                    <span
-                      className="rankCircle"
-                      style={{ background: theme.soft, color: theme.primary }}
-                    >
-                      {index + 1}
-                    </span>
-                  </td>
-                  <td>
+      <div className="candidateCardList">
+        {items.slice(0, 5).map((item, index) => {
+          const name = getName(item);
+          const code = getCode(item);
+          const investmentReport = getObject(item.investmentReport);
+          const decisionEngine = getObject(item.decisionEngine);
+          const fact =
+            getString(investmentReport.fact) ||
+            getString(item.companySummary) ||
+            getString(item.growthStory) ||
+            getString(item.rankReason) ||
+            "성장성과 밸류를 함께 점검";
+          const buyTrigger = getString(decisionEngine.buyTrigger);
+          const riskSummary = getString(item.riskSummary);
+          const confidence = getNumber(decisionEngine.confidence);
+          const per = getNumber(item.per) ?? getNumber(item.PER);
+          const pbr = getNumber(item.pbr) ?? getNumber(item.PBR);
+          const roe = getNumber(item.roe) ?? getNumber(item.ROE);
+          const divYield =
+            getNumber(item.dividendYield) ?? getNumber(item.divYield);
+          const opMargin =
+            getNumber(item.ebitMargin) ?? getNumber(item.opMargin);
+          const valuationText = getString(investmentReport.valuation);
+          const businessImpactText = getString(
+            investmentReport.businessImpact,
+          );
+          const decisionText = getString(investmentReport.decision);
+          const judgmentText = decisionText || businessImpactText;
+          const hasAnyMetric =
+            per !== null ||
+            pbr !== null ||
+            roe !== null ||
+            divYield !== null ||
+            opMargin !== null;
+          const price =
+            getNumber(item.price) ?? getNumber(item.currentPrice);
+          const buyPrice =
+            getNumber(getObject(item.positionSizing).firstBuyPrice) ??
+            price;
+          const score =
+            getNumber(item.aiFundScore) ??
+            getNumber(item.finalBestScore) ??
+            getNumber(item.score) ??
+            0;
+          const stars = Math.max(3, Math.min(5, Math.round(score / 20)));
+          return (
+            <div className="candidateCardRow" key={`${title}-${code}-${index}`}>
+              <div className="candidateCardHeader">
+                <div className="candidateCardLead">
+                  <span
+                    className="rankCircle"
+                    style={{ background: theme.soft, color: theme.primary }}
+                  >
+                    {index + 1}
+                  </span>
+                  <div className="candidateCardName">
                     <b>{name}</b>
                     <span>{code}</span>
-                  </td>
-                  <td className="candidatePointCell">
-                    <div className="candidateFactLine">
-                      {fact.length > 36 ? `${fact.slice(0, 36)}…` : fact}
-                    </div>
-                    {hasAnyMetric ? (
-                      <div className="candidateMetricsRow">
-                        {per !== null ? (
-                          <span className="candidateMetricBadge">
-                            PER {formatNumber(per, 1)}배
-                          </span>
-                        ) : null}
-                        {pbr !== null ? (
-                          <span className="candidateMetricBadge">
-                            PBR {formatNumber(pbr, 1)}배
-                          </span>
-                        ) : null}
-                        {roe !== null ? (
-                          <span className="candidateMetricBadge">
-                            ROE {formatPercent(roe, 1)}
-                          </span>
-                        ) : null}
-                        {divYield !== null ? (
-                          <span className="candidateMetricBadge">
-                            배당 {formatPercent(divYield, 1)}
-                          </span>
-                        ) : null}
-                        {opMargin !== null ? (
-                          <span className="candidateMetricBadge">
-                            영업이익률 {formatPercent(opMargin, 1)}
-                          </span>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {valuationText ? (
-                      <div className="candidateValuationLine">
-                        <b style={{ color: theme.primary }}>밸류</b>{" "}
-                        ·{" "}
-                        {valuationText.length > 80
-                          ? `${valuationText.slice(0, 80)}…`
-                          : valuationText}
-                      </div>
-                    ) : null}
-                    {judgmentText ? (
-                      <div className="candidateDecisionLine">
-                        <b>판단</b> ·{" "}
-                        {judgmentText.length > 70
-                          ? `${judgmentText.slice(0, 70)}…`
-                          : judgmentText}
-                      </div>
-                    ) : null}
-                    {buyTrigger ? (
-                      <span
-                        className="buyTriggerTag"
-                        style={{ background: theme.soft, color: theme.primary, borderColor: theme.border }}
-                      >
-                        {buyTrigger.length > 20 ? `${buyTrigger.slice(0, 20)}…` : buyTrigger}
+                  </div>
+                </div>
+                <div className="candidateCardMeta">
+                  <div className="candidateCardMetaItem">
+                    <span>매수단가</span>
+                    <b>{formatKrw(buyPrice)}</b>
+                  </div>
+                  <div className="candidateCardMetaItem">
+                    <span>현재가</span>
+                    <b>{formatKrw(price)}</b>
+                  </div>
+                  <span className="stars">
+                    {"★".repeat(stars)}
+                    {"☆".repeat(5 - stars)}
+                  </span>
+                </div>
+              </div>
+              <div className="candidateCardBody">
+                <div className="candidateFactLine">{fact}</div>
+                {judgmentText ? (
+                  <div
+                    className="candidateDecisionLine"
+                    style={{ borderLeftColor: theme.primary }}
+                  >
+                    <b style={{ color: theme.primary }}>왜 지금</b>{" "}
+                    {judgmentText}
+                  </div>
+                ) : null}
+                {valuationText ? (
+                  <div className="candidateValuationLine">
+                    <b>밸류</b> · {valuationText}
+                  </div>
+                ) : null}
+                {riskSummary ? (
+                  <div className="riskSummaryLine">⚠ {riskSummary}</div>
+                ) : null}
+                {hasAnyMetric ? (
+                  <div className="candidateMetricsRow">
+                    {per !== null ? (
+                      <span className="candidateMetricBadge">
+                        PER {formatNumber(per, 1)}배
                       </span>
                     ) : null}
-                    {riskSummary ? (
-                      <div className="riskSummaryLine">
-                        ⚠ {riskSummary.length > 28 ? `${riskSummary.slice(0, 28)}…` : riskSummary}
-                      </div>
+                    {pbr !== null ? (
+                      <span className="candidateMetricBadge">
+                        PBR {formatNumber(pbr, 1)}배
+                      </span>
                     ) : null}
-                    {confidence !== null ? (
-                      <div className="confidenceLine">신뢰도 {confidence}%</div>
+                    {roe !== null ? (
+                      <span className="candidateMetricBadge">
+                        ROE {formatPercent(roe, 1)}
+                      </span>
                     ) : null}
-                  </td>
-                  <td>{formatKrw(buyPrice)}</td>
-                  <td>{formatKrw(price)}</td>
-                  <td>
-                    <span className="stars">
-                      {"★".repeat(stars)}
-                      {"☆".repeat(5 - stars)}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-            {items.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="emptyCell">
-                  표시할 후보가 없습니다.
-                </td>
-              </tr>
-            ) : null}
-          </tbody>
-        </table>
+                    {divYield !== null ? (
+                      <span className="candidateMetricBadge">
+                        배당 {formatPercent(divYield, 1)}
+                      </span>
+                    ) : null}
+                    {opMargin !== null ? (
+                      <span className="candidateMetricBadge">
+                        영업이익률 {formatPercent(opMargin, 1)}
+                      </span>
+                    ) : null}
+                  </div>
+                ) : null}
+                {buyTrigger ? (
+                  <span
+                    className="buyTriggerTag"
+                    style={{
+                      background: theme.soft,
+                      color: theme.primary,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    {buyTrigger}
+                  </span>
+                ) : null}
+                {confidence !== null ? (
+                  <div className="confidenceLine">신뢰도 {confidence}%</div>
+                ) : null}
+              </div>
+            </div>
+          );
+        })}
+        {items.length === 0 ? (
+          <div className="emptyCell">표시할 후보가 없습니다.</div>
+        ) : null}
       </div>
     </section>
   );
@@ -1136,6 +1292,7 @@ export default async function StrategyLabPage() {
       <ScrollRestore />
       <style>{dashboardCss}</style>
       <TopBar history={history} />
+      <BestPickHero history={history} />
       <GlobalSummary history={history} />
 
       <section className="fundsGrid">
@@ -1257,7 +1414,7 @@ const dashboardCss = `
   .smallMetricLabel { color: #475569; font-size: 13px; font-weight: 900; margin-bottom: 11px; }
   .smallMetricValue { font-size: 24px; font-weight: 950; letter-spacing: -0.04em; }
   .smallMetricSub { margin-top: 8px; color: #64748b; font-size: 12px; font-weight: 850; }
-  .fundsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 22px; min-width: 0; }
+  .fundsGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 22px; min-width: 0; }
   .fundCard {
     min-width: 0;
     max-width: 100%;
@@ -1275,8 +1432,10 @@ const dashboardCss = `
   .statusPill { border-color: #86efac; background: #f0fdf4; color: #047857; }
   .fundTopGrid { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 16px; align-items: center; border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; background: #fbfdff; min-width: 0; }
   .fundMetricMain { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-  .fundCoreGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; }
-  .fundCoreItem { display: flex; flex-direction: column; gap: 3px; min-width: 0; overflow: hidden; }
+  .fundCoreGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 0; }
+  .fundCoreItem { display: flex; flex-direction: column; gap: 3px; min-width: 0; overflow: hidden; padding: 0 14px; border-left: 1px solid #e2e8f0; }
+  .fundCoreItem:first-child { border-left: none; padding-left: 0; }
+  .fundCoreItem:last-child { padding-right: 0; }
   .coreNumber { font-size: 22px; font-weight: 950; letter-spacing: -0.04em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .coreSub { color: #94a3b8; font-size: 11px; font-weight: 850; line-height: 1.3; }
   .fundAuxGrid { display: flex; gap: 18px; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 10px; }
@@ -1296,6 +1455,19 @@ const dashboardCss = `
   .holdingHeader { margin: 18px 0 10px; }
   .holdingHeader h3 { margin: 0; font-size: 18px; font-weight: 950; }
   .holdingHeader span { color: #2563eb; }
+  .holdingCardList { display: none; }
+  .holdingCard { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 13px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03); }
+  .holdingCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid #eef2f7; }
+  .holdingCardName b { display: block; color: #0f172a; font-size: 15px; font-weight: 950; line-height: 1.2; }
+  .holdingCardName span { display: block; color: #64748b; font-size: 11px; font-weight: 850; margin-top: 2px; }
+  .holdingCardProfit { text-align: right; min-width: 0; }
+  .holdingCardProfitRate { font-size: 16px; font-weight: 950; letter-spacing: -0.02em; line-height: 1.2; }
+  .holdingCardProfitAmount { font-size: 12px; font-weight: 900; margin-top: 2px; }
+  .holdingCardRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-bottom: 6px; }
+  .holdingCardRow:last-child { margin-bottom: 0; }
+  .holdingCardField { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .holdingCardField span { color: #94a3b8; font-size: 10px; font-weight: 900; }
+  .holdingCardField b { color: #0f172a; font-size: 12px; font-weight: 950; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdingTableWrap, .candidateTableWrap { width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #e2e8f0; border-radius: 16px; }
   .candidateTableWrap { border: none; border-radius: 0; }
   .holdingTable, .candidateTable, .compareTable { width: 100%; border-collapse: collapse; table-layout: auto; }
@@ -1313,17 +1485,56 @@ const dashboardCss = `
   .holdReasonItem { color: #334155; font-size: 11px; font-weight: 850; line-height: 1.4; white-space: normal; }
   .signalSummaryText { display: block; margin-top: 3px; color: #64748b; font-size: 11px; font-weight: 850; }
   .nextCheckText { display: block; margin-top: 4px; color: #94a3b8; font-size: 10px; font-weight: 850; line-height: 1.4; white-space: normal; }
-  .candidatePointCell { min-width: 160px; max-width: 240px; }
-  .candidateFactLine { color: #334155; font-size: 12px; font-weight: 850; line-height: 1.4; white-space: normal; margin-bottom: 4px; }
-  .candidateMetricsRow { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 4px; }
-  .candidateMetricBadge { display: inline-block; padding: 2px 7px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; color: #334155; font-size: 10px; font-weight: 900; white-space: nowrap; line-height: 1.4; }
-  .candidateValuationLine { color: #334155; font-size: 11px; font-weight: 850; line-height: 1.4; margin-top: 4px; white-space: normal; }
-  .candidateValuationLine b { font-weight: 950; }
-  .candidateDecisionLine { color: #475569; font-size: 11px; font-weight: 850; line-height: 1.4; margin-top: 3px; white-space: normal; }
-  .candidateDecisionLine b { font-weight: 950; color: #1e293b; }
-  .buyTriggerTag { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 10px; font-weight: 950; border: 1px solid; white-space: nowrap; margin-bottom: 3px; }
-  .riskSummaryLine { color: #dc2626; font-size: 10px; font-weight: 850; margin-top: 3px; line-height: 1.4; white-space: normal; }
-  .confidenceLine { color: #94a3b8; font-size: 10px; font-weight: 900; margin-top: 2px; }
+  .bestHero {
+    position: relative;
+    background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+    border: 2px solid #bfdbfe;
+    border-radius: 22px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 14px 38px rgba(37, 99, 235, 0.12);
+    min-width: 0;
+  }
+  .bestHeroHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .bestHeroTitleRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
+  .bestHeroBadge { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 950; border: 1px solid #fde68a; white-space: nowrap; }
+  .bestHeroName { font-size: 26px; font-weight: 950; color: #0f172a; letter-spacing: -0.04em; line-height: 1.1; }
+  .bestHeroName em { font-style: normal; margin-left: 8px; color: #64748b; font-size: 14px; font-weight: 900; letter-spacing: 0; }
+  .bestHeroMeta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .bestHeroConfidence { display: inline-flex; padding: 5px 11px; border-radius: 999px; background: #dbeafe; color: #1e3a8a; font-size: 12px; font-weight: 950; border: 1px solid #bfdbfe; white-space: nowrap; }
+  .bestHeroScore { display: inline-flex; padding: 5px 11px; border-radius: 999px; background: #f3e8ff; color: #6b21a8; font-size: 12px; font-weight: 950; border: 1px solid #e9d5ff; white-space: nowrap; }
+  .bestHeroHeadline { color: #0f172a; font-size: 17px; font-weight: 950; line-height: 1.45; letter-spacing: -0.01em; margin-bottom: 12px; white-space: normal; }
+  .bestHeroWhy { color: #1e293b; font-size: 13px; font-weight: 900; line-height: 1.5; padding: 9px 12px; border-left: 4px solid #2563eb; background: rgba(255, 255, 255, 0.72); border-radius: 0 10px 10px 0; margin-bottom: 10px; white-space: normal; }
+  .bestHeroWhy b { font-weight: 950; color: #2563eb; margin-right: 5px; }
+  .bestHeroSubRow { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+  .bestHeroValuation { color: #475569; font-size: 12px; font-weight: 850; line-height: 1.5; white-space: normal; flex: 1 1 280px; min-width: 0; }
+  .bestHeroValuation b { font-weight: 950; color: #334155; margin-right: 4px; }
+  .bestHeroRisk { color: #b91c1c; font-size: 12px; font-weight: 900; line-height: 1.5; white-space: normal; flex: 0 1 320px; min-width: 0; }
+  .bestHeroMetricsRow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .bestHeroMetricBadge { display: inline-block; padding: 3px 9px; border-radius: 999px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-size: 11px; font-weight: 900; white-space: nowrap; }
+  .bestHeroBuyTrigger { display: inline-block; padding: 4px 11px; border-radius: 12px; background: #2563eb; color: #fff; font-size: 11px; font-weight: 950; white-space: normal; line-height: 1.35; max-width: 100%; }
+  .candidateCardList { display: flex; flex-direction: column; gap: 14px; }
+  .candidateCardRow { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); }
+  .candidateCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #eef2f7; flex-wrap: wrap; }
+  .candidateCardLead { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 220px; }
+  .candidateCardName { min-width: 0; }
+  .candidateCardName b { display: block; color: #0f172a; font-size: 17px; font-weight: 950; line-height: 1.2; letter-spacing: -0.02em; }
+  .candidateCardName span { display: block; color: #64748b; font-size: 12px; font-weight: 850; margin-top: 3px; }
+  .candidateCardMeta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .candidateCardMetaItem { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .candidateCardMetaItem span { color: #94a3b8; font-size: 11px; font-weight: 900; }
+  .candidateCardMetaItem b { color: #0f172a; font-size: 14px; font-weight: 950; }
+  .candidateCardBody { display: flex; flex-direction: column; gap: 8px; white-space: normal; }
+  .candidateFactLine { color: #0f172a; font-size: 14px; font-weight: 950; line-height: 1.5; white-space: normal; letter-spacing: -0.01em; }
+  .candidateMetricsRow { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 2px; }
+  .candidateMetricBadge { display: inline-block; padding: 3px 9px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 11px; font-weight: 900; line-height: 1.4; white-space: normal; }
+  .candidateValuationLine { color: #475569; font-size: 12.5px; font-weight: 850; line-height: 1.55; white-space: normal; }
+  .candidateValuationLine b { font-weight: 950; color: #334155; margin-right: 2px; }
+  .candidateDecisionLine { color: #1e293b; font-size: 13px; font-weight: 900; line-height: 1.55; white-space: normal; padding: 8px 12px 8px 12px; border-left: 3px solid #2563eb; background: rgba(248, 250, 252, 0.7); border-radius: 0 8px 8px 0; }
+  .candidateDecisionLine b { font-weight: 950; margin-right: 4px; }
+  .buyTriggerTag { display: inline-block; border-radius: 12px; padding: 3px 9px; font-size: 10px; font-weight: 950; border: 1px solid; white-space: normal; line-height: 1.35; max-width: 100%; margin-bottom: 3px; }
+  .riskSummaryLine { color: #dc2626; font-size: 12px; font-weight: 900; line-height: 1.5; white-space: normal; }
+  .confidenceLine { color: #64748b; font-size: 11px; font-weight: 900; margin-top: 2px; }
   .emptyHolding, .emptyCell { color: #64748b; font-size: 13px; font-weight: 850; padding: 18px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; }
   .fundStatsRow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
   .miniStat { display: flex; gap: 10px; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; }
@@ -1337,7 +1548,7 @@ const dashboardCss = `
   .lineChart { width: 100%; height: 240px; display: block; }
   .compareTable th, .compareTable td { text-align: center; }
   .compareTable th:first-child, .compareTable td:first-child { text-align: left; color: #475569; }
-  .candidatesGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 22px; min-width: 0; }
+  .candidatesGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 22px; min-width: 0; }
   .candidateHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
   .candidateHeader h3 { margin: 0; font-size: 20px; font-weight: 950; }
   .candidateHeader p { margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 850; }
@@ -1373,11 +1584,24 @@ const dashboardCss = `
     .bottomGrid { grid-template-columns: 1fr; }
     .philosophyColumns { grid-template-columns: 1fr; }
     .actionPanel { flex-direction: column; align-items: flex-start; }
+    .bestHero { padding: 16px 14px; }
+    .bestHeroName { font-size: 22px; }
+    .bestHeroHeadline { font-size: 15px; }
+    .bestHeroSubRow { flex-direction: column; gap: 8px; }
+    .holdingTableWrap { display: none; }
+    .holdingCardList { display: flex; flex-direction: column; gap: 10px; }
+    .candidateCardHeader { flex-direction: column; align-items: stretch; gap: 10px; }
+    .candidateCardMeta { gap: 14px; }
   }
   @media (max-width: 560px) {
     .globalSummary { grid-template-columns: 1fr; }
     .metricPair { grid-template-columns: 1fr; }
     .fundStatsRow { grid-template-columns: 1fr; }
     .candidateHeader { flex-direction: column; }
+    .fundCoreGrid { grid-template-columns: 1fr; }
+    .fundCoreItem { border-left: none; padding: 8px 0; border-top: 1px solid #e2e8f0; }
+    .fundCoreItem:first-child { border-top: none; padding-top: 0; }
+    .fundCoreItem:last-child { padding-bottom: 0; }
+    .holdingCardRow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 `;
