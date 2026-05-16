@@ -1622,14 +1622,23 @@ const dashboardCss = `
     .bottomGrid { grid-template-columns: 1fr; }
     .philosophyColumns { grid-template-columns: 1fr; }
     .actionPanel { flex-direction: column; align-items: flex-start; }
-    .bestHero { padding: 16px 14px; }
-    .bestHeroName { font-size: 22px; }
-    .bestHeroHeadline { font-size: 15px; }
-    .bestHeroSubRow { flex-direction: column; gap: 8px; }
+    .bestHero { padding: 14px 14px 12px; margin-bottom: 14px; }
+    .bestHeroHeader { margin-bottom: 8px; }
+    .bestHeroName { font-size: 20px; }
+    .bestHeroHeadline { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
+    .bestHeroWhy { padding: 7px 10px; margin-bottom: 8px; }
+    .bestHeroSubRow { flex-direction: column; gap: 6px; margin-bottom: 6px; }
+    .bestHeroValuation, .bestHeroRisk { flex: 0 0 auto; min-height: 0; }
+    .bestHeroMetricsRow { gap: 5px; }
     .holdingTableWrap { display: none; }
     .holdingCardList { display: flex; flex-direction: column; gap: 10px; }
-    .candidateCardHeader { flex-direction: column; align-items: stretch; gap: 10px; }
-    .candidateCardMeta { gap: 14px; }
+    .candidateCardRow { padding: 12px 13px; }
+    .candidateCardHeader { align-items: center; gap: 10px; padding-bottom: 10px; margin-bottom: 10px; }
+    .candidateCardLead { flex: 1 1 auto; gap: 10px; }
+    .candidateCardName b { font-size: 16px; }
+    .candidateCardMeta { gap: 10px; }
+    .candidateCardMetaItem b { font-size: 13px; }
+    .candidateCardBody { gap: 6px; }
   }
   @media (max-width: 560px) {
     .globalSummary { grid-template-columns: 1fr; }
