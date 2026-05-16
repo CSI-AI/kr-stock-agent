@@ -1323,24 +1323,29 @@ export default async function StrategyLabPage() {
         <PhilosophySection />
       </details>
 
-      <section className="actionPanel">
-        <div>
-          <div className="sectionTitle">운용 실행</div>
-          <p>
-            두 펀드 자동운용은 같은 API에서 함께 실행됩니다. 오늘 데이터 생성은
-            분석을 갱신하고, 자동운용은 날짜별 락으로 중복매수를 막습니다.
-          </p>
-        </div>
-        <div className="actionPanelButtons">
-          <div className="compactPanel">
-            <WababaRunPanel />
+      <details className="operationDetails">
+        <summary className="operationSummary">
+          자동운용 상태 · 필요 시 펼쳐서 실행/상세 확인
+        </summary>
+        <section className="actionPanel">
+          <div>
+            <div className="sectionTitle">운용 실행</div>
+            <p>
+              두 펀드 자동운용은 같은 API에서 함께 실행됩니다. 오늘 데이터 생성은
+              분석을 갱신하고, 자동운용은 날짜별 락으로 중복매수를 막습니다.
+            </p>
           </div>
-          <PriceRefreshButton />
-          <a href="/strategy-lab/reviewed">넘긴 종목</a>
-        </div>
-      </section>
+          <div className="actionPanelButtons">
+            <div className="compactPanel">
+              <WababaRunPanel />
+            </div>
+            <PriceRefreshButton />
+            <a href="/strategy-lab/reviewed">넘긴 종목</a>
+          </div>
+        </section>
 
-      <WababaAutoDailyPanel />
+        <WababaAutoDailyPanel />
+      </details>
     </main>
   );
 }
@@ -1559,6 +1564,14 @@ const dashboardCss = `
   .rankCircle { display: inline-flex !important; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; font-weight: 950; margin: 0 !important; }
   .stars { color: #f59e0b !important; font-size: 15px !important; letter-spacing: 1px; margin: 0 !important; }
   .bottomGrid { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; margin-bottom: 18px; min-width: 0; }
+  .operationDetails { margin-top: 12px; margin-bottom: 12px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 6px 16px; }
+  .operationDetails[open] { padding: 6px 16px 14px; }
+  .operationDetails > .actionPanel { margin-top: 10px; margin-bottom: 10px; box-shadow: none; border: 1px solid #eef2f7; }
+  .operationSummary { cursor: pointer; color: #475569; font-size: 13px; font-weight: 950; padding: 8px 0; list-style: none; user-select: none; line-height: 1.5; }
+  .operationSummary::-webkit-details-marker { display: none; }
+  .operationSummary::marker { display: none; content: ""; }
+  .operationSummary::before { content: "▸"; display: inline-block; margin-right: 8px; color: #94a3b8; transition: transform 0.18s; }
+  .operationDetails[open] > .operationSummary::before { transform: rotate(90deg); }
   .philosophyDetails { margin-bottom: 18px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 6px 16px; }
   .philosophyDetails[open] { padding: 6px 16px 14px; }
   .philosophyDetails > .bottomGrid { margin-top: 10px; margin-bottom: 0; }
