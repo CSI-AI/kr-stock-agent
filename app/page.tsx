@@ -1,5 +1,5 @@
-import PhaseOneHome from "@/components/home/phase-one-home";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <PhaseOneHome />;
+  redirect("/strategy-lab");
 }
