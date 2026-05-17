@@ -86,13 +86,44 @@ python scripts\qa\generate_daily_summary.py
 리포트 활용 가이드:
 - 오늘의 종합 **BEST** 확인 (DAILY SUMMARY 최상단)
 - **신규 / 연속 / 탈락** 변화 확인 — 매일 교체 흐름 파악
+- **오늘 예상 주문 (Dry-Run)** 확인 — 아래 §2-B-1 참조
 - **이상치 / 주의 종목** 확인 — qualityWarnings, 영업익 폭증, 성장↑밸류↑(고평가) 등 자동 태그
 - **점수 높지만 미선정** TOP5 — 차순위 후보 모니터링
 - DAILY SUMMARY 한 페이지로 **30초 운영 판단** 가능
 
-스크립트 자체는 데이터 repo에 commit됨 (Phase 32-D, hash `888eca7`):
-- `scripts/qa/generate_qa_report.py`
-- `scripts/qa/generate_daily_summary.py`
+스크립트 자체는 데이터 repo에 commit됨:
+- `scripts/qa/generate_qa_report.py` (Phase 32-D, hash `888eca7`)
+- `scripts/qa/generate_daily_summary.py` (Phase 32-D, hash `888eca7`; Dry-Run 통합은 Phase 33-C, hash `632cbc9`)
+
+---
+
+### 2-B-1. DAILY SUMMARY 안의 "오늘 예상 주문 (Dry-Run)" 섹션
+
+DAILY SUMMARY MD 파일 안에는 추천 흐름(BEST·신규/연속/탈락) 직후에
+**"## 오늘 예상 주문 (Dry-Run)"** 섹션이 자동으로 표시된다.
+
+이 섹션이 보여주는 것:
+- **와바바펀드 / 와바바AI펀드** 각각의 예상 BUY / SELL 주문
+- 각 주문의 종목명·코드·수량·예상 금액·사유
+- 주문 후 예상 현금 잔액
+- **위험 체크** 결과: 현금 부족 / 종목 비중 초과 / 중복 매수 / 가격 0 / 일일 한도 초과 / 1주 매수 예산 미달
+- **MARKET_CLOSED** 여부 (개장일이 아니면 실제 주문은 발생하지 않음을 안내)
+
+⚠ **이 섹션은 dry-run (시뮬레이션) 결과다.**
+- `build_recommendation_history.py`의 read-only 헬퍼만 import해 계산한다.
+- `apply_*_auto_trading` / `write_json` / `main()` 어떤 것도 호출하지 않는다.
+- `portfolio.json` / `trade-history.json` / `wababa-auto-trade-log.json` / `wababa-ai-*` 파일을 **절대 수정하지 않는다**.
+- 따라서 이 섹션이 보여주는 주문은 "지금 자동매매 게이트를 다 통과시켰다면 어떤 주문이 만들어졌을지"의 예상치다.
+
+⚠ **자동매매 ON 직전 반드시 이 섹션을 먼저 확인한다.**
+- WABABA / AI 양쪽 예상 주문이 의도와 일치하는지
+- 위험 체크에 ⚠ 항목이 0건인지
+- MARKET_CLOSED 안내가 아닌지 (평일 확인용)
+- 매수 후 현금이 minCashRate 이상으로 남는지
+
+빠른 모드:
+- `python scripts\qa\generate_daily_summary.py --no-dry-run`
+- Dry-Run 계산을 생략해 빠르게 요약만 보고 싶을 때 사용 (기본은 포함)
 
 ---
 
