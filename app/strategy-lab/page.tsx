@@ -13,6 +13,12 @@ const RECOMMENDATION_HISTORY_PATH = path.join(
   DATA_ROOT_DIR,
   "recommendation-history.json",
 );
+const PUBLIC_RECOMMENDATION_HISTORY_PATH = path.join(
+  process.cwd(),
+  "public",
+  "data",
+  "recommendation-history.json",
+);
 
 type AnyRecord = Record<string, unknown>;
 
@@ -52,17 +58,24 @@ const AI_THEME: FundTheme = {
   glow: "rgba(124, 58, 237, 0.14)",
 };
 
-function readRecommendationHistory(): AnyRecord {
+function readJsonObject(filePath: string): AnyRecord | null {
   try {
-    const parsed = JSON.parse(
-      fs.readFileSync(RECOMMENDATION_HISTORY_PATH, "utf-8"),
-    );
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
-      return {};
-    return parsed as AnyRecord;
+    const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      return parsed as AnyRecord;
+    }
   } catch {
-    return {};
+    // ignore — try next candidate
   }
+  return null;
+}
+
+function readRecommendationHistory(): AnyRecord {
+  return (
+    readJsonObject(RECOMMENDATION_HISTORY_PATH) ??
+    readJsonObject(PUBLIC_RECOMMENDATION_HISTORY_PATH) ??
+    {}
+  );
 }
 
 function getObject(value: unknown): AnyRecord {
