@@ -66,6 +66,36 @@ python scripts\build_recommendation_history.py --no-trade
 
 ---
 
+## 2-B. QA / DAILY SUMMARY 리포트 생성
+
+데이터 생성 직후 추천 품질을 사람이 빠르게 검토할 수 있도록 QA 리포트를 생성한다.
+
+```powershell
+cd C:\work\kr-stock-agent-data-new
+python scripts\qa\generate_qa_report.py
+python scripts\qa\generate_daily_summary.py
+```
+
+생성되는 파일 (데이터 repo `reports/` 폴더):
+- `reports\qa-recommendation-YYYY-MM-DD.txt` — 사람용 상세 QA 리포트
+- `reports\qa-recommendation-YYYY-MM-DD.json` — 후속 도구 연동용 동일 데이터
+- `reports\daily-summary-YYYY-MM-DD.md` — 운영자용 30초 한 페이지 브리핑
+
+⚠ `reports/` 는 데이터 repo `.gitignore` 처리됨 (Phase 32-E) — **commit 대상이 아니다**. 매일 재생성되므로 그대로 사용/삭제 자유.
+
+리포트 활용 가이드:
+- 오늘의 종합 **BEST** 확인 (DAILY SUMMARY 최상단)
+- **신규 / 연속 / 탈락** 변화 확인 — 매일 교체 흐름 파악
+- **이상치 / 주의 종목** 확인 — qualityWarnings, 영업익 폭증, 성장↑밸류↑(고평가) 등 자동 태그
+- **점수 높지만 미선정** TOP5 — 차순위 후보 모니터링
+- DAILY SUMMARY 한 페이지로 **30초 운영 판단** 가능
+
+스크립트 자체는 데이터 repo에 commit됨 (Phase 32-D, hash `888eca7`):
+- `scripts/qa/generate_qa_report.py`
+- `scripts/qa/generate_daily_summary.py`
+
+---
+
 ## 3. sanitized public JSON 생성 확인법
 
 데이터 생성 후 webapp의 공개용 사본이 갱신됐는지 확인한다.
@@ -239,7 +269,7 @@ webapp repo에서 commit하면 안 되는 파일:
 ## 10. 운영 루틴 한 줄 요약
 
 ```
-[데이터 생성 (no-trade)] → [public JSON 갱신 자동 확인] → [git add 단일 파일 → commit → push] → [Vercel 자동 배포 확인]
+[데이터 생성 (no-trade)] → [QA + DAILY SUMMARY 리포트 생성] → [public JSON 갱신 자동 확인] → [git add 단일 파일 → commit → push] → [Vercel 자동 배포 확인]
 ```
 
 이 흐름만 지키면 MVP 운영이 깨지지 않는다.
