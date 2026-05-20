@@ -55,44 +55,25 @@ try {
     throw "build_recommendation_history.py 실패 (exit code = $exitCode)"
   }
 
-  # 결과 요약 작성: recommendation-history.json 읽어서 핵심 지표 추출
-  $finishedAt = Get-Date
-  $history = $null
-  if (Test-Path $histPath) {
-    $history = Get-Content $histPath -Raw -Encoding utf8 | ConvertFrom-Json
+  # 결과 요약 작성: PowerShell 5.1 ConvertFrom-Json은 키 비교가 대소문자 무시라
+  # recommendation-history.json에 'ROE'/'roe'처럼 케이스만 다른 키가 함께 있으면
+  # 변환이 실패한다. Python json 모듈로 평탄 요약을 받아 안전하게 파싱한다.
+  $finishedAt    = Get-Date
+  $summaryScript = Join-Path $PSScriptRoot "extract_auto_daily_summary.py"
+  $summaryJson   = & python $summaryScript $histPath
+  if ($LASTEXITCODE -ne 0) {
+    throw "extract_auto_daily_summary.py 실패 (exit code = $LASTEXITCODE)"
   }
+  $summary = $summaryJson | ConvertFrom-Json
 
-  $fundOrders        = 0
-  $aiOrders          = 0
-  $fundStatus        = $null
-  $aiStatus          = $null
-  $baseDate          = $null
-  $finalBestPickName = $null
-  $wababaPickCount   = 0
-
-  if ($history) {
-    if ($history.fundTradeResult) {
-      $fundStatus = $history.fundTradeResult.status
-      if ($history.fundTradeResult.orders) {
-        $fundOrders = @($history.fundTradeResult.orders).Count
-      }
-    }
-    if ($history.aiFundTradeResult) {
-      $aiStatus = $history.aiFundTradeResult.status
-      if ($history.aiFundTradeResult.orders) {
-        $aiOrders = @($history.aiFundTradeResult.orders).Count
-      }
-    }
-    $baseDate = $history.baseDate
-    if ($history.finalBestPick) {
-      $finalBestPickName = $history.finalBestPick.corpName
-    }
-    if ($history.wababaPicks) {
-      $wababaPickCount = @($history.wababaPicks).Count
-    }
-  }
-
-  $totalOrders = $fundOrders + $aiOrders
+  $fundOrders        = [int]$summary.fundOrderCount
+  $aiOrders          = [int]$summary.aiFundOrderCount
+  $fundStatus        = $summary.fundTradeStatus
+  $aiStatus          = $summary.aiFundTradeStatus
+  $baseDate          = $summary.baseDate
+  $finalBestPickName = $summary.finalBestPickName
+  $wababaPickCount   = [int]$summary.wababaPickCount
+  $totalOrders       = $fundOrders + $aiOrders
 
   $result = [ordered]@{
     ok                = $true
