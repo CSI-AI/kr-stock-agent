@@ -1,6 +1,7 @@
 import { rankedTopRecommendations } from "@/data/mock-dashboard";
 import { formatNumber } from "@/components/home/home-format";
 import HomeSectionCard from "@/components/home/home-section-card";
+import { buildSectorDurabilityNarrative } from "@/lib/wababa/build-sector-durability-narrative";
 
 function renderRankChange(rankChange: number | null) {
   if (rankChange === null) {
@@ -173,6 +174,17 @@ export default function RecommendationSection() {
                   ))}
                 </ul>
               </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+              <p className="text-sm font-semibold text-emerald-300">산업 지속성</p>
+              <p className="mt-2 line-clamp-3 break-keep text-sm leading-6 text-slate-200">
+                {buildSectorDurabilityNarrative({
+                  name: stock.name,
+                  code: stock.code,
+                  hypothesis: stock.hypothesis,
+                })}
+              </p>
             </div>
 
             <div className="mt-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4">

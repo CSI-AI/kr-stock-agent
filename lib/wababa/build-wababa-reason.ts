@@ -1,3 +1,5 @@
+import { buildSectorDurabilityNarrative } from "@/lib/wababa/build-sector-durability-narrative";
+
 export function buildWababaReason(item: any): string {
   const name =
     item.name ||
@@ -58,4 +60,26 @@ export function buildWababaReason(item: any): string {
 
   // 4️⃣ fallback
   return "업황 회복 가능성, 실적 개선 기대, 밸류에이션 부담 낮음";
+}
+
+// Phase 37-A1: 기존 reason 출력에 산업 지속성 narrative를 후행 append 한다.
+// 기존 buildWababaReason 시그니처/동작은 보존하고, narrative를 함께 노출하고 싶은
+// 신규 호출자만 이 헬퍼를 사용한다. ranking/score에는 영향 없음.
+export function appendSectorDurabilityNarrative(
+  reason: string,
+  item: unknown
+): string {
+  const narrative = buildSectorDurabilityNarrative(
+    (item as any) ?? {}
+  );
+
+  if (!narrative) {
+    return reason;
+  }
+
+  if (!reason || reason.trim().length === 0) {
+    return narrative;
+  }
+
+  return `${reason} · ${narrative}`;
 }

@@ -12,6 +12,9 @@ import type {
   StrategyPublishedPortfolioItem,
   StrategyResult,
 } from "@/lib/strategy/strategy-engine";
+import { buildSectorDurabilityNarrative } from "@/lib/wababa/build-sector-durability-narrative";
+import { buildHoldNarrative } from "@/lib/wababa/build-hold-narrative";
+import { buildHoldRiskNarrative } from "@/lib/wababa/build-hold-risk-narrative";
 
 export type DailyReportRecommendationItem = {
   rank: number;
@@ -30,6 +33,7 @@ export type DailyReportRecommendationItem = {
   risk: string[];
   invalidation: string[];
   recommendationLabel: string;
+  sectorDurabilityNarrative?: string;
 };
 
 export type DailyReportTop10ChangeItem = {
@@ -87,6 +91,11 @@ export type DailyReportPublicPortfolioImpact = {
   items: DailyReportPublicPortfolioImpactItem[];
 };
 
+export type DailyReportHoldingStatusItem = OperationHoldingStatusItem & {
+  holdNarrative?: string;
+  holdRiskNarrative?: string;
+};
+
 export type DailyReport = {
   generatedAt: string;
   todayRecommendations: DailyReportRecommendationItem[];
@@ -94,7 +103,7 @@ export type DailyReport = {
     newEntries: DailyReportTop10ChangeItem[];
     dropped: DailyReportTop10ChangeItem[];
   };
-  holdingsStatus: OperationHoldingStatusItem[];
+  holdingsStatus: DailyReportHoldingStatusItem[];
   sellCandidates: OperationSellCandidateItem[];
   actionSummary: OperationActionSummary;
   finalDecisionSummary: DailyReportFinalDecisionSummary;
@@ -122,6 +131,12 @@ function mapRecommendationItem(
     risk: item.risk,
     invalidation: item.invalidation,
     recommendationLabel: item.recommendationLabel,
+    sectorDurabilityNarrative: buildSectorDurabilityNarrative({
+      industryName: item.industry,
+      name: item.name,
+      code: item.code,
+      hypothesis: item.hypothesis,
+    }),
   };
 }
 
@@ -429,7 +444,21 @@ export function buildDailyReport(strategyResult: StrategyResult): DailyReport {
     mapRecommendationItem
   );
 
-  const holdingsStatus = portfolioView.holdingsStatus;
+  // Phase 37-A5/A6: 보유 종목에 hold + risk narrative 옵셔널 attach.
+  // ranking/score/trade/sell candidate 무영향. SELL trigger 생성 X.
+  const holdingsStatus: DailyReportHoldingStatusItem[] =
+    portfolioView.holdingsStatus.map((h) => ({
+      ...h,
+      holdNarrative: buildHoldNarrative({
+        name: h.name,
+        code: h.code,
+        hypothesis: h.hypothesis,
+      }),
+      holdRiskNarrative: buildHoldRiskNarrative({
+        name: h.name,
+        code: h.code,
+      }),
+    }));
   const sellCandidates = portfolioView.sellCandidates;
 
   const finalDecisionSummary = buildFinalDecisionSummary(
