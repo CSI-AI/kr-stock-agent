@@ -1,6 +1,6 @@
 {
-  "baseDate": "2026-05-21",
-  "generatedAt": "2026-05-21 08:45:04",
+  "baseDate": "2026-05-27",
+  "generatedAt": "2026-05-27 08:45:03",
   "portfolioSummary": {
     "initialCapital": 50000000.0,
     "cash": 39219050.0,
@@ -176,8 +176,8 @@
     ]
   },
   "performanceAnalysis": {
-    "baseDate": "2026-05-21",
-    "generatedAt": "2026-05-21 08:45:04",
+    "baseDate": "2026-05-27",
+    "generatedAt": "2026-05-27 08:45:03",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 39219050.0,
@@ -185,9 +185,9 @@
       "totalAssetAmount": 49852900.0,
       "realizedProfit": 0.0,
       "unrealizedProfit": -147100.0,
-      "totalProfitAmount": -138973.0,
-      "estimatedDividendIncome": 8127.0,
-      "totalProfitRate": -0.28,
+      "totalProfitAmount": -134055.0,
+      "estimatedDividendIncome": 13045.0,
+      "totalProfitRate": -0.27,
       "dailyReturnRate": -0.29,
       "cumulativeReturnRate": -0.29,
       "label": "약손실",
@@ -257,7 +257,7 @@
           "realizedProfitChange": 0
         },
         {
-          "date": "2026-05-21",
+          "date": "2026-05-27",
           "totalAssetAmount": 49852900.0,
           "profitAmount": -147100.0,
           "dailyReturnRate": -0.29,
@@ -277,14 +277,14 @@
       "averageReturnRate": -1.22,
       "maxProfitRate": 1.03,
       "maxLossRate": -8.32,
-      "averageHoldingDays": 6.5,
+      "averageHoldingDays": 12.5,
       "bestItem": {
         "code": "019180",
         "name": "티에이치엔",
         "status": "OPEN",
         "buyDate": "2026-05-08",
         "sellDate": null,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "buyPrice": 7780.0,
         "currentPrice": 7860.0,
         "quantity": 235.0,
@@ -298,7 +298,7 @@
         "status": "OPEN",
         "buyDate": "2026-05-07",
         "sellDate": null,
-        "holdingDays": 14,
+        "holdingDays": 20,
         "buyPrice": 19000.0,
         "currentPrice": 17420.0,
         "quantity": 105.0,
@@ -313,7 +313,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 13,
+          "holdingDays": 19,
           "buyPrice": 7780.0,
           "currentPrice": 7860.0,
           "quantity": 235.0,
@@ -327,7 +327,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-20",
           "sellDate": null,
-          "holdingDays": 1,
+          "holdingDays": 7,
           "buyPrice": 418000.0,
           "currentPrice": 418000.0,
           "quantity": 4.0,
@@ -341,7 +341,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 2,
+          "holdingDays": 8,
           "buyPrice": 29800.0,
           "currentPrice": 29800.0,
           "quantity": 55.0,
@@ -355,7 +355,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 3,
+          "holdingDays": 9,
           "buyPrice": 86700.0,
           "currentPrice": 86700.0,
           "quantity": 21.0,
@@ -369,7 +369,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 6,
+          "holdingDays": 12,
           "buyPrice": 9870.0,
           "currentPrice": 9870.0,
           "quantity": 185.0,
@@ -383,7 +383,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 14,
+          "holdingDays": 20,
           "buyPrice": 19000.0,
           "currentPrice": 17420.0,
           "quantity": 105.0,
@@ -491,42 +491,42 @@
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 8127.0,
+      "estimatedDividendIncome": 13045.0,
       "items": [
         {
           "code": "039490",
           "name": "키움증권",
           "dividendYield": 2.75,
-          "holdingDays": 1,
-          "estimatedDividendIncome": 126.0
+          "holdingDays": 7,
+          "estimatedDividendIncome": 882.0
         },
         {
           "code": "041510",
           "name": "에스엠",
           "dividendYield": 1.87,
-          "holdingDays": 3,
-          "estimatedDividendIncome": 280.0
+          "holdingDays": 9,
+          "estimatedDividendIncome": 840.0
         },
         {
           "code": "088130",
           "name": "동아엘텍",
           "dividendYield": 1.52,
-          "holdingDays": 6,
-          "estimatedDividendIncome": 456.0
+          "holdingDays": 12,
+          "estimatedDividendIncome": 912.0
         },
         {
           "code": "019180",
           "name": "티에이치엔",
           "dividendYield": 1.53,
-          "holdingDays": 13,
-          "estimatedDividendIncome": 1007.0
+          "holdingDays": 19,
+          "estimatedDividendIncome": 1471.0
         },
         {
           "code": "461300",
           "name": "아이스크림미디어",
           "dividendYield": 8.92,
-          "holdingDays": 14,
-          "estimatedDividendIncome": 6258.0
+          "holdingDays": 20,
+          "estimatedDividendIncome": 8940.0
         }
       ]
     },
@@ -637,7 +637,7 @@
     },
     "recentEvents": [
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -646,11 +646,11 @@
         "amount": 18800.0,
         "profitRate": 1.03,
         "profitAmount": 18800.0,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -659,11 +659,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 1,
+        "holdingDays": 7,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -672,11 +672,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 2,
+        "holdingDays": 8,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -685,11 +685,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 3,
+        "holdingDays": 9,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -698,11 +698,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 6,
+        "holdingDays": 12,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -711,7 +711,7 @@
         "amount": -165900.0,
         "profitRate": -8.32,
         "profitAmount": -165900.0,
-        "holdingDays": 14,
+        "holdingDays": 20,
         "reason": "현재 보유 수익률 추적"
       },
       {
@@ -788,19 +788,19 @@
       }
     ],
     "insights": [
-      "포트폴리오 누적 수익률은 -0.28%입니다. 손실 확대 여부를 매일 점검합니다.",
+      "포트폴리오 누적 수익률은 -0.27%입니다. 손실 확대 여부를 매일 점검합니다.",
       "실제 운용 성과는 자동 매수·매도 체결이 쌓이면 계산됩니다.",
       "현재 최고 성과 종목은 티에이치엔입니다.",
       "현재 최저 성과 종목은 아이스크림미디어입니다."
     ],
     "summary": {
-      "totalReturnRate": -0.28,
-      "totalProfitAmount": -138973.0,
+      "totalReturnRate": -0.27,
+      "totalProfitAmount": -134055.0,
       "winRate": 16.67,
       "averageReturnRate": -1.22,
       "maxLossRate": -8.32,
       "evaluatedCount": 0,
-      "averageHoldingDays": 6.5,
+      "averageHoldingDays": 12.5,
       "totalTradeCount": 6,
       "closedTradeCount": 0,
       "recentEventCount": 12,
@@ -808,23 +808,23 @@
     }
   },
   "dailyFundMemo": {
-    "date": "2026-05-21",
-    "title": "2026-05-21 와바바 운용일지",
+    "date": "2026-05-27",
+    "title": "2026-05-27 와바바 운용일지",
     "status": "NO_TRADE",
     "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
     "lines": [
       "오늘은 기준을 만족하는 신규 매수 체결 없음.",
       "보유: 키움증권, 시프트업, 에스엠 중심으로 성장 유지 여부 점검.",
-      "총자산 4,985만원, 누적수익률 -0.28%."
+      "총자산 4,985만원, 누적수익률 -0.27%."
     ],
     "holdingCount": 6,
     "orderCount": 0,
     "cash": 39219050.0,
     "totalAssetAmount": 49852900.0,
-    "totalReturnRate": -0.28
+    "totalReturnRate": -0.27
   },
   "holdingReview": {
-    "date": "2026-05-21",
+    "date": "2026-05-27",
     "summary": "보유 종목 6개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
     "holdingCount": 6,
     "sellWatchCount": 0,
@@ -835,7 +835,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-20",
-        "holdingDays": 1,
+        "holdingDays": 7,
         "profitRate": 0.0,
         "growthConsistencyScore": 81.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -857,7 +857,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 2,
+        "holdingDays": 8,
         "profitRate": 0.0,
         "growthConsistencyScore": 98.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -879,7 +879,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 3,
+        "holdingDays": 9,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -901,7 +901,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 6,
+        "holdingDays": 12,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -923,7 +923,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 13,
+        "holdingDays": 19,
         "profitRate": 1.03,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -945,7 +945,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 14,
+        "holdingDays": 20,
         "profitRate": -8.32,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1291,8 +1291,8 @@
     ]
   },
   "aiPerformanceAnalysis": {
-    "baseDate": "2026-05-21",
-    "generatedAt": "2026-05-21 08:45:04",
+    "baseDate": "2026-05-27",
+    "generatedAt": "2026-05-27 08:45:03",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 25408885.0,
@@ -1300,9 +1300,9 @@
       "totalAssetAmount": 49775280.0,
       "realizedProfit": 0.0,
       "unrealizedProfit": -224720.0,
-      "totalProfitAmount": -203551.0,
-      "estimatedDividendIncome": 21169.0,
-      "totalProfitRate": -0.41,
+      "totalProfitAmount": -188177.0,
+      "estimatedDividendIncome": 36543.0,
+      "totalProfitRate": -0.38,
       "dailyReturnRate": -0.45,
       "cumulativeReturnRate": -0.45,
       "label": "약손실",
@@ -1363,7 +1363,7 @@
           "realizedProfitChange": 0
         },
         {
-          "date": "2026-05-21",
+          "date": "2026-05-27",
           "totalAssetAmount": 49775280.0,
           "profitAmount": -224720.0,
           "dailyReturnRate": -0.45,
@@ -1383,14 +1383,14 @@
       "averageReturnRate": -0.9,
       "maxProfitRate": 3.06,
       "maxLossRate": -11.31,
-      "averageHoldingDays": 7.6,
+      "averageHoldingDays": 13.6,
       "bestItem": {
         "code": "015360",
         "name": "INVENI",
         "status": "OPEN",
         "buyDate": "2026-05-08",
         "sellDate": null,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "buyPrice": 16360.0,
         "currentPrice": 16860.0,
         "quantity": 152.0,
@@ -1404,7 +1404,7 @@
         "status": "OPEN",
         "buyDate": "2026-05-08",
         "sellDate": null,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "buyPrice": 5040.0,
         "currentPrice": 4470.0,
         "quantity": 496.0,
@@ -1419,7 +1419,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 13,
+          "holdingDays": 19,
           "buyPrice": 16360.0,
           "currentPrice": 16860.0,
           "quantity": 152.0,
@@ -1433,7 +1433,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 14,
+          "holdingDays": 20,
           "buyPrice": 7780.0,
           "currentPrice": 7860.0,
           "quantity": 321.0,
@@ -1447,7 +1447,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 2,
+          "holdingDays": 8,
           "buyPrice": 14040.0,
           "currentPrice": 14040.0,
           "quantity": 178.0,
@@ -1461,7 +1461,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 2,
+          "holdingDays": 8,
           "buyPrice": 9870.0,
           "currentPrice": 9870.0,
           "quantity": 253.0,
@@ -1475,7 +1475,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 3,
+          "holdingDays": 9,
           "buyPrice": 1112000.0,
           "currentPrice": 1112000.0,
           "quantity": 2.0,
@@ -1489,7 +1489,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 3,
+          "holdingDays": 9,
           "buyPrice": 43350.0,
           "currentPrice": 43350.0,
           "quantity": 57.0,
@@ -1503,7 +1503,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 6,
+          "holdingDays": 12,
           "buyPrice": 89700.0,
           "currentPrice": 89700.0,
           "quantity": 27.0,
@@ -1517,7 +1517,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 6,
+          "holdingDays": 12,
           "buyPrice": 4565.0,
           "currentPrice": 4565.0,
           "quantity": 547.0,
@@ -1531,7 +1531,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 14,
+          "holdingDays": 20,
           "buyPrice": 3430.0,
           "currentPrice": 3370.0,
           "quantity": 728.0,
@@ -1545,7 +1545,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 13,
+          "holdingDays": 19,
           "buyPrice": 5040.0,
           "currentPrice": 4470.0,
           "quantity": 496.0,
@@ -1705,70 +1705,70 @@
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 21169.0,
+      "estimatedDividendIncome": 36543.0,
       "items": [
         {
           "code": "017510",
           "name": "세명전기",
           "dividendYield": 1.57,
-          "holdingDays": 2,
-          "estimatedDividendIncome": 215.0
+          "holdingDays": 8,
+          "estimatedDividendIncome": 860.0
         },
         {
           "code": "088130",
           "name": "동아엘텍",
           "dividendYield": 1.52,
-          "holdingDays": 2,
-          "estimatedDividendIncome": 208.0
+          "holdingDays": 8,
+          "estimatedDividendIncome": 832.0
         },
         {
           "code": "065710",
           "name": "서호전기",
           "dividendYield": 13.84,
-          "holdingDays": 3,
-          "estimatedDividendIncome": 2811.0
+          "holdingDays": 9,
+          "estimatedDividendIncome": 8432.0
         },
         {
           "code": "171090",
           "name": "선익시스템",
           "dividendYield": 1.11,
-          "holdingDays": 6,
-          "estimatedDividendIncome": 442.0
+          "holdingDays": 12,
+          "estimatedDividendIncome": 884.0
         },
         {
           "code": "037270",
           "name": "YG PLUS",
           "dividendYield": 0.66,
-          "holdingDays": 6,
-          "estimatedDividendIncome": 271.0
+          "holdingDays": 12,
+          "estimatedDividendIncome": 542.0
         },
         {
           "code": "015360",
           "name": "INVENI",
           "dividendYield": 6.41,
-          "holdingDays": 13,
-          "estimatedDividendIncome": 5851.0
+          "holdingDays": 19,
+          "estimatedDividendIncome": 8551.0
         },
         {
           "code": "020710",
           "name": "시공테크",
           "dividendYield": 7.58,
-          "holdingDays": 13,
-          "estimatedDividendIncome": 5986.0
+          "holdingDays": 19,
+          "estimatedDividendIncome": 8748.0
         },
         {
           "code": "021080",
           "name": "에이티넘인베스트",
           "dividendYield": 4.15,
-          "holdingDays": 14,
-          "estimatedDividendIncome": 3905.0
+          "holdingDays": 20,
+          "estimatedDividendIncome": 5579.0
         },
         {
           "code": "019180",
           "name": "티에이치엔",
           "dividendYield": 1.53,
-          "holdingDays": 14,
-          "estimatedDividendIncome": 1481.0
+          "holdingDays": 20,
+          "estimatedDividendIncome": 2115.0
         }
       ]
     },
@@ -1939,7 +1939,7 @@
     },
     "recentEvents": [
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -1948,11 +1948,11 @@
         "amount": 76000.0,
         "profitRate": 3.06,
         "profitAmount": 76000.0,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -1961,11 +1961,11 @@
         "amount": 25680.0,
         "profitRate": 1.03,
         "profitAmount": 25680.0,
-        "holdingDays": 14,
+        "holdingDays": 20,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -1974,11 +1974,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 2,
+        "holdingDays": 8,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -1987,11 +1987,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 2,
+        "holdingDays": 8,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -2000,11 +2000,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 3,
+        "holdingDays": 9,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -2013,11 +2013,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 3,
+        "holdingDays": 9,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -2026,11 +2026,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 6,
+        "holdingDays": 12,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -2039,11 +2039,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 6,
+        "holdingDays": 12,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2052,11 +2052,11 @@
         "amount": -43680.0,
         "profitRate": -1.75,
         "profitAmount": -43680.0,
-        "holdingDays": 14,
+        "holdingDays": 20,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-05-21",
+        "date": "2026-05-27",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2065,7 +2065,7 @@
         "amount": -282720.0,
         "profitRate": -11.31,
         "profitAmount": -282720.0,
-        "holdingDays": 13,
+        "holdingDays": 19,
         "reason": "현재 보유 수익률 추적"
       },
       {
@@ -2094,19 +2094,19 @@
       }
     ],
     "insights": [
-      "포트폴리오 누적 수익률은 -0.41%입니다. 손실 확대 여부를 매일 점검합니다.",
+      "포트폴리오 누적 수익률은 -0.38%입니다. 손실 확대 여부를 매일 점검합니다.",
       "실제 운용 성과는 자동 매수·매도 체결이 쌓이면 계산됩니다.",
       "현재 최고 성과 종목은 INVENI입니다.",
       "현재 최저 성과 종목은 시공테크입니다."
     ],
     "summary": {
-      "totalReturnRate": -0.41,
-      "totalProfitAmount": -203551.0,
+      "totalReturnRate": -0.38,
+      "totalProfitAmount": -188177.0,
       "winRate": 20.0,
       "averageReturnRate": -0.9,
       "maxLossRate": -11.31,
       "evaluatedCount": 0,
-      "averageHoldingDays": 7.6,
+      "averageHoldingDays": 13.6,
       "totalTradeCount": 10,
       "closedTradeCount": 0,
       "recentEventCount": 12,
@@ -2114,23 +2114,23 @@
     }
   },
   "aiDailyFundMemo": {
-    "date": "2026-05-21",
+    "date": "2026-05-27",
     "title": "와바바AI펀드 운용 메모",
     "status": "NO_TRADE",
     "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
     "lines": [
       "오늘은 기준을 만족하는 신규 매수 체결 없음.",
       "보유: 세명전기, 동아엘텍, SK스퀘어 중심으로 성장 유지 여부 점검.",
-      "총자산 4,977만원, 누적수익률 -0.41%."
+      "총자산 4,977만원, 누적수익률 -0.38%."
     ],
     "holdingCount": 10,
     "orderCount": 0,
     "cash": 25408885.0,
     "totalAssetAmount": 49775280.0,
-    "totalReturnRate": -0.41
+    "totalReturnRate": -0.38
   },
   "aiHoldingReview": {
-    "date": "2026-05-21",
+    "date": "2026-05-27",
     "summary": "보유 종목 10개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
     "holdingCount": 10,
     "sellWatchCount": 0,
@@ -2141,7 +2141,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 2,
+        "holdingDays": 8,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2163,7 +2163,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 2,
+        "holdingDays": 8,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2185,7 +2185,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 3,
+        "holdingDays": 9,
         "profitRate": 0.0,
         "growthConsistencyScore": 60.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2207,7 +2207,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 3,
+        "holdingDays": 9,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2229,7 +2229,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 6,
+        "holdingDays": 12,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2251,7 +2251,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 6,
+        "holdingDays": 12,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2273,7 +2273,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 13,
+        "holdingDays": 19,
         "profitRate": 3.06,
         "growthConsistencyScore": 69.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2295,7 +2295,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 13,
+        "holdingDays": 19,
         "profitRate": -11.31,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2317,7 +2317,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 14,
+        "holdingDays": 20,
         "profitRate": -1.75,
         "growthConsistencyScore": 88.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2339,7 +2339,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 14,
+        "holdingDays": 20,
         "profitRate": 1.03,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2473,10 +2473,10 @@
     "opportunityScore": 2781.1939999999995,
     "qualityPenalty": 0,
     "qualityLevel": "양호",
-    "finalBestScore": 3322.611999999999,
-    "todayPickScore": 3322.611999999999,
+    "finalBestScore": 3335.211999999999,
+    "todayPickScore": 3335.211999999999,
     "wababaType": "오늘 1종목",
-    "wababaScore": 3322.611999999999,
+    "wababaScore": 3335.211999999999,
     "companySummary": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
     "investmentThesis": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
     "industryMomentum": "IT 서비스 업종: 매출 27.7%·영업이익 4515.0% 함께 증가.",
@@ -2543,6 +2543,15 @@
       "ROE 12.2%로 고성장 기준 미달",
       "영업이익률 13.7%로 수익성 방어",
       "3년 매출 CAGR 19.0%"
+    ],
+    "growthDurabilityScore": 100,
+    "growthDurabilityLabel": "장기보유 후보",
+    "sectorDurabilityScore": 70,
+    "sectorDurabilityLabel": "회복 사이클",
+    "sectorDurabilityReasons": [
+      "회복 사이클 · 70점",
+      "산업 IT 서비스 (기본 65점)",
+      "3년 매출 CAGR 19.0% — 산업 수요가 매출로 이어짐"
     ],
     "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
     "valueBuyPassed": false,
@@ -2627,8 +2636,8 @@
       "opportunityScore": 862.924,
       "qualityPenalty": 22,
       "qualityLevel": "보통",
-      "finalBestScore": 1244.3065,
-      "todayPickScore": 1244.3065,
+      "finalBestScore": 1256.0065,
+      "todayPickScore": 1256.0065,
       "wababaType": "안정형",
       "wababaScore": 243.24200000000002,
       "companySummary": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -2697,6 +2706,15 @@
         "ROE 67.1%로 고성장 기준 통과",
         "영업이익률 21.6%로 수익성 방어",
         "3년 매출 CAGR 91.0%"
+      ],
+      "growthDurabilityScore": 100,
+      "growthDurabilityLabel": "장기보유 후보",
+      "sectorDurabilityScore": 65,
+      "sectorDurabilityLabel": "회복 사이클",
+      "sectorDurabilityReasons": [
+        "회복 사이클 · 65점",
+        "산업 기계·장비 (기본 60점)",
+        "3년 매출 CAGR 91.0% — 산업 수요가 매출로 이어짐"
       ],
       "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
       "valueBuyPassed": true,
@@ -2780,8 +2798,8 @@
       "opportunityScore": 2781.1939999999995,
       "qualityPenalty": 0,
       "qualityLevel": "양호",
-      "finalBestScore": 3322.611999999999,
-      "todayPickScore": 3322.611999999999,
+      "finalBestScore": 3335.211999999999,
+      "todayPickScore": 3335.211999999999,
       "wababaType": "성장형",
       "wababaScore": 9055.568,
       "companySummary": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
@@ -2850,6 +2868,15 @@
         "ROE 12.2%로 고성장 기준 미달",
         "영업이익률 13.7%로 수익성 방어",
         "3년 매출 CAGR 19.0%"
+      ],
+      "growthDurabilityScore": 100,
+      "growthDurabilityLabel": "장기보유 후보",
+      "sectorDurabilityScore": 70,
+      "sectorDurabilityLabel": "회복 사이클",
+      "sectorDurabilityReasons": [
+        "회복 사이클 · 70점",
+        "산업 IT 서비스 (기본 65점)",
+        "3년 매출 CAGR 19.0% — 산업 수요가 매출로 이어짐"
       ],
       "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
       "valueBuyPassed": false,
@@ -2933,8 +2960,8 @@
       "opportunityScore": 180.55599999999998,
       "qualityPenalty": 0,
       "qualityLevel": "양호",
-      "finalBestScore": 291.3445,
-      "todayPickScore": 291.3445,
+      "finalBestScore": 302.1445,
+      "todayPickScore": 302.1445,
       "wababaType": "기회형",
       "wababaScore": 180.55599999999998,
       "companySummary": "HD한국조선해양, 영업익 183%↑ \"27년까지 마진 담보\"...목표가 일제히 '상향' [주가동향]",
@@ -3003,6 +3030,16 @@
         "ROE 17.3%로 고성장 기준 통과",
         "영업이익률 13.0%로 수익성 방어",
         "3년 매출 CAGR 20.1%"
+      ],
+      "growthDurabilityScore": 97,
+      "growthDurabilityLabel": "장기보유 후보",
+      "sectorDurabilityScore": 70,
+      "sectorDurabilityLabel": "회복 사이클",
+      "sectorDurabilityReasons": [
+        "회복 사이클 · 70점",
+        "산업 기타금융 (기본 50점)",
+        "키워드 보조: 조선·해양 업황",
+        "3년 매출 CAGR 20.1% — 산업 수요가 매출로 이어짐"
       ],
       "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
       "valueBuyPassed": false,
@@ -3089,10 +3126,10 @@
         "opportunityScore": 2781.1939999999995,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 3322.611999999999,
-        "todayPickScore": 3322.611999999999,
+        "finalBestScore": 3335.211999999999,
+        "todayPickScore": 3335.211999999999,
         "wababaType": "종합",
-        "wababaScore": 3322.611999999999,
+        "wababaScore": 3335.211999999999,
         "companySummary": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
         "investmentThesis": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
         "industryMomentum": "IT 서비스 업종: 매출 27.7%·영업이익 4515.0% 함께 증가.",
@@ -3160,6 +3197,15 @@
           "영업이익률 13.7%로 수익성 방어",
           "3년 매출 CAGR 19.0%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 IT 서비스 (기본 65점)",
+          "3년 매출 CAGR 19.0% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
         "buyReason": [
@@ -3185,7 +3231,7 @@
         "rank": 1,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 3322.611999999999,
+        "exploreScore": 3335.211999999999,
         "isMainPick": true,
         "rankReason": "ROE 안정, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -3246,10 +3292,10 @@
         "opportunityScore": 949.6,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 1257.9689999999998,
-        "todayPickScore": 1257.9689999999998,
+        "finalBestScore": 1270.5689999999997,
+        "todayPickScore": 1270.5689999999997,
         "wababaType": "종합",
-        "wababaScore": 1257.9689999999998,
+        "wababaScore": 1270.5689999999997,
         "companySummary": "전기·전자 업종, 매출 151.0%·영업이익 1439.0% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
         "investmentThesis": "전기·전자 업종, 매출 151.0%·영업이익 1439.0% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
         "industryMomentum": "전기·전자 업종: 매출 151.0%·영업이익 1439.0% 함께 증가.",
@@ -3319,6 +3365,15 @@
           "영업이익률 21.7%로 수익성 방어",
           "3년 매출 CAGR 24.7%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 75,
+        "sectorDurabilityLabel": "구조적 성장 산업",
+        "sectorDurabilityReasons": [
+          "구조적 성장 산업 · 75점",
+          "산업 전기·전자 (기본 65점)",
+          "3년 매출 CAGR 24.7% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -3344,7 +3399,7 @@
         "rank": 2,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 1257.9689999999998,
+        "exploreScore": 1270.5689999999997,
         "isMainPick": false,
         "rankReason": "고ROE, 저PER, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -3405,10 +3460,10 @@
         "opportunityScore": 862.924,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 1244.3065,
-        "todayPickScore": 1244.3065,
+        "finalBestScore": 1256.0065,
+        "todayPickScore": 1256.0065,
         "wababaType": "종합",
-        "wababaScore": 1244.3065,
+        "wababaScore": 1256.0065,
         "companySummary": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
         "investmentThesis": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
         "industryMomentum": "기계·장비 업종: 매출 356.7%·영업이익 1310.5% 함께 증가.",
@@ -3476,6 +3531,15 @@
           "영업이익률 21.6%로 수익성 방어",
           "3년 매출 CAGR 91.0%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 91.0% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -3501,7 +3565,7 @@
         "rank": 3,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 1244.3065,
+        "exploreScore": 1256.0065,
         "isMainPick": true,
         "rankReason": "고ROE, 저PER, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -3561,10 +3625,10 @@
         "opportunityScore": 148.91,
         "qualityPenalty": 34,
         "qualityLevel": "보통",
-        "finalBestScore": 949.1305,
-        "todayPickScore": 949.1305,
+        "finalBestScore": 960.1105,
+        "todayPickScore": 960.1105,
         "wababaType": "종합",
-        "wababaScore": 949.1305,
+        "wababaScore": 960.1105,
         "companySummary": "SK스퀘어, ‘하이닉스 투자회사’로 영업익 8조8000억 사상 최대",
         "investmentThesis": "SK스퀘어, ‘하이닉스 투자회사’로 영업익 8조8000억 사상 최대",
         "industryMomentum": "SK스퀘어, ‘하이닉스 투자회사’로 영업익 8조8000억 사상 최대",
@@ -3633,6 +3697,15 @@
           "영업이익률 623.3%로 수익성 방어",
           "성장 힌트 수주/신사업"
         ],
+        "growthDurabilityScore": 60,
+        "growthDurabilityLabel": "지속성 양호",
+        "sectorDurabilityScore": 66,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 66점",
+          "산업 기타금융 (기본 50점)",
+          "키워드 보조: AI·반도체 수요"
+        ],
         "longTermHoldView": "지속성 양호: 분기 실적 유지 여부를 보며 보유",
         "valueBuyPassed": false,
         "buyReason": [
@@ -3658,7 +3731,7 @@
         "rank": 4,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 949.1305,
+        "exploreScore": 960.1105,
         "isMainPick": false,
         "rankReason": "고ROE, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -3719,10 +3792,10 @@
         "opportunityScore": 490.814,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 757.5295,
-        "todayPickScore": 757.5295,
+        "finalBestScore": 769.2295,
+        "todayPickScore": 769.2295,
         "wababaType": "종합",
-        "wababaScore": 757.5295,
+        "wababaScore": 769.2295,
         "companySummary": "기계·장비 업종, 매출 226.4%·영업이익 668.7% 동반 성장. ROE 39.8%인데 PER 3.5배로 이익 체력 대비 부담 낮음.",
         "investmentThesis": "기계·장비 업종, 매출 226.4%·영업이익 668.7% 동반 성장. ROE 39.8%인데 PER 3.5배로 이익 체력 대비 부담 낮음.",
         "industryMomentum": "기계·장비 업종: 매출 226.4%·영업이익 668.7% 함께 증가.",
@@ -3790,6 +3863,15 @@
           "영업이익률 19.4%로 수익성 방어",
           "3년 매출 CAGR 39.7%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 39.7% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -3815,7 +3897,7 @@
         "rank": 5,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 757.5295,
+        "exploreScore": 769.2295,
         "isMainPick": false,
         "rankReason": "고ROE, 저PER, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -3896,10 +3978,10 @@
         "opportunityScore": 354.082,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 509.58849999999995,
-        "todayPickScore": 509.58849999999995,
+        "finalBestScore": 516.7885,
+        "todayPickScore": 516.7885,
         "wababaType": "종합",
-        "wababaScore": 509.58849999999995,
+        "wababaScore": 516.7885,
         "companySummary": "오락·문화 업종, 매출 21.3%·영업이익 470.5% 동반 성장. ROE 36.1% 대비 PER 10.0배로 저평가 구간.",
         "investmentThesis": "오락·문화 업종, 매출 21.3%·영업이익 470.5% 동반 성장. ROE 36.1% 대비 PER 10.0배로 저평가 구간.",
         "industryMomentum": "오락·문화 업종: 매출 21.3%·영업이익 470.5% 함께 증가.",
@@ -3967,6 +4049,15 @@
           "영업이익률 16.0%로 수익성 방어",
           "3년 매출 CAGR 27.4%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 오락·문화 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 27.4% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -3992,7 +4083,7 @@
         "rank": 6,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 509.58849999999995,
+        "exploreScore": 516.7885,
         "isMainPick": false,
         "rankReason": "고ROE, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -4053,10 +4144,10 @@
         "opportunityScore": 294.212,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 486.9364999999999,
-        "todayPickScore": 486.9364999999999,
+        "finalBestScore": 494.1364999999999,
+        "todayPickScore": 494.1364999999999,
         "wababaType": "종합",
-        "wababaScore": 486.9364999999999,
+        "wababaScore": 494.1364999999999,
         "companySummary": "금속 업종, 매출 124.0%·영업이익 389.0% 동반 성장. 소재·화학 업황 회복 가능성.",
         "investmentThesis": "금속 업종, 매출 124.0%·영업이익 389.0% 동반 성장. 소재·화학 업황 회복 가능성.",
         "industryMomentum": "금속 업종: 매출 124.0%·영업이익 389.0% 함께 증가.",
@@ -4125,6 +4216,15 @@
           "영업이익률 45.8%로 수익성 방어",
           "3년 매출 CAGR 32.3%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 45,
+        "sectorDurabilityLabel": "안정 수요",
+        "sectorDurabilityReasons": [
+          "안정 수요 · 45점",
+          "산업 금속 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 32.3% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
         "buyReason": [
@@ -4150,7 +4250,7 @@
         "rank": 7,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 486.9364999999999,
+        "exploreScore": 494.1364999999999,
         "isMainPick": false,
         "rankReason": "ROE 안정, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -4211,10 +4311,10 @@
         "opportunityScore": 311.512,
         "qualityPenalty": 8,
         "qualityLevel": "양호",
-        "finalBestScore": 482.23900000000003,
-        "todayPickScore": 482.23900000000003,
+        "finalBestScore": 493.939,
+        "todayPickScore": 493.939,
         "wababaType": "종합",
-        "wababaScore": 482.23900000000003,
+        "wababaScore": 493.939,
         "companySummary": "기계·장비 업종, 매출 106.0%·영업이익 400.5% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
         "investmentThesis": "기계·장비 업종, 매출 106.0%·영업이익 400.5% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
         "industryMomentum": "기계·장비 업종: 매출 106.0%·영업이익 400.5% 함께 증가.",
@@ -4284,6 +4384,15 @@
           "영업이익률 18.4%로 수익성 방어",
           "3년 매출 CAGR 44.0%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 44.0% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -4309,7 +4418,7 @@
         "rank": 8,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 482.23900000000003,
+        "exploreScore": 493.939,
         "isMainPick": false,
         "rankReason": "고ROE, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -4370,10 +4479,10 @@
         "opportunityScore": 307.58000000000004,
         "qualityPenalty": 35,
         "qualityLevel": "보통",
-        "finalBestScore": 398.6685,
-        "todayPickScore": 398.6685,
+        "finalBestScore": 404.9685,
+        "todayPickScore": 404.9685,
         "wababaType": "종합",
-        "wababaScore": 398.6685,
+        "wababaScore": 404.9685,
         "companySummary": "일반서비스 업종, 매출 14.4%·영업이익 360.3% 동반 성장. PER 4.2배 수준으로 이익 대비 밸류 부담 낮음.",
         "investmentThesis": "일반서비스 업종, 매출 14.4%·영업이익 360.3% 동반 성장. PER 4.2배 수준으로 이익 대비 밸류 부담 낮음.",
         "industryMomentum": "일반서비스 업종: 매출 14.4%·영업이익 360.3% 함께 증가.",
@@ -4441,6 +4550,14 @@
           "영업이익률 8.4%로 수익성 추가 확인",
           "성장 힌트 실적"
         ],
+        "growthDurabilityScore": 69,
+        "growthDurabilityLabel": "지속성 양호",
+        "sectorDurabilityScore": 35,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 35점",
+          "산업 일반서비스 (분류 외, 기본 35점)"
+        ],
         "longTermHoldView": "지속성 양호: 분기 실적 유지 여부를 보며 보유",
         "valueBuyPassed": false,
         "buyReason": [
@@ -4466,7 +4583,7 @@
         "rank": 9,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 398.6685,
+        "exploreScore": 404.9685,
         "isMainPick": false,
         "rankReason": "ROE 안정, 저PER, 비교 종목",
         "portfolioDecision": {
@@ -4540,10 +4657,10 @@
         "opportunityScore": 243.76,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 384.5225,
-        "todayPickScore": 384.5225,
+        "finalBestScore": 396.22249999999997,
+        "todayPickScore": 396.22249999999997,
         "wababaType": "종합",
-        "wababaScore": 384.5225,
+        "wababaScore": 396.22249999999997,
         "companySummary": "화학 업종, 매출 78.0%·영업이익 276.6% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
         "investmentThesis": "화학 업종, 매출 78.0%·영업이익 276.6% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
         "industryMomentum": "화학 업종: 매출 78.0%·영업이익 276.6% 함께 증가.",
@@ -4611,6 +4728,15 @@
           "영업이익률 17.5%로 수익성 방어",
           "3년 매출 CAGR 31.5%"
         ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 화학 (기본 60점)",
+          "3년 매출 CAGR 31.5% — 산업 수요가 매출로 이어짐"
+        ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
         "buyReason": [
@@ -4636,7 +4762,7 @@
         "rank": 10,
         "exploreGroup": "total",
         "exploreType": "종합",
-        "exploreScore": 384.5225,
+        "exploreScore": 396.22249999999997,
         "isMainPick": false,
         "rankReason": "고ROE, PER 부담 낮음, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
@@ -4699,8 +4825,8 @@
         "opportunityScore": 862.924,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 1244.3065,
-        "todayPickScore": 1244.3065,
+        "finalBestScore": 1256.0065,
+        "todayPickScore": 1256.0065,
         "wababaType": "안정형",
         "wababaScore": 243.24200000000002,
         "companySummary": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -4769,6 +4895,15 @@
           "ROE 67.1%로 고성장 기준 통과",
           "영업이익률 21.6%로 수익성 방어",
           "3년 매출 CAGR 91.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 91.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -4854,8 +4989,8 @@
         "opportunityScore": 97.69800000000001,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 268.197,
-        "todayPickScore": 268.197,
+        "finalBestScore": 279.897,
+        "todayPickScore": 279.897,
         "wababaType": "안정형",
         "wababaScore": 207.74200000000002,
         "companySummary": "IT 서비스 업종, 영업이익 18.8% 증가. PER 9.1배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -4924,6 +5059,14 @@
           "ROE 20.8%로 고성장 기준 통과",
           "영업이익률 61.6%로 수익성 방어",
           "성장 힌트 실적"
+        ],
+        "growthDurabilityScore": 98,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 IT 서비스 (기본 65점)"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -5031,8 +5174,8 @@
         "opportunityScore": 490.814,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 757.5295,
-        "todayPickScore": 757.5295,
+        "finalBestScore": 769.2295,
+        "todayPickScore": 769.2295,
         "wababaType": "안정형",
         "wababaScore": 201.518,
         "companySummary": "기계·장비 업종, 매출 226.4%·영업이익 668.7% 동반 성장. ROE 39.8%인데 PER 3.5배로 이익 체력 대비 부담 낮음.",
@@ -5101,6 +5244,15 @@
           "ROE 39.8%로 고성장 기준 통과",
           "영업이익률 19.4%로 수익성 방어",
           "3년 매출 CAGR 39.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 39.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -5206,8 +5358,8 @@
         "opportunityScore": 116.382,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 267.7,
-        "todayPickScore": 267.7,
+        "finalBestScore": 279.4,
+        "todayPickScore": 279.4,
         "wababaType": "안정형",
         "wababaScore": 195.97199999999998,
         "companySummary": "IT 서비스 업종, 매출 28.7%·영업이익 34.0% 동반 성장. ROE 24.1%인데 PER 4.5배로 이익 체력 대비 부담 낮음.",
@@ -5277,6 +5429,15 @@
           "ROE 24.1%로 고성장 기준 통과",
           "영업이익률 31.5%로 수익성 방어",
           "성장 힌트 신사업/실적"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 73,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 73점",
+          "산업 IT 서비스 (기본 65점)",
+          "키워드 보조: K콘텐츠·엔터"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -5384,8 +5545,8 @@
         "opportunityScore": 165.74800000000002,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 315.072,
-        "todayPickScore": 315.072,
+        "finalBestScore": 326.772,
+        "todayPickScore": 326.772,
         "wababaType": "안정형",
         "wababaScore": 192.232,
         "companySummary": "화학 업종, 매출 56.7%·영업이익 148.6% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -5454,6 +5615,15 @@
           "ROE 46.0%로 고성장 기준 통과",
           "영업이익률 19.1%로 수익성 방어",
           "3년 매출 CAGR 35.5%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 화학 (기본 60점)",
+          "3년 매출 CAGR 35.5% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -5541,8 +5711,8 @@
         "opportunityScore": 181.486,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 335.538,
-        "todayPickScore": 335.538,
+        "finalBestScore": 344.538,
+        "todayPickScore": 344.538,
         "wababaType": "안정형",
         "wababaScore": 190.392,
         "companySummary": "금융 업종, 매출 36.4%·영업이익 136.8% 동반 성장. PER 6.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -5611,6 +5781,14 @@
           "ROE 12.3%로 고성장 기준 미달",
           "영업이익률 45.3%로 수익성 방어",
           "3년 매출 흐름 약화"
+        ],
+        "growthDurabilityScore": 88,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 50,
+        "sectorDurabilityLabel": "안정 수요",
+        "sectorDurabilityReasons": [
+          "안정 수요 · 50점",
+          "산업 금융 (기본 50점)"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
@@ -5710,8 +5888,8 @@
         "opportunityScore": 102.178,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 237.89500000000004,
-        "todayPickScore": 237.89500000000004,
+        "finalBestScore": 245.09500000000003,
+        "todayPickScore": 245.09500000000003,
         "wababaType": "안정형",
         "wababaScore": 183.96800000000002,
         "companySummary": "일반서비스 업종, 영업이익 15.6% 증가. ROE 28.4%인데 PER 5.4배로 이익 체력 대비 부담 낮음.",
@@ -5780,6 +5958,15 @@
           "ROE 28.4%로 고성장 기준 통과",
           "영업이익률 16.0%로 수익성 방어",
           "3년 매출 CAGR 11.4%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 일반서비스 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 11.4% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -5879,8 +6066,8 @@
         "opportunityScore": 121.05,
         "qualityPenalty": 8,
         "qualityLevel": "양호",
-        "finalBestScore": 269.5025,
-        "todayPickScore": 269.5025,
+        "finalBestScore": 283.9025,
+        "todayPickScore": 283.9025,
         "wababaType": "안정형",
         "wababaScore": 171.69,
         "companySummary": "제약 업종, 매출 55.4%·영업이익 76.8% 동반 성장. ROE 23.5% 대비 PER 10.7배로 저평가 구간.",
@@ -5950,6 +6137,15 @@
           "ROE 23.5%로 고성장 기준 통과",
           "영업이익률 40.7%로 수익성 방어",
           "3년 매출 CAGR 39.1%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 80,
+        "sectorDurabilityLabel": "구조적 성장 산업",
+        "sectorDurabilityReasons": [
+          "구조적 성장 산업 · 80점",
+          "산업 제약 (기본 75점)",
+          "3년 매출 CAGR 39.1% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -6037,8 +6233,8 @@
         "opportunityScore": 949.6,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 1257.9689999999998,
-        "todayPickScore": 1257.9689999999998,
+        "finalBestScore": 1270.5689999999997,
+        "todayPickScore": 1270.5689999999997,
         "wababaType": "안정형",
         "wababaScore": 170.538,
         "companySummary": "전기·전자 업종, 매출 151.0%·영업이익 1439.0% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -6109,6 +6305,15 @@
           "ROE 24.9%로 고성장 기준 통과",
           "영업이익률 21.7%로 수익성 방어",
           "3년 매출 CAGR 24.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 75,
+        "sectorDurabilityLabel": "구조적 성장 산업",
+        "sectorDurabilityReasons": [
+          "구조적 성장 산업 · 75점",
+          "산업 전기·전자 (기본 65점)",
+          "3년 매출 CAGR 24.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -6196,8 +6401,8 @@
         "opportunityScore": 158.60199999999998,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 298.2325,
-        "todayPickScore": 298.2325,
+        "finalBestScore": 305.4325,
+        "todayPickScore": 305.4325,
         "wababaType": "안정형",
         "wababaScore": 169.472,
         "companySummary": "오락·문화 업종, 매출 18.7%·영업이익 109.7% 동반 성장. ROE 26.4%인데 PER 5.7배로 이익 체력 대비 부담 낮음.",
@@ -6266,6 +6471,15 @@
           "ROE 26.4%로 고성장 기준 통과",
           "영업이익률 15.6%로 수익성 방어",
           "3년 매출 CAGR 11.4%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 오락·문화 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 11.4% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -6375,8 +6589,8 @@
         "opportunityScore": 2781.1939999999995,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 3322.611999999999,
-        "todayPickScore": 3322.611999999999,
+        "finalBestScore": 3335.211999999999,
+        "todayPickScore": 3335.211999999999,
         "wababaType": "성장형",
         "wababaScore": 9055.568,
         "companySummary": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
@@ -6445,6 +6659,15 @@
           "ROE 12.2%로 고성장 기준 미달",
           "영업이익률 13.7%로 수익성 방어",
           "3년 매출 CAGR 19.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 IT 서비스 (기본 65점)",
+          "3년 매출 CAGR 19.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
@@ -6532,8 +6755,8 @@
         "opportunityScore": 949.6,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 1257.9689999999998,
-        "todayPickScore": 1257.9689999999998,
+        "finalBestScore": 1270.5689999999997,
+        "todayPickScore": 1270.5689999999997,
         "wababaType": "성장형",
         "wababaScore": 2925.3160000000003,
         "companySummary": "전기·전자 업종, 매출 151.0%·영업이익 1439.0% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -6604,6 +6827,15 @@
           "ROE 24.9%로 고성장 기준 통과",
           "영업이익률 21.7%로 수익성 방어",
           "3년 매출 CAGR 24.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 75,
+        "sectorDurabilityLabel": "구조적 성장 산업",
+        "sectorDurabilityReasons": [
+          "구조적 성장 산업 · 75점",
+          "산업 전기·전자 (기본 65점)",
+          "3년 매출 CAGR 24.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -6691,8 +6923,8 @@
         "opportunityScore": 862.924,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 1244.3065,
-        "todayPickScore": 1244.3065,
+        "finalBestScore": 1256.0065,
+        "todayPickScore": 1256.0065,
         "wababaType": "성장형",
         "wababaScore": 2718.9199999999996,
         "companySummary": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -6761,6 +6993,15 @@
           "ROE 67.1%로 고성장 기준 통과",
           "영업이익률 21.6%로 수익성 방어",
           "3년 매출 CAGR 91.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 91.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -6848,8 +7089,8 @@
         "opportunityScore": 490.814,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 757.5295,
-        "todayPickScore": 757.5295,
+        "finalBestScore": 769.2295,
+        "todayPickScore": 769.2295,
         "wababaType": "성장형",
         "wababaScore": 1400.704,
         "companySummary": "기계·장비 업종, 매출 226.4%·영업이익 668.7% 동반 성장. ROE 39.8%인데 PER 3.5배로 이익 체력 대비 부담 낮음.",
@@ -6918,6 +7159,15 @@
           "ROE 39.8%로 고성장 기준 통과",
           "영업이익률 19.4%로 수익성 방어",
           "3년 매출 CAGR 39.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 39.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -7025,8 +7275,8 @@
         "opportunityScore": 354.082,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 509.58849999999995,
-        "todayPickScore": 509.58849999999995,
+        "finalBestScore": 516.7885,
+        "todayPickScore": 516.7885,
         "wababaType": "성장형",
         "wababaScore": 997.1120000000001,
         "companySummary": "오락·문화 업종, 매출 21.3%·영업이익 470.5% 동반 성장. ROE 36.1% 대비 PER 10.0배로 저평가 구간.",
@@ -7095,6 +7345,15 @@
           "ROE 36.1%로 고성장 기준 통과",
           "영업이익률 16.0%로 수익성 방어",
           "3년 매출 CAGR 27.4%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 오락·문화 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 27.4% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -7182,8 +7441,8 @@
         "opportunityScore": 311.512,
         "qualityPenalty": 8,
         "qualityLevel": "양호",
-        "finalBestScore": 482.23900000000003,
-        "todayPickScore": 482.23900000000003,
+        "finalBestScore": 493.939,
+        "todayPickScore": 493.939,
         "wababaType": "성장형",
         "wababaScore": 843.4839999999999,
         "companySummary": "기계·장비 업종, 매출 106.0%·영업이익 400.5% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
@@ -7254,6 +7513,15 @@
           "ROE 23.1%로 고성장 기준 통과",
           "영업이익률 18.4%로 수익성 방어",
           "3년 매출 CAGR 44.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 44.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -7341,8 +7609,8 @@
         "opportunityScore": 294.212,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 486.9364999999999,
-        "todayPickScore": 486.9364999999999,
+        "finalBestScore": 494.1364999999999,
+        "todayPickScore": 494.1364999999999,
         "wababaType": "성장형",
         "wababaScore": 831.6879999999999,
         "companySummary": "금속 업종, 매출 124.0%·영업이익 389.0% 동반 성장. 소재·화학 업황 회복 가능성.",
@@ -7412,6 +7680,15 @@
           "ROE 14.2%로 고성장 기준 미달",
           "영업이익률 45.8%로 수익성 방어",
           "3년 매출 CAGR 32.3%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 45,
+        "sectorDurabilityLabel": "안정 수요",
+        "sectorDurabilityReasons": [
+          "안정 수요 · 45점",
+          "산업 금속 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 32.3% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
@@ -7498,8 +7775,8 @@
         "opportunityScore": 148.91,
         "qualityPenalty": 34,
         "qualityLevel": "보통",
-        "finalBestScore": 949.1305,
-        "todayPickScore": 949.1305,
+        "finalBestScore": 960.1105,
+        "todayPickScore": 960.1105,
         "wababaType": "성장형",
         "wababaScore": 791.02,
         "companySummary": "SK스퀘어, ‘하이닉스 투자회사’로 영업익 8조8000억 사상 최대",
@@ -7569,6 +7846,15 @@
           "ROE 31.5%로 고성장 기준 통과",
           "영업이익률 623.3%로 수익성 방어",
           "성장 힌트 수주/신사업"
+        ],
+        "growthDurabilityScore": 60,
+        "growthDurabilityLabel": "지속성 양호",
+        "sectorDurabilityScore": 66,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 66점",
+          "산업 기타금융 (기본 50점)",
+          "키워드 보조: AI·반도체 수요"
         ],
         "longTermHoldView": "지속성 양호: 분기 실적 유지 여부를 보며 보유",
         "valueBuyPassed": false,
@@ -7656,8 +7942,8 @@
         "opportunityScore": 307.58000000000004,
         "qualityPenalty": 35,
         "qualityLevel": "보통",
-        "finalBestScore": 398.6685,
-        "todayPickScore": 398.6685,
+        "finalBestScore": 404.9685,
+        "todayPickScore": 404.9685,
         "wababaType": "성장형",
         "wababaScore": 743.456,
         "companySummary": "일반서비스 업종, 매출 14.4%·영업이익 360.3% 동반 성장. PER 4.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -7726,6 +8012,14 @@
           "ROE 13.4%로 고성장 기준 미달",
           "영업이익률 8.4%로 수익성 추가 확인",
           "성장 힌트 실적"
+        ],
+        "growthDurabilityScore": 69,
+        "growthDurabilityLabel": "지속성 양호",
+        "sectorDurabilityScore": 35,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 35점",
+          "산업 일반서비스 (분류 외, 기본 35점)"
         ],
         "longTermHoldView": "지속성 양호: 분기 실적 유지 여부를 보며 보유",
         "valueBuyPassed": false,
@@ -7826,8 +8120,8 @@
         "opportunityScore": 243.76,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 384.5225,
-        "todayPickScore": 384.5225,
+        "finalBestScore": 396.22249999999997,
+        "todayPickScore": 396.22249999999997,
         "wababaType": "성장형",
         "wababaScore": 585.652,
         "companySummary": "화학 업종, 매출 78.0%·영업이익 276.6% 동반 성장. PER 12.0배로 가격 부담 낮은 편.",
@@ -7896,6 +8190,15 @@
           "ROE 15.4%로 고성장 기준 통과",
           "영업이익률 17.5%로 수익성 방어",
           "3년 매출 CAGR 31.5%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 화학 (기본 60점)",
+          "3년 매출 CAGR 31.5% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -7985,8 +8288,8 @@
         "opportunityScore": 180.55599999999998,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 291.3445,
-        "todayPickScore": 291.3445,
+        "finalBestScore": 302.1445,
+        "todayPickScore": 302.1445,
         "wababaType": "기회형",
         "wababaScore": 180.55599999999998,
         "companySummary": "HD한국조선해양, 영업익 183%↑ \"27년까지 마진 담보\"...목표가 일제히 '상향' [주가동향]",
@@ -8055,6 +8358,16 @@
           "ROE 17.3%로 고성장 기준 통과",
           "영업이익률 13.0%로 수익성 방어",
           "3년 매출 CAGR 20.1%"
+        ],
+        "growthDurabilityScore": 97,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 기타금융 (기본 50점)",
+          "키워드 보조: 조선·해양 업황",
+          "3년 매출 CAGR 20.1% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
@@ -8142,8 +8455,8 @@
         "opportunityScore": 149.368,
         "qualityPenalty": 20,
         "qualityLevel": "보통",
-        "finalBestScore": 236.32800000000003,
-        "todayPickScore": 236.32800000000003,
+        "finalBestScore": 247.668,
+        "todayPickScore": 247.668,
         "wababaType": "기회형",
         "wababaScore": 149.368,
         "companySummary": "한전기술, 실적 개선세+신규 수주 기대감...목표주가 '상향' [키움證] [주가동향] ROE 17.6%인데 PER 3.1배로 이익 체력 대비 부담 낮음.",
@@ -8213,6 +8526,15 @@
           "ROE 17.6%로 고성장 기준 통과",
           "영업이익률 13.8%로 수익성 방어",
           "3년 매출 CAGR 11.0%"
+        ],
+        "growthDurabilityScore": 82,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 63,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 63점",
+          "산업 전기·가스 (기본 50점)",
+          "3년 매출 CAGR 11.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -8299,8 +8621,8 @@
         "opportunityScore": 148.91,
         "qualityPenalty": 34,
         "qualityLevel": "보통",
-        "finalBestScore": 949.1305,
-        "todayPickScore": 949.1305,
+        "finalBestScore": 960.1105,
+        "todayPickScore": 960.1105,
         "wababaType": "기회형",
         "wababaScore": 148.91,
         "companySummary": "SK스퀘어, ‘하이닉스 투자회사’로 영업익 8조8000억 사상 최대",
@@ -8370,6 +8692,15 @@
           "ROE 31.5%로 고성장 기준 통과",
           "영업이익률 623.3%로 수익성 방어",
           "성장 힌트 수주/신사업"
+        ],
+        "growthDurabilityScore": 60,
+        "growthDurabilityLabel": "지속성 양호",
+        "sectorDurabilityScore": 66,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 66점",
+          "산업 기타금융 (기본 50점)",
+          "키워드 보조: AI·반도체 수요"
         ],
         "longTermHoldView": "지속성 양호: 분기 실적 유지 여부를 보며 보유",
         "valueBuyPassed": false,
@@ -8456,8 +8787,8 @@
         "opportunityScore": 124.90599999999999,
         "qualityPenalty": 20,
         "qualityLevel": "보통",
-        "finalBestScore": 199.37399999999997,
-        "todayPickScore": 199.37399999999997,
+        "finalBestScore": 211.25399999999996,
+        "todayPickScore": 211.25399999999996,
         "wababaType": "기회형",
         "wababaScore": 124.90599999999999,
         "companySummary": "현대로템, \"실적은 호흡 조절ㆍ수주는 충전 중\"...목표가 '유지' [주가동향] PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -8529,6 +8860,15 @@
           "ROE 16.6%로 고성장 기준 통과",
           "영업이익률 8.7%로 수익성 추가 확인",
           "성장 힌트 수주/신사업"
+        ],
+        "growthDurabilityScore": 81,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 66,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 66점",
+          "산업 증권 (기본 50점)",
+          "키워드 보조: AI·반도체 수요"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -8637,8 +8977,8 @@
         "opportunityScore": 104.956,
         "qualityPenalty": 8,
         "qualityLevel": "양호",
-        "finalBestScore": 177.994,
-        "todayPickScore": 177.994,
+        "finalBestScore": 185.194,
+        "todayPickScore": 185.194,
         "wababaType": "기회형",
         "wababaScore": 104.956,
         "companySummary": "[CEO투데이] '최대 실적' 현대글로비스 이규복 사장의 4년차 혁신경영 ROE 16.7% 대비 PER 11.6배로 저평가 구간.",
@@ -8707,6 +9047,14 @@
           "ROE 16.7%로 고성장 기준 통과",
           "영업이익률 7.0%로 수익성 추가 확인",
           "3년 매출 CAGR 3.1%"
+        ],
+        "growthDurabilityScore": 80,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 운송·창고 (분류 외, 기본 35점)"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -8794,8 +9142,8 @@
         "opportunityScore": 2781.1939999999995,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 3322.611999999999,
-        "todayPickScore": 3322.611999999999,
+        "finalBestScore": 3335.211999999999,
+        "todayPickScore": 3335.211999999999,
         "wababaType": "기회형",
         "wababaScore": 2781.1939999999995,
         "companySummary": "IT 서비스 업종, 매출 27.7%·영업이익 4515.0% 동반 성장. PER 12.9배로 가격 부담 낮은 편.",
@@ -8864,6 +9212,15 @@
           "ROE 12.2%로 고성장 기준 미달",
           "영업이익률 13.7%로 수익성 방어",
           "3년 매출 CAGR 19.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 70,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 70점",
+          "산업 IT 서비스 (기본 65점)",
+          "3년 매출 CAGR 19.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": false,
@@ -8951,8 +9308,8 @@
         "opportunityScore": 949.6,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 1257.9689999999998,
-        "todayPickScore": 1257.9689999999998,
+        "finalBestScore": 1270.5689999999997,
+        "todayPickScore": 1270.5689999999997,
         "wababaType": "기회형",
         "wababaScore": 949.6,
         "companySummary": "전기·전자 업종, 매출 151.0%·영업이익 1439.0% 동반 성장. PER 9.4배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -9023,6 +9380,15 @@
           "ROE 24.9%로 고성장 기준 통과",
           "영업이익률 21.7%로 수익성 방어",
           "3년 매출 CAGR 24.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 75,
+        "sectorDurabilityLabel": "구조적 성장 산업",
+        "sectorDurabilityReasons": [
+          "구조적 성장 산업 · 75점",
+          "산업 전기·전자 (기본 65점)",
+          "3년 매출 CAGR 24.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -9110,8 +9476,8 @@
         "opportunityScore": 862.924,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 1244.3065,
-        "todayPickScore": 1244.3065,
+        "finalBestScore": 1256.0065,
+        "todayPickScore": 1256.0065,
         "wababaType": "기회형",
         "wababaScore": 862.924,
         "companySummary": "기계·장비 업종, 매출 356.7%·영업이익 1310.5% 동반 성장. PER 8.2배 수준으로 이익 대비 밸류 부담 낮음.",
@@ -9180,6 +9546,15 @@
           "ROE 67.1%로 고성장 기준 통과",
           "영업이익률 21.6%로 수익성 방어",
           "3년 매출 CAGR 91.0%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 91.0% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -9267,8 +9642,8 @@
         "opportunityScore": 490.814,
         "qualityPenalty": 0,
         "qualityLevel": "양호",
-        "finalBestScore": 757.5295,
-        "todayPickScore": 757.5295,
+        "finalBestScore": 769.2295,
+        "todayPickScore": 769.2295,
         "wababaType": "기회형",
         "wababaScore": 490.814,
         "companySummary": "기계·장비 업종, 매출 226.4%·영업이익 668.7% 동반 성장. ROE 39.8%인데 PER 3.5배로 이익 체력 대비 부담 낮음.",
@@ -9337,6 +9712,15 @@
           "ROE 39.8%로 고성장 기준 통과",
           "영업이익률 19.4%로 수익성 방어",
           "3년 매출 CAGR 39.7%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 65,
+        "sectorDurabilityLabel": "회복 사이클",
+        "sectorDurabilityReasons": [
+          "회복 사이클 · 65점",
+          "산업 기계·장비 (기본 60점)",
+          "3년 매출 CAGR 39.7% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
@@ -9444,8 +9828,8 @@
         "opportunityScore": 354.082,
         "qualityPenalty": 22,
         "qualityLevel": "보통",
-        "finalBestScore": 509.58849999999995,
-        "todayPickScore": 509.58849999999995,
+        "finalBestScore": 516.7885,
+        "todayPickScore": 516.7885,
         "wababaType": "기회형",
         "wababaScore": 354.082,
         "companySummary": "오락·문화 업종, 매출 21.3%·영업이익 470.5% 동반 성장. ROE 36.1% 대비 PER 10.0배로 저평가 구간.",
@@ -9514,6 +9898,15 @@
           "ROE 36.1%로 고성장 기준 통과",
           "영업이익률 16.0%로 수익성 방어",
           "3년 매출 CAGR 27.4%"
+        ],
+        "growthDurabilityScore": 100,
+        "growthDurabilityLabel": "장기보유 후보",
+        "sectorDurabilityScore": 40,
+        "sectorDurabilityLabel": "단기 테마",
+        "sectorDurabilityReasons": [
+          "단기 테마 · 40점",
+          "산업 오락·문화 (분류 외, 기본 35점)",
+          "3년 매출 CAGR 27.4% — 산업 수요가 매출로 이어짐"
         ],
         "longTermHoldView": "장기보유 후보: 성장이 유지되면 3년 이상 보유 가능",
         "valueBuyPassed": true,
