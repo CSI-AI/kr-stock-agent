@@ -2,6 +2,18 @@ import { ScrollRestore } from "./_components/ScrollRestore";
 import { WababaRunPanel } from "./_components/WababaRunPanel";
 import { WababaAutoDailyPanel } from "./_components/WababaAutoDailyPanel";
 import { PriceRefreshButton } from "./_components/PriceRefreshButton";
+import {
+  buildPortfolioState,
+  type PortfolioHoldingInput,
+} from "@/lib/wababa/build-portfolio-state";
+import { buildPortfolioDriftTimeline } from "@/lib/wababa/build-portfolio-drift";
+import { buildPortfolioActionLayer } from "@/lib/wababa/build-portfolio-action";
+import {
+  loadPortfolioSnapshots,
+  getPreviousPortfolioSnapshot,
+  snapshotToDriftSnapshot,
+  type PortfolioSnapshot,
+} from "@/lib/wababa/snapshot/portfolio-snapshot";
 
 import fs from "fs";
 import path from "path";
@@ -285,6 +297,55 @@ function readHoldingReview(history: AnyRecord, key: string): AnyRecord[] {
   return getArray(getObject(history[key]).items);
 }
 
+function collectMetadataByCode(history: AnyRecord): Map<string, AnyRecord> {
+  const map = new Map<string, AnyRecord>();
+  const sources: AnyRecord[] = [];
+
+  const picks = getArray(history.wababaPicks);
+  sources.push(...picks);
+
+  const exploreGroups = getObject(history.exploreGroups);
+  for (const value of Object.values(exploreGroups)) {
+    if (Array.isArray(value)) {
+      sources.push(...getArray(value));
+    }
+  }
+
+  for (const item of sources) {
+    const code = getCode(item);
+    if (code && !map.has(code)) {
+      map.set(code, item);
+    }
+  }
+  return map;
+}
+
+function buildHoldingsForState(
+  positions: AnyRecord[],
+  history: AnyRecord,
+): PortfolioHoldingInput[] {
+  const metaByCode = collectMetadataByCode(history);
+  return positions.map((pos) => {
+    const code = getCode(pos);
+    const meta = metaByCode.get(code) || {};
+    const per = getNumber(meta.per) ?? getNumber(meta.PER) ?? undefined;
+    return {
+      code: code || undefined,
+      name: getName(pos) || getName(meta) || undefined,
+      industryName: getString(meta.industryName) || undefined,
+      sectorDurabilityLabel:
+        getString(meta.sectorDurabilityLabel) || undefined,
+      growthDurabilityLabel:
+        getString(meta.growthDurabilityLabel) || undefined,
+      growthConsistencyLabel:
+        getString(meta.growthConsistencyLabel) || undefined,
+      longTermHoldView: getString(meta.longTermHoldView) || undefined,
+      industryTailwind: getString(meta.industryTailwind) || undefined,
+      per: per === null ? undefined : per,
+    };
+  });
+}
+
 function getFundData(history: AnyRecord, theme: FundTheme) {
   const isAi = theme.key === "ai";
   const summary = isAi
@@ -438,12 +499,153 @@ function CashDonut({
   );
 }
 
-function FundCard({
+function PortfolioStateBanner({
   history,
   theme,
+  positions,
+  cashRatePercent,
+  snapshots,
 }: {
   history: AnyRecord;
   theme: FundTheme;
+  positions: AnyRecord[];
+  cashRatePercent: number | null;
+  snapshots: PortfolioSnapshot[];
+}) {
+  const holdings = buildHoldingsForState(positions, history);
+  const state = buildPortfolioState({
+    fundKey: theme.key,
+    holdings,
+    cashRatePercent: cashRatePercent ?? undefined,
+    totalPositions: positions.length,
+  });
+
+  // Phase 37-A9: drift timeline. 현재 시점 ratios만 계산.
+  // 과거 ratios snapshot이 데이터에 없으면 함수가 DATA_LIMITED로 처리.
+  const totalHoldings = holdings.length;
+  const longHoldCount = holdings.filter(
+    (h) =>
+      (h.longTermHoldView || "").includes("장기보유") ||
+      (h.growthDurabilityLabel || "").includes("장기보유"),
+  ).length;
+  const cycleCount = holdings.filter((h) =>
+    (h.sectorDurabilityLabel || "").includes("회복 사이클"),
+  ).length;
+  const valCount = holdings.filter(
+    (h) => typeof h.per === "number" && (h.per as number) > 25,
+  ).length;
+
+  // Phase 37-A12: snapshot에서 previous 자동 lookup.
+  // snapshot/previous 결측 시 안전 fallback (DATA_LIMITED).
+  const currentDate = getString(history.baseDate) || undefined;
+  const previousSnap = getPreviousPortfolioSnapshot({
+    fundKey: theme.key,
+    currentDate,
+    snapshots,
+  });
+  const previousInput = snapshotToDriftSnapshot(previousSnap);
+
+  const drift = buildPortfolioDriftTimeline({
+    fundKey: theme.key,
+    current: {
+      date: currentDate,
+      longHoldRatio: totalHoldings > 0 ? longHoldCount / totalHoldings : 0,
+      cycleRatio: totalHoldings > 0 ? cycleCount / totalHoldings : 0,
+      valuationStretchedRatio:
+        totalHoldings > 0 ? valCount / totalHoldings : 0,
+      cashRatePercent: cashRatePercent ?? undefined,
+      totalPositions: totalHoldings,
+    },
+    previous: previousInput,
+  });
+
+  // Phase 37-A10: Action Layer. drift direction을 운영 모드 결정에 활용.
+  const action = buildPortfolioActionLayer({
+    fundKey: theme.key,
+    holdings,
+    cashRatePercent: cashRatePercent ?? undefined,
+    driftDirection: drift.driftDirection,
+    totalPositions: totalHoldings,
+  });
+
+  const chipClass =
+    state.portfolioHealthLevel === "건강"
+      ? "portfolioHealthChip portfolioHealthChip--healthy"
+      : "portfolioHealthChip portfolioHealthChip--watch";
+
+  return (
+    <div
+      className="portfolioStateBanner"
+      style={{ borderColor: theme.border, background: theme.soft }}
+    >
+      <div className="portfolioStateRow">
+        <span className={chipClass}>{state.portfolioHealthLevel}</span>
+        <span
+          className="portfolioStateTitleText"
+          style={{ color: theme.primary }}
+        >
+          {state.portfolioStateTitle}
+        </span>
+      </div>
+      <div className="portfolioStateText">
+        {state.portfolioStateNarrative}
+      </div>
+      {state.portfolioStateTags.length > 0 ? (
+        <div className="portfolioStateTagRow">
+          {state.portfolioStateTags.map((tag) => (
+            <span
+              key={`${theme.key}-pst-${tag}`}
+              className="portfolioStateTag"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      <div className="portfolioDriftRow">
+        <span className="portfolioDriftLabel">상태 흐름</span>
+        <span className="portfolioDriftText">
+          {drift.driftNarrative}
+        </span>
+      </div>
+      <div className="portfolioActionRow">
+        <span
+          className="portfolioActionLabel"
+          style={{ color: theme.primary }}
+        >
+          오늘의 운영 포인트
+        </span>
+        <span className="portfolioActionText">{action.actionNarrative}</span>
+      </div>
+      {action.actionTags.length > 0 ? (
+        <div className="portfolioActionTagRow">
+          {action.actionTags.map((tag) => (
+            <span
+              key={`${theme.key}-pa-${tag}`}
+              className="portfolioActionTag"
+              style={{
+                background: theme.soft,
+                color: theme.primary,
+                borderColor: theme.border,
+              }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function FundCard({
+  history,
+  theme,
+  snapshots,
+}: {
+  history: AnyRecord;
+  theme: FundTheme;
+  snapshots: PortfolioSnapshot[];
 }) {
   const data = getFundData(history, theme);
   const memoLines =
@@ -500,6 +702,14 @@ function FundCard({
         </div>
         <span className="statusPill">{theme.badge}</span>
       </div>
+
+      <PortfolioStateBanner
+        history={history}
+        theme={theme}
+        positions={data.positions}
+        cashRatePercent={data.cashRate}
+        snapshots={snapshots}
+      />
 
       <div className="fundTopGrid">
         <div className="fundMetricMain">
@@ -1304,66 +1514,77 @@ export default async function StrategyLabPage() {
   const history = readRecommendationHistory();
   const wababaCandidates = buildWababaCandidates(history);
   const aiCandidates = buildAiCandidates(history);
+  // Phase 37-A12: 1회 server-side snapshot load. 결측 시 빈 배열, fallback OK.
+  const snapshots = loadPortfolioSnapshots();
 
   return (
     <main className="dashboardRoot">
       <ScrollRestore />
       <style>{dashboardCss}</style>
       <TopBar history={history} />
+
+      {/* 화면 상단 — 헤드라인과 핵심 요약. PC/모바일 동일하게 width 전체 */}
       <BestPickHero history={history} />
-
-      <section className="candidatesGrid">
-        <CandidateSection
-          title="오늘의 매수 후보 TOP 5"
-          subtitle="와바바 가치투자 기준"
-          items={wababaCandidates}
-          theme={WABABA_THEME}
-        />
-        <CandidateSection
-          title="AI 발굴 유망 종목 TOP 5"
-          subtitle="와바바AI 자율운용 기준"
-          items={aiCandidates}
-          theme={AI_THEME}
-        />
-      </section>
-
       <GlobalSummary history={history} />
 
-      <section className="fundsGrid">
-        <FundCard history={history} theme={WABABA_THEME} />
-        <FundCard history={history} theme={AI_THEME} />
-      </section>
+      {/* 본문 2단 대시보드. lg 1180px 이상에서 좌/우 분할, 그 미만은 자동 1열 */}
+      <div className="dashboardGrid">
+        <div className="dashboardCol dashboardCol--left">
+          <section className="candidatesGrid">
+            <CandidateSection
+              title="오늘의 매수 후보 TOP 5"
+              subtitle="와바바 가치투자 기준"
+              items={wababaCandidates}
+              theme={WABABA_THEME}
+            />
+            <CandidateSection
+              title="AI 발굴 유망 종목 TOP 5"
+              subtitle="와바바AI 자율운용 기준"
+              items={aiCandidates}
+              theme={AI_THEME}
+            />
+          </section>
 
-      <ComparisonSection history={history} />
+          <ComparisonSection history={history} />
+        </div>
 
-      <details className="philosophyDetails">
-        <summary className="philosophySummary">운용 원칙 보기</summary>
-        <PhilosophySection />
-      </details>
+        <div className="dashboardCol dashboardCol--right">
+          <section className="fundsGrid">
+            <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
+            <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
+          </section>
 
-      <details className="operationDetails">
-        <summary className="operationSummary">
-          자동운용 상태 · 필요 시 펼쳐서 실행/상세 확인
-        </summary>
-        <section className="actionPanel">
-          <div>
-            <div className="sectionTitle">운용 실행</div>
-            <p>
-              두 펀드 자동운용은 같은 API에서 함께 실행됩니다. 오늘 데이터 생성은
-              분석을 갱신하고, 자동운용은 날짜별 락으로 중복매수를 막습니다.
-            </p>
-          </div>
-          <div className="actionPanelButtons">
-            <div className="compactPanel">
-              <WababaRunPanel />
-            </div>
-            <PriceRefreshButton />
-            <a href="/strategy-lab/reviewed">넘긴 종목</a>
-          </div>
-        </section>
+          <details className="philosophyDetails">
+            <summary className="philosophySummary">운용 원칙 보기</summary>
+            <PhilosophySection />
+          </details>
 
-        <WababaAutoDailyPanel />
-      </details>
+          <details className="operationDetails">
+            <summary className="operationSummary">
+              자동운용 상태 · 필요 시 펼쳐서 실행/상세 확인
+            </summary>
+            <section className="actionPanel">
+              <div>
+                <div className="sectionTitle">운용 실행</div>
+                <p>
+                  두 펀드 자동운용은 같은 API에서 함께 실행됩니다. 오늘
+                  데이터 생성은 분석을 갱신하고, 자동운용은 날짜별 락으로
+                  중복매수를 막습니다.
+                </p>
+              </div>
+              <div className="actionPanelButtons">
+                <div className="compactPanel">
+                  <WababaRunPanel />
+                </div>
+                <PriceRefreshButton />
+                <a href="/strategy-lab/reviewed">넘긴 종목</a>
+              </div>
+            </section>
+
+            <WababaAutoDailyPanel />
+          </details>
+        </div>
+      </div>
     </main>
   );
 }
@@ -1583,7 +1804,158 @@ const dashboardCss = `
   .lineChart { width: 100%; height: 240px; display: block; }
   .compareTable th, .compareTable td { text-align: center; }
   .compareTable th:first-child, .compareTable td:first-child { text-align: left; color: #475569; }
-  .candidatesGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 22px; min-width: 0; }
+  .candidatesGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 0; min-width: 0; }
+  .portfolioStateBanner {
+    border: 1px solid;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .portfolioStateRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .portfolioHealthChip {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 950;
+    white-space: nowrap;
+  }
+  .portfolioHealthChip--healthy {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+  .portfolioHealthChip--watch {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+  }
+  .portfolioStateTitleText {
+    font-size: 14px;
+    font-weight: 950;
+    letter-spacing: -0.01em;
+    min-width: 0;
+  }
+  .portfolioStateText {
+    color: #475569;
+    font-size: 12.5px;
+    font-weight: 850;
+    line-height: 1.5;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .portfolioStateTagRow {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .portfolioStateTag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .portfolioDriftRow {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding-top: 8px;
+    margin-top: 2px;
+    border-top: 1px dashed #cbd5e1;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .portfolioDriftLabel {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 950;
+    white-space: nowrap;
+    padding-top: 1px;
+  }
+  .portfolioDriftText {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .portfolioActionRow {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding-top: 6px;
+    margin-top: 2px;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .portfolioActionLabel {
+    font-size: 11px;
+    font-weight: 950;
+    white-space: nowrap;
+    padding-top: 1px;
+    letter-spacing: -0.01em;
+  }
+  .portfolioActionText {
+    color: #475569;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .portfolioActionTagRow {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin-top: 2px;
+  }
+  .portfolioActionTag {
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .dashboardGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+    min-width: 0;
+    align-items: start;
+  }
+  .dashboardCol {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-width: 0;
+    max-width: 100%;
+  }
+  @media (min-width: 1180px) {
+    .dashboardGrid {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    }
+  }
   .candidateHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
   .candidateHeader h3 { margin: 0; font-size: 20px; font-weight: 950; }
   .candidateHeader p { margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 850; }
