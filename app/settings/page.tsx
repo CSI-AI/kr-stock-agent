@@ -1,0 +1,42 @@
+import { AppNav } from "../_dashboard/AppNav";
+import {
+  DashboardStyles,
+  readRecommendationHistory,
+  formatShortDate,
+  PhilosophySection,
+} from "../_dashboard/kit";
+
+export const dynamic = "force-dynamic";
+
+// 설정 — 운용 규칙 / 데이터 기준 / 관리 링크.
+// 자동운용 실행 패널(WababaRunPanel 등)은 lib/strategy/strategy-store 결함으로
+// 현재 빌드 불가 상태라 제외. 복구 후 재연결 예정(남은 작업 참고).
+export default function SettingsPage() {
+  const history = readRecommendationHistory();
+
+  return (
+    <main className="dashboardRoot">
+      <DashboardStyles />
+      <AppNav updatedAt={formatShortDate(history.generatedAt)} />
+
+      <section className="actionPanel">
+        <div>
+          <div className="sectionTitle">데이터 기준</div>
+          <p>
+            마지막 데이터 생성: {formatShortDate(history.generatedAt)} · 기준일{" "}
+            {formatShortDate(history.baseDate)}. 두 펀드 자동운용은 매일 같은
+            파이프라인에서 함께 실행됩니다.
+          </p>
+        </div>
+        <div className="actionPanelButtons">
+          <a href="/strategy-lab/reviewed">넘긴 종목 관리</a>
+        </div>
+      </section>
+
+      <details className="philosophyDetails">
+        <summary className="philosophySummary">운용 원칙 보기</summary>
+        <PhilosophySection />
+      </details>
+    </main>
+  );
+}
