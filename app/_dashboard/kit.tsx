@@ -911,54 +911,21 @@ function HoldingTable({
 
       <div className="holdingCardList">
         {rows.map((r) => (
-          <div key={r.key} className="holdingCard">
-            <div className="holdingCardHeader">
-              <div className="holdingCardName">
-                <b>{r.name}</b>
-                <span>{r.code}</span>
-              </div>
-              <div className="holdingCardProfit">
-                <div
-                  className="holdingCardProfitRate"
-                  style={{ color: toneColor(r.profitRate) }}
-                >
-                  {formatPercent(r.profitRate)}
-                </div>
-                <div
-                  className="holdingCardProfitAmount"
-                  style={{ color: toneColor(r.profitAmount) }}
-                >
-                  {formatKrw(r.profitAmount)}
-                </div>
-              </div>
+          <div key={r.key} className="holdRow">
+            <div className="holdRowMain">
+              <span className="holdRowName">{r.name}</span>
+              <span
+                className="holdRowRate"
+                style={{ color: toneColor(r.profitRate) }}
+              >
+                {formatPercent(r.profitRate)}
+              </span>
             </div>
-            <div className="holdingCardRow">
-              <div className="holdingCardField">
-                <span>수량</span>
-                <b>{formatNumber(r.quantity, 0)}주</b>
-              </div>
-              <div className="holdingCardField">
-                <span>평균단가</span>
-                <b>{formatKrw(r.buyPrice)}</b>
-              </div>
-              <div className="holdingCardField">
-                <span>현재가</span>
-                <b>{formatKrw(r.currentPrice)}</b>
-              </div>
-            </div>
-            <div className="holdingCardRow">
-              <div className="holdingCardField">
-                <span>평가금액</span>
-                <b>{formatKrw(r.evalAmount)}</b>
-              </div>
-              <div className="holdingCardField">
-                <span>비중</span>
-                <b>{formatPercent(r.weight, 1)}</b>
-              </div>
-              <div className="holdingCardField">
-                <span>보유기간</span>
-                <b>{r.holdingDays}</b>
-              </div>
+            <div className="holdRowSub">
+              <span>평가 {formatKrw(r.evalAmount)}</span>
+              <span>비중 {formatPercent(r.weight, 1)}</span>
+              <span>평단 {formatKrw(r.buyPrice)}</span>
+              <span>현재 {formatKrw(r.currentPrice)}</span>
             </div>
           </div>
         ))}
@@ -1670,18 +1637,13 @@ const dashboardCss = `
   .holdingHeader h3 { margin: 0; font-size: 18px; font-weight: 950; }
   .holdingHeader span { color: #2563eb; }
   .holdingCardList { display: none; }
-  .holdingCard { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 13px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03); }
-  .holdingCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid #eef2f7; }
-  .holdingCardName b { display: block; color: #0f172a; font-size: 15px; font-weight: 950; line-height: 1.2; }
-  .holdingCardName span { display: block; color: #64748b; font-size: 11px; font-weight: 850; margin-top: 2px; }
-  .holdingCardProfit { text-align: right; min-width: 0; }
-  .holdingCardProfitRate { font-size: 16px; font-weight: 950; letter-spacing: -0.02em; line-height: 1.2; }
-  .holdingCardProfitAmount { font-size: 12px; font-weight: 900; margin-top: 2px; }
-  .holdingCardRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; margin-bottom: 6px; }
-  .holdingCardRow:last-child { margin-bottom: 0; }
-  .holdingCardField { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .holdingCardField span { color: #94a3b8; font-size: 10px; font-weight: 900; }
-  .holdingCardField b { color: #0f172a; font-size: 12px; font-weight: 950; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Phase 38-D: 보유 종목 compact 1행 (종목당 2줄) */
+  .holdRow { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 11px; }
+  .holdRowMain { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .holdRowName { color: #0f172a; font-size: 14px; font-weight: 900; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .holdRowRate { font-size: 14px; font-weight: 950; letter-spacing: -0.02em; white-space: nowrap; }
+  .holdRowSub { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: 800; }
+  .holdRowSub span { white-space: nowrap; }
   .holdingTableWrap, .candidateTableWrap { width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #e2e8f0; border-radius: 16px; }
   .candidateTableWrap { border: none; border-radius: 0; }
   .holdingTable, .candidateTable, .compareTable { width: 100%; border-collapse: collapse; table-layout: auto; }
@@ -1980,7 +1942,7 @@ const dashboardCss = `
     .bestHeroReason { font-size: 13px; }
     .bestHeroMetricsRow { gap: 5px; }
     .holdingTableWrap { display: none; }
-    .holdingCardList { display: flex; flex-direction: column; gap: 10px; }
+    .holdingCardList { display: flex; flex-direction: column; gap: 6px; }
     .candidateCardRow { padding: 12px 13px; }
     .candidateCardHeader { align-items: center; gap: 10px; padding-bottom: 10px; margin-bottom: 10px; }
     .candidateCardLead { flex: 1 1 auto; gap: 10px; }
@@ -1998,7 +1960,6 @@ const dashboardCss = `
     .fundCoreItem { border-left: none; padding: 8px 0; border-top: 1px solid #e2e8f0; }
     .fundCoreItem:first-child { border-top: none; padding-top: 0; }
     .fundCoreItem:last-child { padding-bottom: 0; }
-    .holdingCardRow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 `;
 
