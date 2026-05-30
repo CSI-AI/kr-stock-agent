@@ -35,6 +35,16 @@ const ACTION_TITLES: Record<PortfolioActionMode, string> = {
   GROWTH_FOCUS: "장기 성장 가설 중심",
 };
 
+// 와바바AI펀드 전용 제목 — 재무·뉴스·성장신호 기반 기회·리스크 탐색 톤.
+// 차트·거래량·추세·모멘텀·변동성 등 미구현 신호어는 쓰지 않음.
+const ACTION_TITLES_AI: Record<PortfolioActionMode, string> = {
+  OBSERVATION: "시장 기회 탐색 중심",
+  BALANCED: "기회·리스크 균형 감지",
+  CYCLE_WATCH: "사이클 리스크 감지",
+  CASH_READY: "현금 보유·기회 대기",
+  GROWTH_FOCUS: "성장 신호 집중",
+};
+
 // Mode별 4 variant. 차분한 PM 톤. 미래 단정/매수·매도 권유 표현 금지.
 const ACTION_NARRATIVES: Record<PortfolioActionMode, ReadonlyArray<string>> = {
   OBSERVATION: [
@@ -69,12 +79,55 @@ const ACTION_NARRATIVES: Record<PortfolioActionMode, ReadonlyArray<string>> = {
   ],
 };
 
+// 와바바AI펀드 전용 narrative — 재무·뉴스·실적·성장신호 기반 기회·리스크 감지 톤.
+// 차트·거래량·추세·모멘텀·변동성 등 아직 입력 feature에 없는 신호어는 쓰지 않음.
+const ACTION_NARRATIVES_AI: Record<PortfolioActionMode, ReadonlyArray<string>> = {
+  OBSERVATION: [
+    "현재는 신규 확대보다 시장 기회 변화를 우선 탐색하는 상태.",
+    "뚜렷한 신호 변화가 감지되지 않아 탐색 중심으로 운영하는 구간.",
+    "현재 구성을 유지하며 실적·뉴스 신호가 잡힐 때까지 탐색하는 모드.",
+    "데이터 신호가 충분히 누적되기 전까지는 탐색 우선으로 운영하는 시점.",
+  ],
+  BALANCED: [
+    "현재 구성을 유지하며 실적·성장신호 지속 여부를 감지 중.",
+    "큰 방향 전환 신호 없이 균형을 유지하며 기회·리스크를 함께 감지하는 운영.",
+    "산업·실적 신호를 보면서 균형 비중을 유지하는 단계.",
+    "특별 신호 없이 흐름 유지와 시장 기회 감지를 함께 진행하는 모드.",
+  ],
+  CYCLE_WATCH: [
+    "회복 사이클형 종목 비중이 있어 리스크를 함께 감지하는 운영 상태.",
+    "회복 사이클 비중을 두고 사이클 지속 여부를 단계적으로 감지하는 운영.",
+    "사이클 노출이 일부 존재해 단기 리스크와 기회를 함께 보는 모드.",
+    "회복 사이클형 비중을 두고 사이클 지속 여부를 우선 감지하는 단계.",
+  ],
+  CASH_READY: [
+    "현금 비중이 높은 상태로 새로운 시장 기회를 탐색할 여력이 유지되는 구성.",
+    "현금이 충분히 확보되어 기회 포착에 여유가 있는 운영 모드.",
+    "현금 비중 우세 상태로 신규 진입은 신호 확인 후 검토하며 탐색 우선.",
+    "현금이 두텁게 유지되어 새로운 기회 신호가 잡힐 때까지 탐색을 이어가는 단계.",
+  ],
+  GROWTH_FOCUS: [
+    "성장신호 우호 종목 중심으로 지속 여부를 감지하는 포트폴리오.",
+    "성장신호 비중이 우세해 지속 여부를 핵심으로 보는 운영 모드.",
+    "실적·성장신호 우호 종목 중심 구성으로 신호 지속을 우선 감지.",
+    "성장신호 우호 종목 중심 비중을 두고 신호 유지 여부를 단계별로 감지하는 단계.",
+  ],
+};
+
 const ACTION_TAGS: Record<PortfolioActionMode, ReadonlyArray<string>> = {
   OBSERVATION: ["관찰 우선", "흐름 변화 점검", "신규 보수적 검토"],
   BALANCED: ["균형 유지", "실적 지속 점검", "흐름 관찰 지속"],
   CYCLE_WATCH: ["변동성 점검", "사이클 흐름 추적", "장기 가설 유지 확인"],
   CASH_READY: ["현금 여력 유지", "후보 탐색 지속", "신규 보수적 진입"],
   GROWTH_FOCUS: ["장기 가설 유지 점검", "흐름 길이 관찰", "단기 변동 무게 낮춤"],
+};
+
+const ACTION_TAGS_AI: Record<PortfolioActionMode, ReadonlyArray<string>> = {
+  OBSERVATION: ["기회 탐색 우선", "신호 변화 감지", "신규 신호 확인"],
+  BALANCED: ["기회·리스크 균형", "실적 신호 점검", "신호 감지 지속"],
+  CYCLE_WATCH: ["리스크 감지", "사이클 지속 추적", "기회 점검"],
+  CASH_READY: ["현금 여력 유지", "기회 탐색 지속", "신규 신호 확인"],
+  GROWTH_FOCUS: ["성장신호 점검", "신호 지속 감지", "리스크 동시 감지"],
 };
 
 const ABSOLUTE_FALLBACK =
@@ -162,16 +215,17 @@ export function buildPortfolioActionLayer(
     };
   }
 
+  const isAi = input.fundKey === "ai";
   const mode = classifyMode(input);
-  const variants = ACTION_NARRATIVES[mode];
+  const variants = isAi ? ACTION_NARRATIVES_AI[mode] : ACTION_NARRATIVES[mode];
   const idx = stableHash(seedOf(input) + "-A") % variants.length;
   const narrative = variants[idx] || ABSOLUTE_FALLBACK;
 
   return {
     actionMode: mode,
-    actionTitle: ACTION_TITLES[mode],
+    actionTitle: (isAi ? ACTION_TITLES_AI : ACTION_TITLES)[mode],
     actionNarrative: narrative,
-    actionTags: [...ACTION_TAGS[mode]],
+    actionTags: [...(isAi ? ACTION_TAGS_AI : ACTION_TAGS)[mode]],
   };
 }
 

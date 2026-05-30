@@ -36,8 +36,10 @@ export function AppNav({ updatedAt }: { updatedAt?: string }) {
         })}
       </nav>
       <div className="topStatus">
-        <span className="autoOn">● 자동운용 ON</span>
-        {updatedAt ? <span>마지막 업데이트: {updatedAt}</span> : null}
+        <span>
+          자동운용 <span className="autoOn">● ON</span>
+          {updatedAt ? ` · ${updatedAt}` : null}
+        </span>
       </div>
     </header>
   );

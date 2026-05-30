@@ -774,7 +774,7 @@ function FundCard({
           ) : null}
         </summary>
         <div className="memoLines">
-          {memoLines.slice(0, 4).map((line, index) => (
+          {memoLines.slice(0, 3).map((line, index) => (
             <div key={`${theme.key}-memo-${line}-${index}`}>· {line}</div>
           ))}
         </div>
@@ -1117,7 +1117,6 @@ function BestPickHero({ history }: { history: AnyRecord }) {
     getNumber(finalBest.finalBestScore) ??
     getNumber(finalBest.score);
   const per = getNumber(finalBest.per) ?? getNumber(finalBest.PER);
-  const pbr = getNumber(finalBest.pbr) ?? getNumber(finalBest.PBR);
   const roe = getNumber(finalBest.roe) ?? getNumber(finalBest.ROE);
 
   return (
@@ -1145,9 +1144,6 @@ function BestPickHero({ history }: { history: AnyRecord }) {
       <div className="bestHeroMetricsRow">
         {per !== null ? (
           <span className="bestHeroMetricBadge">PER {formatNumber(per, 1)}배</span>
-        ) : null}
-        {pbr !== null ? (
-          <span className="bestHeroMetricBadge">PBR {formatNumber(pbr, 1)}배</span>
         ) : null}
         {roe !== null ? (
           <span className="bestHeroMetricBadge">ROE {formatPercent(roe, 1)}</span>
@@ -1284,12 +1280,6 @@ function CandidateSection({
           const buyPrice =
             getNumber(getObject(item.positionSizing).firstBuyPrice) ??
             price;
-          const score =
-            getNumber(item.aiFundScore) ??
-            getNumber(item.finalBestScore) ??
-            getNumber(item.score) ??
-            0;
-          const stars = Math.max(3, Math.min(5, Math.round(score / 20)));
           return (
             <div className="candidateCardRow" key={`${title}-${code}-${index}`}>
               <div className="candidateCardHeader">
@@ -1314,10 +1304,6 @@ function CandidateSection({
                     <span>현재가</span>
                     <b>{formatKrw(price)}</b>
                   </div>
-                  <span className="stars">
-                    {"★".repeat(stars)}
-                    {"☆".repeat(5 - stars)}
-                  </span>
                 </div>
               </div>
               <div className="candidateCardBody">
@@ -1417,9 +1403,9 @@ function PhilosophySection() {
           </div>
           <div>
             <h4 style={{ color: AI_THEME.primary }}>와바바 AI 펀드</h4>
-            <p>AI가 시장 데이터를 실시간 분석해 최적 의사결정</p>
-            <p>모멘텀, 성장성, 밸류에이션 자동 평가</p>
-            <p>유연한 포지션 조절로 최대 수익 추구</p>
+            <p>가치투자 기준과 별도로 운용하는 AI 자율운용</p>
+            <p>재무·뉴스·성장신호를 종합해 기회와 리스크를 감지</p>
+            <p>시장에서 수익 기회를 탐색</p>
           </div>
         </div>
       </div>
@@ -1513,44 +1499,44 @@ const dashboardCss = `
     padding: 0 24px 28px;
   }
   .topBar {
-    height: 64px;
+    height: 50px;
     display: grid;
-    grid-template-columns: 260px 1fr 330px;
+    grid-template-columns: 240px 1fr 300px;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
     border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
   .brand {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 950;
     color: #1e3a8a;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 9px;
   }
   .brand span {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 11px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
     background: linear-gradient(135deg, #2563eb, #7c3aed);
     color: #fff;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 950;
   }
-  nav { display: flex; justify-content: center; gap: 34px; }
-  nav a { color: #334155; font-size: 15px; font-weight: 900; text-decoration: none; padding: 22px 0 18px; }
-  nav a.active { color: #2563eb; border-bottom: 3px solid #2563eb; }
-  .topStatus { display: flex; justify-content: flex-end; align-items: center; gap: 16px; color: #64748b; font-size: 13px; font-weight: 850; }
+  nav { display: flex; justify-content: center; gap: 28px; height: 100%; align-items: stretch; }
+  nav a { display: inline-flex; align-items: center; color: #334155; font-size: 14px; font-weight: 900; text-decoration: none; border-bottom: 2px solid transparent; }
+  nav a.active { color: #2563eb; border-bottom-color: #2563eb; }
+  .topStatus { display: flex; justify-content: flex-end; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 850; white-space: nowrap; }
   .autoOn { color: #059669; font-weight: 950; }
   .globalSummary {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 10px;
+    margin-bottom: 12px;
     min-width: 0;
   }
   .smallMetricCard {
@@ -1565,8 +1551,8 @@ const dashboardCss = `
   .smallMetricValue { font-size: 19px; font-weight: 950; letter-spacing: -0.04em; }
   .smallMetricSub { margin-top: 5px; color: #64748b; font-size: 11px; font-weight: 850; }
   /* Phase 38-B: 종목 우선 섹션 (사고/보유/판/펀드) */
-  .dashSection { margin-bottom: 18px; }
-  .dashSectionTitle { margin: 0 0 10px; font-size: 14px; font-weight: 900; color: #475569; }
+  .dashSection { margin-bottom: 12px; }
+  .dashSectionTitle { margin: 0 0 7px; font-size: 13px; font-weight: 900; color: #475569; }
   .holdStrip { display: flex; flex-direction: column; gap: 6px; }
   .holdStripRow {
     display: grid;
@@ -1665,13 +1651,13 @@ const dashboardCss = `
     position: relative;
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
     border: 2px solid #bfdbfe;
-    border-radius: 16px;
-    padding: 14px 16px;
+    border-radius: 14px;
+    padding: 11px 14px;
     margin-bottom: 0;
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.1);
     min-width: 0;
   }
-  .bestHeroHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .bestHeroHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
   .bestHeroTitleRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
   .bestHeroBadge { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 950; border: 1px solid #fde68a; white-space: nowrap; }
   .bestHeroName { font-size: 21px; font-weight: 950; color: #0f172a; letter-spacing: -0.04em; line-height: 1.1; }
@@ -1681,9 +1667,9 @@ const dashboardCss = `
   .bestHeroScore { display: inline-flex; padding: 5px 11px; border-radius: 999px; background: #f3e8ff; color: #6b21a8; font-size: 12px; font-weight: 950; border: 1px solid #e9d5ff; white-space: nowrap; }
   .bestHeroMetricsRow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .bestHeroMetricBadge { display: inline-block; padding: 3px 9px; border-radius: 999px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-size: 11px; font-weight: 900; white-space: nowrap; }
-  .candidateCardList { display: flex; flex-direction: column; gap: 14px; }
-  .candidateCardRow { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); }
-  .candidateCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #eef2f7; flex-wrap: wrap; }
+  .candidateCardList { display: flex; flex-direction: column; gap: 10px; }
+  .candidateCardRow { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 11px 13px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); }
+  .candidateCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding-bottom: 9px; margin-bottom: 9px; border-bottom: 1px solid #eef2f7; flex-wrap: wrap; }
   .candidateCardLead { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 220px; }
   .candidateCardName { min-width: 0; }
   .candidateCardName b { display: block; color: #0f172a; font-size: 17px; font-weight: 950; line-height: 1.2; letter-spacing: -0.02em; }
@@ -1727,10 +1713,10 @@ const dashboardCss = `
   .comparisonSummary::marker { display: none; content: ""; }
   .comparisonSummary::before { content: "▸"; display: inline-block; margin-right: 8px; color: #94a3b8; transition: transform 0.18s; }
   .comparisonDetails[open] > .comparisonSummary::before { transform: rotate(90deg); }
-  .chartCard, .compareTableCard, .candidateCard, .philosophyBox, .systemBox, .actionPanel { min-width: 0; max-width: 100%; overflow: hidden; background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04); }
-  .sectionTitle { font-size: 18px; font-weight: 950; color: #0f172a; margin-bottom: 12px; }
-  .chartTitle { color: #334155; font-size: 14px; font-weight: 950; margin-bottom: 10px; }
-  .lineChart { width: 100%; height: 240px; display: block; }
+  .chartCard, .compareTableCard, .candidateCard, .philosophyBox, .systemBox, .actionPanel { min-width: 0; max-width: 100%; overflow: hidden; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04); }
+  .sectionTitle { font-size: 16px; font-weight: 950; color: #0f172a; margin-bottom: 8px; }
+  .chartTitle { color: #334155; font-size: 13px; font-weight: 950; margin-bottom: 6px; }
+  .lineChart { width: 100%; height: 160px; display: block; }
   .compareTable th, .compareTable td { text-align: center; }
   .compareTable th:first-child, .compareTable td:first-child { text-align: left; color: #475569; }
   .candidatesGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 0; min-width: 0; }
@@ -1927,8 +1913,9 @@ const dashboardCss = `
   }
   @media (max-width: 900px) {
     .dashboardRoot { padding: 0 12px 24px; }
-    .topBar { grid-template-columns: 1fr; height: auto; padding: 14px 0; }
-    nav { justify-content: flex-start; gap: 14px; overflow-x: auto; }
+    .topBar { grid-template-columns: 1fr; height: auto; gap: 8px; padding: 9px 0; }
+    nav { justify-content: flex-start; gap: 16px; height: auto; overflow-x: auto; }
+    nav a { padding: 4px 0; }
     .topStatus { justify-content: flex-start; }
     .globalSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .fundTopGrid { grid-template-columns: 1fr; }
@@ -1936,8 +1923,8 @@ const dashboardCss = `
     .bottomGrid { grid-template-columns: 1fr; }
     .philosophyColumns { grid-template-columns: 1fr; }
     .actionPanel { flex-direction: column; align-items: flex-start; }
-    .bestHero { padding: 13px 14px; margin-bottom: 0; }
-    .bestHeroHeader { margin-bottom: 8px; }
+    .bestHero { padding: 11px 13px; margin-bottom: 0; }
+    .bestHeroHeader { margin-bottom: 7px; }
     .bestHeroName { font-size: 19px; }
     .bestHeroReason { font-size: 13px; }
     .bestHeroMetricsRow { gap: 5px; }
