@@ -754,30 +754,31 @@ function FundCard({
         <CashDonut cashRate={data.cashRate} theme={theme} />
       </div>
 
-      <div
+      <details
         className="memoBox"
         style={{
           background: `linear-gradient(135deg, ${theme.soft} 0%, #ffffff 100%)`,
           borderColor: theme.border,
         }}
       >
-        <div className="memoTitle" style={{ color: theme.primary }}>
+        <summary className="memoTitle" style={{ color: theme.primary }}>
           오늘의 운용 메모
-        </div>
+          {topReview ? (
+            <span className="reviewHintInline">
+              {" · "}
+              {getName(topReview)}{" "}
+              {getString(topReview.actionLabel) ||
+                getString(topReview.action) ||
+                "보유 점검"}
+            </span>
+          ) : null}
+        </summary>
         <div className="memoLines">
           {memoLines.slice(0, 4).map((line, index) => (
             <div key={`${theme.key}-memo-${line}-${index}`}>· {line}</div>
           ))}
         </div>
-        {topReview ? (
-          <div className="reviewHint">
-            {getName(topReview)} ·{" "}
-            {getString(topReview.actionLabel) ||
-              getString(topReview.action) ||
-              "보유 점검"}
-          </div>
-        ) : null}
-      </div>
+      </details>
 
       <div className="holdingHeader">
         <h3>
@@ -1353,24 +1354,14 @@ function CandidateSection({
                 </div>
               </div>
               <div className="candidateCardBody">
-                <div className="candidateFactLine">{fact}</div>
-                {judgmentText ? (
-                  <div
-                    className="candidateDecisionLine"
-                    style={{ borderLeftColor: theme.primary }}
-                  >
-                    <b style={{ color: theme.primary }}>왜 지금</b>{" "}
-                    {judgmentText}
-                  </div>
-                ) : null}
-                {valuationText ? (
-                  <div className="candidateValuationLine">
-                    <b>밸류</b> · {valuationText}
-                  </div>
-                ) : null}
-                {riskSummary ? (
-                  <div className="riskSummaryLine">⚠ {riskSummary}</div>
-                ) : null}
+                {/* 한줄 이유 — 가장 짧은 핵심만 우선 노출 */}
+                <div className="candidateReasonLine">
+                  {(() => {
+                    const r = buyTrigger || fact;
+                    return r.length > 40 ? `${r.slice(0, 40)}…` : r;
+                  })()}
+                </div>
+                {/* 핵심 지표 한 줄 */}
                 {hasAnyMetric ? (
                   <div className="candidateMetricsRow">
                     {per !== null ? (
@@ -1398,22 +1389,40 @@ function CandidateSection({
                         영업이익률 {formatPercent(opMargin, 1)}
                       </span>
                     ) : null}
+                    {confidence !== null ? (
+                      <span className="candidateMetricBadge">
+                        신뢰도 {confidence}%
+                      </span>
+                    ) : null}
                   </div>
                 ) : null}
-                {buyTrigger ? (
-                  <span
-                    className="buyTriggerTag"
-                    style={{
-                      background: theme.soft,
-                      color: theme.primary,
-                      borderColor: theme.border,
-                    }}
-                  >
-                    {buyTrigger}
-                  </span>
-                ) : null}
-                {confidence !== null ? (
-                  <div className="confidenceLine">신뢰도 {confidence}%</div>
+                {/* 상세 설명 — 접어서 아래로 밀기 (삭제하지 않음) */}
+                {judgmentText || valuationText || riskSummary ? (
+                  <details className="candidateDetails">
+                    <summary className="candidateDetailsSummary">
+                      상세 보기
+                    </summary>
+                    <div className="candidateDetailsBody">
+                      <div className="candidateFactLine">{fact}</div>
+                      {judgmentText ? (
+                        <div
+                          className="candidateDecisionLine"
+                          style={{ borderLeftColor: theme.primary }}
+                        >
+                          <b style={{ color: theme.primary }}>왜 지금</b>{" "}
+                          {judgmentText}
+                        </div>
+                      ) : null}
+                      {valuationText ? (
+                        <div className="candidateValuationLine">
+                          <b>밸류</b> · {valuationText}
+                        </div>
+                      ) : null}
+                      {riskSummary ? (
+                        <div className="riskSummaryLine">⚠ {riskSummary}</div>
+                      ) : null}
+                    </div>
+                  </details>
                 ) : null}
               </div>
             </div>
@@ -1621,8 +1630,8 @@ const dashboardCss = `
     overflow: hidden;
     background: #fff;
     border: 2px solid;
-    border-radius: 22px;
-    padding: 18px;
+    border-radius: 16px;
+    padding: 14px;
   }
   .fundCardHeader { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
   .fundTitleRow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -1630,7 +1639,7 @@ const dashboardCss = `
   h2 { margin: 0; font-size: 25px; line-height: 1; letter-spacing: -0.04em; }
   .pill, .statusPill { border: 1px solid; border-radius: 999px; padding: 6px 11px; font-size: 12px; font-weight: 950; white-space: nowrap; }
   .statusPill { border-color: #86efac; background: #f0fdf4; color: #047857; }
-  .fundTopGrid { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 16px; align-items: center; border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; background: #fbfdff; min-width: 0; }
+  .fundTopGrid { display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 14px; align-items: center; border: 1px solid #e2e8f0; border-radius: 14px; padding: 13px; background: #fbfdff; min-width: 0; }
   .fundMetricMain { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .fundCoreGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 0; }
   .fundCoreItem { display: flex; flex-direction: column; gap: 3px; min-width: 0; overflow: hidden; padding: 0 14px; border-left: 1px solid #e2e8f0; }
@@ -1648,10 +1657,15 @@ const dashboardCss = `
   .cashDonutInner { width: 100%; height: 100%; border-radius: 999px; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: inset 0 0 0 1px #e2e8f0; }
   .cashDonutInner span { color: #64748b; font-size: 13px; font-weight: 900; }
   .cashDonutInner b { color: #0f172a; font-size: 18px; font-weight: 950; }
-  .memoBox { margin-top: 14px; border: 1px solid; border-radius: 18px; padding: 16px; min-height: 142px; }
-  .memoTitle { font-size: 15px; font-weight: 950; margin-bottom: 10px; }
-  .memoLines { display: grid; gap: 7px; color: #334155; font-size: 13px; font-weight: 850; line-height: 1.45; }
-  .reviewHint { margin-top: 10px; color: #64748b; font-size: 12px; font-weight: 900; }
+  .memoBox { margin-top: 12px; border: 1px solid; border-radius: 14px; padding: 12px 14px; }
+  .memoTitle { font-size: 14px; font-weight: 950; cursor: pointer; list-style: none; line-height: 1.4; }
+  .memoTitle::-webkit-details-marker { display: none; }
+  .memoTitle::marker { content: ""; }
+  .memoTitle::before { content: "▸"; display: inline-block; margin-right: 7px; color: #94a3b8; transition: transform 0.18s; }
+  .memoBox[open] > .memoTitle::before { transform: rotate(90deg); }
+  .reviewHintInline { color: #64748b; font-size: 12px; font-weight: 850; }
+  .memoBox:not([open]) > .memoLines { display: none; }
+  .memoBox[open] > .memoLines { display: grid; gap: 6px; margin-top: 10px; color: #334155; font-size: 13px; font-weight: 850; line-height: 1.45; }
   .holdingHeader { margin: 18px 0 10px; }
   .holdingHeader h3 { margin: 0; font-size: 18px; font-weight: 950; }
   .holdingHeader span { color: #2563eb; }
@@ -1716,9 +1730,18 @@ const dashboardCss = `
   .candidateCardMetaItem { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .candidateCardMetaItem span { color: #94a3b8; font-size: 11px; font-weight: 900; }
   .candidateCardMetaItem b { color: #0f172a; font-size: 14px; font-weight: 950; }
-  .candidateCardBody { display: flex; flex-direction: column; gap: 8px; white-space: normal; }
+  .candidateCardBody { display: flex; flex-direction: column; gap: 7px; white-space: normal; }
+  .candidateReasonLine { color: #1e293b; font-size: 13px; font-weight: 900; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .candidateDetails { margin-top: 1px; }
+  .candidateDetailsSummary { cursor: pointer; color: #64748b; font-size: 12px; font-weight: 900; list-style: none; padding: 2px 0; user-select: none; }
+  .candidateDetailsSummary::-webkit-details-marker { display: none; }
+  .candidateDetailsSummary::marker { content: ""; }
+  .candidateDetailsSummary::before { content: "▸"; display: inline-block; margin-right: 6px; color: #94a3b8; transition: transform 0.18s; }
+  .candidateDetails[open] > .candidateDetailsSummary::before { transform: rotate(90deg); }
+  .candidateDetails:not([open]) > .candidateDetailsBody { display: none; }
+  .candidateDetails[open] > .candidateDetailsBody { display: flex; flex-direction: column; gap: 7px; margin-top: 8px; }
   .candidateFactLine { color: #0f172a; font-size: 14px; font-weight: 950; line-height: 1.5; white-space: normal; letter-spacing: -0.01em; }
-  .candidateMetricsRow { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0 2px; }
+  .candidateMetricsRow { display: flex; flex-wrap: wrap; gap: 5px; margin: 1px 0 2px; }
   .candidateMetricBadge { display: inline-block; padding: 3px 9px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-size: 11px; font-weight: 900; line-height: 1.4; white-space: normal; }
   .candidateValuationLine { color: #475569; font-size: 12.5px; font-weight: 850; line-height: 1.55; white-space: normal; }
   .candidateValuationLine b { font-weight: 950; color: #334155; margin-right: 2px; }
@@ -1728,7 +1751,7 @@ const dashboardCss = `
   .riskSummaryLine { color: #dc2626; font-size: 12px; font-weight: 900; line-height: 1.5; white-space: normal; }
   .confidenceLine { color: #64748b; font-size: 11px; font-weight: 900; margin-top: 2px; }
   .emptyHolding, .emptyCell { color: #64748b; font-size: 13px; font-weight: 850; padding: 18px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc; }
-  .fundStatsRow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .fundStatsRow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
   .miniStat { display: flex; gap: 10px; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 15px; background: #fff; }
   .miniStatIcon { width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 950; }
   .miniStatLabel { color: #64748b; font-size: 12px; font-weight: 900; }
