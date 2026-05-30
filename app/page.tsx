@@ -5,12 +5,14 @@ import {
   formatShortDate,
   BestPickHero,
   GlobalSummary,
+  DashboardHoldings,
+  DashboardSold,
 } from "./_dashboard/kit";
 
 export const dynamic = "force-dynamic";
 
-// 대시보드 — 오늘의 매수 BEST + 펀드 현황만 압축해서 보여준다.
-// 상세 후보/판단은 전략랩, 보유 포트폴리오는 성과분석으로 분리.
+// 대시보드 — 운용앱 구조: 사고 → 보유 → 판 종목 → 펀드 현황.
+// 설명/판단 상세는 전략랩으로, 보유 상세는 성과분석으로 분리.
 export default function DashboardPage() {
   const history = readRecommendationHistory();
 
@@ -18,8 +20,26 @@ export default function DashboardPage() {
     <main className="dashboardRoot">
       <DashboardStyles />
       <AppNav updatedAt={formatShortDate(history.generatedAt)} />
-      <BestPickHero history={history} />
-      <GlobalSummary history={history} />
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">오늘 살 종목</h2>
+        <BestPickHero history={history} />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">현재 보유</h2>
+        <DashboardHoldings history={history} />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">최근 판 종목</h2>
+        <DashboardSold history={history} />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">펀드 현황</h2>
+        <GlobalSummary history={history} />
+      </section>
     </main>
   );
 }

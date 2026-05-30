@@ -1138,9 +1138,11 @@ function BestPickHero({ history }: { history: AnyRecord }) {
   const whyText =
     getString(investmentReport.decision) ||
     getString(investmentReport.businessImpact);
-  const valuationText = getString(investmentReport.valuation);
-  const riskSummary = getString(finalBest.riskSummary);
   const buyTrigger = getString(decisionEngine.buyTrigger);
+  // 운용앱 원칙: 이유는 한 줄(40자 전후). 긴 설명은 전략랩으로.
+  const reasonRaw = buyTrigger || whyText || headline;
+  const reasonLine =
+    reasonRaw.length > 40 ? `${reasonRaw.slice(0, 40)}…` : reasonRaw;
   const confidence = getNumber(decisionEngine.confidence);
   const score =
     getNumber(finalBest.aiFundScore) ??
@@ -1170,39 +1172,9 @@ function BestPickHero({ history }: { history: AnyRecord }) {
         </div>
       </div>
 
-      <div className="bestHeroHeadline">
-        {headline.length > 110 ? `${headline.slice(0, 110)}…` : headline}
-      </div>
-
-      {whyText ? (
-        <div className="bestHeroWhy">
-          <b>왜 지금</b>{" "}
-          {whyText.length > 130 ? `${whyText.slice(0, 130)}…` : whyText}
-        </div>
-      ) : null}
-
-      <div className="bestHeroSubRow">
-        {valuationText ? (
-          <div className="bestHeroValuation">
-            <b>밸류</b>{" "}
-            {valuationText.length > 90
-              ? `${valuationText.slice(0, 90)}…`
-              : valuationText}
-          </div>
-        ) : null}
-        {riskSummary ? (
-          <div className="bestHeroRisk">
-            ⚠ {riskSummary.length > 70 ? `${riskSummary.slice(0, 70)}…` : riskSummary}
-          </div>
-        ) : null}
-      </div>
+      <div className="bestHeroReason">{reasonLine}</div>
 
       <div className="bestHeroMetricsRow">
-        {buyTrigger ? (
-          <span className="bestHeroBuyTrigger">
-            {buyTrigger.length > 30 ? `${buyTrigger.slice(0, 30)}…` : buyTrigger}
-          </span>
-        ) : null}
         {per !== null ? (
           <span className="bestHeroMetricBadge">PER {formatNumber(per, 1)}배</span>
         ) : null}
@@ -1214,6 +1186,65 @@ function BestPickHero({ history }: { history: AnyRecord }) {
         ) : null}
       </div>
     </section>
+  );
+}
+
+// 대시보드 전용 — 현재 보유 종목 압축 1줄 목록(와바바 펀드 기준).
+function DashboardHoldings({ history }: { history: AnyRecord }) {
+  const data = getFundData(history, WABABA_THEME);
+  const positions = data.positions;
+  if (positions.length === 0) {
+    return <div className="emptyCell">현재 보유 중인 종목이 없습니다.</div>;
+  }
+  return (
+    <div className="holdStrip">
+      {positions.map((position, index) => {
+        const rate = getPositionProfitRate(position);
+        const weight = getPositionWeight(position, data.totalAsset);
+        return (
+          <div className="holdStripRow" key={`hold-${getCode(position)}-${index}`}>
+            <span className="holdStripName">{getName(position)}</span>
+            <span className="holdStripWeight">{formatPercent(weight, 1)}</span>
+            <span className="holdStripRate" style={{ color: toneColor(rate) }}>
+              {formatPercent(rate)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// 대시보드 전용 — 최근 판 종목. 매도 이력(tradeHistory)이 채워지면 자동 표시.
+function DashboardSold({ history }: { history: AnyRecord }) {
+  const analysis = getObject(history.performanceAnalysis);
+  const sold = getArray(analysis.tradeHistory).filter((trade) =>
+    /매도|sell/i.test(
+      getString(trade.action) ||
+        getString(trade.side) ||
+        getString(trade.type),
+    ),
+  );
+  if (sold.length === 0) {
+    return <div className="emptyCell">최근 판 종목이 없습니다.</div>;
+  }
+  return (
+    <div className="holdStrip">
+      {sold.slice(0, 5).map((trade, index) => {
+        const rate = getPositionProfitRate(trade);
+        return (
+          <div className="holdStripRow" key={`sold-${getCode(trade)}-${index}`}>
+            <span className="holdStripName">{getName(trade)}</span>
+            <span className="holdStripWeight">
+              {formatShortDate(trade.date || trade.sellDate)}
+            </span>
+            <span className="holdStripRate" style={{ color: toneColor(rate) }}>
+              {formatPercent(rate)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -1549,14 +1580,40 @@ const dashboardCss = `
   .smallMetricCard {
     background: #fff;
     border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 18px 18px;
-    min-height: 104px;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+    border-radius: 14px;
+    padding: 12px 14px;
+    min-height: 0;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
   }
-  .smallMetricLabel { color: #475569; font-size: 13px; font-weight: 900; margin-bottom: 11px; }
-  .smallMetricValue { font-size: 24px; font-weight: 950; letter-spacing: -0.04em; }
-  .smallMetricSub { margin-top: 8px; color: #64748b; font-size: 12px; font-weight: 850; }
+  .smallMetricLabel { color: #475569; font-size: 12px; font-weight: 900; margin-bottom: 6px; }
+  .smallMetricValue { font-size: 19px; font-weight: 950; letter-spacing: -0.04em; }
+  .smallMetricSub { margin-top: 5px; color: #64748b; font-size: 11px; font-weight: 850; }
+  /* Phase 38-B: 종목 우선 섹션 (사고/보유/판/펀드) */
+  .dashSection { margin-bottom: 18px; }
+  .dashSectionTitle { margin: 0 0 10px; font-size: 14px; font-weight: 900; color: #475569; }
+  .holdStrip { display: flex; flex-direction: column; gap: 6px; }
+  .holdStripRow {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .holdStripName { font-size: 14px; font-weight: 850; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .holdStripWeight { font-size: 12px; color: #94a3b8; font-weight: 750; white-space: nowrap; }
+  .holdStripRate { font-size: 14px; font-weight: 900; min-width: 56px; text-align: right; }
+  .bestHeroReason {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .fundsGrid { display: grid; grid-template-columns: 1fr; gap: 22px; margin-bottom: 22px; min-width: 0; }
   .fundCard {
     min-width: 0;
@@ -1632,30 +1689,22 @@ const dashboardCss = `
     position: relative;
     background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
     border: 2px solid #bfdbfe;
-    border-radius: 22px;
-    padding: 20px 22px;
-    margin-bottom: 18px;
-    box-shadow: 0 14px 38px rgba(37, 99, 235, 0.12);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 0;
+    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.1);
     min-width: 0;
   }
   .bestHeroHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
   .bestHeroTitleRow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
   .bestHeroBadge { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 950; border: 1px solid #fde68a; white-space: nowrap; }
-  .bestHeroName { font-size: 26px; font-weight: 950; color: #0f172a; letter-spacing: -0.04em; line-height: 1.1; }
+  .bestHeroName { font-size: 21px; font-weight: 950; color: #0f172a; letter-spacing: -0.04em; line-height: 1.1; }
   .bestHeroName em { font-style: normal; margin-left: 8px; color: #64748b; font-size: 14px; font-weight: 900; letter-spacing: 0; }
   .bestHeroMeta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .bestHeroConfidence { display: inline-flex; padding: 5px 11px; border-radius: 999px; background: #dbeafe; color: #1e3a8a; font-size: 12px; font-weight: 950; border: 1px solid #bfdbfe; white-space: nowrap; }
   .bestHeroScore { display: inline-flex; padding: 5px 11px; border-radius: 999px; background: #f3e8ff; color: #6b21a8; font-size: 12px; font-weight: 950; border: 1px solid #e9d5ff; white-space: nowrap; }
-  .bestHeroHeadline { color: #0f172a; font-size: 17px; font-weight: 950; line-height: 1.45; letter-spacing: -0.01em; margin-bottom: 12px; white-space: normal; }
-  .bestHeroWhy { color: #1e293b; font-size: 13px; font-weight: 900; line-height: 1.5; padding: 9px 12px; border-left: 4px solid #2563eb; background: rgba(255, 255, 255, 0.72); border-radius: 0 10px 10px 0; margin-bottom: 10px; white-space: normal; }
-  .bestHeroWhy b { font-weight: 950; color: #2563eb; margin-right: 5px; }
-  .bestHeroSubRow { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
-  .bestHeroValuation { color: #475569; font-size: 12px; font-weight: 850; line-height: 1.5; white-space: normal; flex: 1 1 280px; min-width: 0; }
-  .bestHeroValuation b { font-weight: 950; color: #334155; margin-right: 4px; }
-  .bestHeroRisk { color: #b91c1c; font-size: 12px; font-weight: 900; line-height: 1.5; white-space: normal; flex: 0 1 320px; min-width: 0; }
   .bestHeroMetricsRow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .bestHeroMetricBadge { display: inline-block; padding: 3px 9px; border-radius: 999px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font-size: 11px; font-weight: 900; white-space: nowrap; }
-  .bestHeroBuyTrigger { display: inline-block; padding: 4px 11px; border-radius: 12px; background: #2563eb; color: #fff; font-size: 11px; font-weight: 950; white-space: normal; line-height: 1.35; max-width: 100%; }
   .candidateCardList { display: flex; flex-direction: column; gap: 14px; }
   .candidateCardRow { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 16px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); }
   .candidateCardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #eef2f7; flex-wrap: wrap; }
@@ -1902,13 +1951,10 @@ const dashboardCss = `
     .bottomGrid { grid-template-columns: 1fr; }
     .philosophyColumns { grid-template-columns: 1fr; }
     .actionPanel { flex-direction: column; align-items: flex-start; }
-    .bestHero { padding: 14px 14px 12px; margin-bottom: 14px; }
+    .bestHero { padding: 13px 14px; margin-bottom: 0; }
     .bestHeroHeader { margin-bottom: 8px; }
-    .bestHeroName { font-size: 20px; }
-    .bestHeroHeadline { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
-    .bestHeroWhy { padding: 7px 10px; margin-bottom: 8px; }
-    .bestHeroSubRow { flex-direction: column; gap: 6px; margin-bottom: 6px; }
-    .bestHeroValuation, .bestHeroRisk { flex: 0 0 auto; min-height: 0; }
+    .bestHeroName { font-size: 19px; }
+    .bestHeroReason { font-size: 13px; }
     .bestHeroMetricsRow { gap: 5px; }
     .holdingTableWrap { display: none; }
     .holdingCardList { display: flex; flex-direction: column; gap: 10px; }
@@ -1921,7 +1967,7 @@ const dashboardCss = `
     .candidateCardBody { gap: 6px; }
   }
   @media (max-width: 560px) {
-    .globalSummary { grid-template-columns: 1fr; }
+    .globalSummary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .metricPair { grid-template-columns: 1fr; }
     .fundStatsRow { grid-template-columns: 1fr; }
     .candidateHeader { flex-direction: column; }
@@ -1950,5 +1996,7 @@ export {
   FundCard,
   ComparisonSection,
   PhilosophySection,
+  DashboardHoldings,
+  DashboardSold,
   dashboardCss,
 };
