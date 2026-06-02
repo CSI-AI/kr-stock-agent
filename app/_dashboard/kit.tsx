@@ -274,10 +274,29 @@ function buildSellReason(
 ): { line: string; evidence: string[] } {
   const raw = humanizeReason(getString(trade.reason) || getString(trade.sellReason));
   const rate = getPositionProfitRate(trade);
-  const line =
-    raw || (isAi ? "기대수익 저하로 매도" : "리스크 확대로 매도");
+  // 매도 사유 꼬리말 — reason 텍스트에서 실적/재무 신호 감지(엔진 표현은 제외).
+  const tail = /성장|실적/.test(raw)
+    ? isAi
+      ? "성장신호 약화"
+      : "성장 가설 약화"
+    : /부채|재무/.test(raw)
+      ? "재무 리스크 확대"
+      : "리스크 점검 기준 도달";
+
+  let line: string;
+  if (rate !== null && rate < 0) {
+    line = `손실 ${formatPercent(Math.abs(rate))}, ${tail}`;
+  } else if (rate !== null && rate > 0) {
+    line = `차익 실현, ${tail}`;
+  } else {
+    line = isAi ? "기대수익 저하로 매도" : "리스크 확대로 매도";
+  }
+
   const evidence: string[] = [];
-  if (raw) evidence.push(raw);
+  // 엔진/등급 표현이 아닌 경우에만 원문 근거 노출.
+  if (raw && !/엔진|\bHIGH\b|\bMID\b|\bLOW\b|score|점수/i.test(raw)) {
+    evidence.push(raw);
+  }
   if (rate !== null) evidence.push(`실현 수익률 ${formatPercent(rate)}`);
   return { line: clamp(line, 40), evidence };
 }
@@ -1347,7 +1366,7 @@ function DashboardHoldings({ history }: { history: AnyRecord }) {
   );
 }
 
-// 대시보드 전용 — 최근 판 종목. 매도 이력(tradeHistory)이 채워지면 자동 표시.
+// 대시보드 전용 — 최근 매도/축소. 일부 매도 후 잔여 보유면 "판 종목"으로 단정하지 않음.
 function DashboardSold({ history }: { history: AnyRecord }) {
   const analysis = getObject(history.performanceAnalysis);
   const sold = getArray(analysis.tradeHistory).filter((trade) =>
@@ -1358,19 +1377,42 @@ function DashboardSold({ history }: { history: AnyRecord }) {
     ),
   );
   if (sold.length === 0) {
-    return <div className="emptyCell">최근 판 종목이 없습니다.</div>;
+    return <div className="emptyCell">최근 매도 내역이 없습니다.</div>;
   }
+  // 현재 보유 코드(펀드별) — 일부 매도 / 펀드 차이를 구분하기 위함.
+  const wababaHeld = new Set(
+    getFundData(history, WABABA_THEME).positions.map((p) => getCode(p)),
+  );
+  const aiHeld = new Set(
+    getFundData(history, AI_THEME).positions.map((p) => getCode(p)),
+  );
   return (
     <div className="holdStrip">
       {sold.slice(0, 5).map((trade, index) => {
         const rate = getPositionProfitRate(trade);
+        const code = getCode(trade);
+        // 매도 이력은 와바바펀드 기준(tradeHistory). 잔여 보유 여부로 라벨 결정.
+        let statusLabel: string;
+        let statusNote = "";
+        if (wababaHeld.has(code)) {
+          statusLabel = "일부 매도";
+          statusNote = "현재 일부 보유 중";
+        } else if (aiHeld.has(code)) {
+          statusLabel = "와바바펀드 매도";
+          statusNote = "AI펀드 보유 중";
+        } else {
+          statusLabel = "전량 매도";
+        }
         return (
-          <div className="holdStripRow" key={`sold-${getCode(trade)}-${index}`}>
+          <div className="holdStripRow" key={`sold-${code}-${index}`}>
             <div className="holdStripMain">
               <span className="holdStripName">{getName(trade)}</span>
               <span className="holdStripReason">
-                매도 · {buildSellReason(trade, false).line}
+                {statusLabel} · {buildSellReason(trade, false).line}
               </span>
+              {statusNote ? (
+                <span className="holdSoldNote">{statusNote}</span>
+              ) : null}
             </div>
             <span className="holdStripWeight">
               {formatShortDate(trade.date || trade.sellDate)}
@@ -1741,6 +1783,7 @@ const dashboardCss = `
   .holdStripMain { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .holdStripName { font-size: 14px; font-weight: 850; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdStripReason { font-size: 11px; color: #94a3b8; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .holdSoldNote { font-size: 10px; color: #2563eb; font-weight: 850; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdStripWeight { font-size: 12px; color: #94a3b8; font-weight: 750; white-space: nowrap; }
   .holdStripRate { font-size: 14px; font-weight: 900; min-width: 56px; text-align: right; }
   .bestHeroReason {

@@ -32,7 +32,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">최근 판 종목</h2>
+        <h2 className="dashSectionTitle">최근 매도/축소</h2>
         <DashboardSold history={history} />
       </section>
 
