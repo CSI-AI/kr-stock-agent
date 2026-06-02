@@ -216,6 +216,42 @@ dev server 를 끄면 UI 패널 / 수동 재실행 API 만 막힐 뿐 자동 매
 
 ---
 
+## 2-D. 공개 데이터 신선도 / 누출 점검 (push 직전 필수 게이트) — Phase 41-A
+
+`build_recommendation_history.py`는 public sanitized JSON을 매일 자동 갱신하지만,
+**Vercel 반영(commit + push)은 수동**이다. 데이터가 갱신돼도 push를 잊으면 공개 링크가 옛 날짜에 머문다(stale 재발).
+push 직전에 아래 read-only 점검을 돌려 신선도·배포 반영·민감필드 누출을 한 번에 확인한다.
+
+```powershell
+cd C:\work\kr-stock-agent
+$env:PYTHONIOENCODING="utf-8"
+python scripts\qa\check_public_data_freshness.py
+```
+
+이 스크립트가 하는 일 (쓰기/commit/push 없음, 순수 읽기):
+- 공개 작업본 `public/data/recommendation-history.json`의 `baseDate` / `generatedAt` 출력
+- **REPO2 원본**(`kr-stock-agent-data-new/recommendation-history.json`)과 기준일 일치 확인 → sanitize/동기화 누락 탐지
+- **git HEAD(=배포본)**와 기준일 비교 → 작업본이 더 최신이면 "커밋/푸시 필요(미반영)" 로 **FAIL** (stale 재발 차단)
+- top-level 키 수(기대 16), 민감 키(token/secret/path 등), 로컬 경로(`C:\...`) 노출 검사
+- 정상이면 `결과: PASS`, 문제 있으면 `결과: FAIL` + exit code 1
+
+판정 활용:
+- **PASS** → §4 절차로 단일 파일 commit + push 진행.
+- **FAIL: ... 커밋/푸시 필요** → 데이터는 신선한데 배포만 안 됨. §4 절차로 push하면 해소.
+- **FAIL: 로컬 경로(C:\...) 노출 필드** → 아래 §2-D-1 알려진 이슈 참조.
+
+### 2-D-1. 알려진 이슈 — `tradeHistoryPath` 로컬 경로 노출 (미해결, 별도 Phase)
+
+현재 공개 JSON에 로컬 절대경로가 노출되어 있다(Phase 41-A에서 점검 스크립트로 발견):
+- `performanceAnalysis.tradePerformance.tradeHistoryPath`
+- `aiPerformanceAnalysis.tradePerformance.tradeHistoryPath`
+- 값 예: `C:\work\kr-stock-agent-data-new\trade-history.json`
+
+이 값은 공개 URL(`/data/recommendation-history.json`)로 그대로 노출되어 운영 PC 경로 구조가 드러난다(민감도 낮으나 불필요).
+**해결은 REPO2 `build_recommendation_history.py`의 sanitize 단계에서 해당 필드를 제거**해야 하며, REPO2 수정이 필요하므로 별도 Phase로 진행한다. 그전까지 freshness 점검은 이 항목으로 FAIL을 띄운다(의도된 알림).
+
+---
+
 ## 3. sanitized public JSON 생성 확인법
 
 데이터 생성 후 webapp의 공개용 사본이 갱신됐는지 확인한다.
@@ -307,11 +343,26 @@ webapp repo에서 commit하면 안 되는 파일:
 
 | 파일 | 이유 |
 |---|---|
-| `next-env.d.ts` | Next.js 빌드 자동 생성, git이 추적해도 commit 대상 아님 |
+| `next-env.d.ts` | Next.js 자동 생성, git이 추적해도 commit 대상 아님 |
 | `data/financial-universe-real.json` | 운영 데이터 (untracked로 관리) |
 | `data/financial-universe-upstream-sample.json` | 운영 데이터 (untracked로 관리) |
 
 ⚠ `git add .` 또는 `git add -A`를 쓰면 위 파일들이 함께 묶일 수 있다. **반드시 단일 파일 명시**.
+
+### 6-1. `next-env.d.ts`가 계속 dirty로 뜨는 이유 (Phase 41-A 조사)
+
+`next-env.d.ts`는 Next.js가 자동 생성하는 파일로 git에 **추적은 되지만 commit하면 안 된다**(파일 상단에도 `This file should not be edited` 명시).
+계속 dirty로 뜨는 원인은 dev/build가 이 파일의 import 경로를 서로 다르게 다시 쓰기 때문이다:
+- `npm run dev` 실행 후 → `import "./.next/dev/types/routes.d.ts";`
+- `npm run build` 실행 후 → `import "./.next/types/routes.d.ts";`
+
+즉 dev와 build를 번갈아 돌리면 이 한 줄이 `/dev/types` ↔ `/types` 로 계속 바뀌어 항상 변경 상태가 된다. **정상 동작이며 무시 대상**이다.
+
+처리 방법:
+- (현행 유지) 그냥 두고 **절대 stage하지 않는다**. freshness 점검·commit 절차 모두 이 파일을 건드리지 않는다.
+- (원하면, 별도 Phase) `.gitignore`에 `next-env.d.ts` 추가 + `git rm --cached next-env.d.ts`로 추적 해제하면 dirty 표시 자체가 사라진다. 단 이는 추적 상태 변경이라 별도 커밋이 필요하므로 이번 운영 점검 범위 밖이다.
+
+원상복구가 필요하면(다른 작업 전 깨끗이): `git restore next-env.d.ts` (단 다음 dev/build에서 다시 바뀜).
 
 ---
 
@@ -389,7 +440,8 @@ webapp repo에서 commit하면 안 되는 파일:
 ## 10. 운영 루틴 한 줄 요약
 
 ```
-[데이터 생성 (no-trade)] → [QA + DAILY SUMMARY 리포트 생성] → [public JSON 갱신 자동 확인] → [git add 단일 파일 → commit → push] → [Vercel 자동 배포 확인]
+[데이터 생성 (no-trade)] → [QA + DAILY SUMMARY 리포트 생성] → [freshness 점검(check_public_data_freshness.py)] → [git add 단일 파일 → commit → push] → [Vercel 자동 배포 확인]
 ```
 
 이 흐름만 지키면 MVP 운영이 깨지지 않는다.
+특히 **freshness 점검을 push 직전 게이트로 삼으면** "데이터는 갱신됐는데 push를 잊어 공개 링크가 stale" 사고가 반복되지 않는다(§2-D).

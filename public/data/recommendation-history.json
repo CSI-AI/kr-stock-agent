@@ -1,6 +1,6 @@
 {
   "baseDate": "2026-06-02",
-  "generatedAt": "2026-06-02 08:48:34",
+  "generatedAt": "2026-06-02 20:01:56",
   "portfolioSummary": {
     "initialCapital": 50000000.0,
     "cash": 38900450.0,
@@ -177,7 +177,7 @@
   },
   "performanceAnalysis": {
     "baseDate": "2026-06-02",
-    "generatedAt": "2026-06-02 08:48:34",
+    "generatedAt": "2026-06-02 20:01:56",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 38900450.0,
@@ -423,7 +423,6 @@
     },
     "tradePerformance": {
       "source": "portfolio.tradeLedger",
-      "tradeHistoryPath": "C:\\work\\kr-stock-agent-data-new\\trade-history.json",
       "totalTradeCount": 10,
       "closedTradeCount": 2,
       "winCount": 0,
@@ -931,17 +930,16 @@
   "dailyFundMemo": {
     "date": "2026-06-02",
     "title": "2026-06-02 와바바 운용일지",
-    "status": "TRADED",
-    "summary": "동아엘텍 신규 매수.",
+    "status": "NO_TRADE_MODE",
+    "summary": "--no-trade 모드: 자동매매 스킵. portfolio 변경 없음.",
     "lines": [
-      "동아엘텍 신규 매수.",
-      "오늘 1종목 · 신뢰도 87% · 목표 비중 11%",
-      "선정 근거: 동아엘텍이 가치매수 후보로 통과.",
+      "--no-trade 모드: 자동매매 스킵. portfolio 변경 없음.",
       "보유: 동아엘텍, SAMG엔터, 키움증권 중심으로 성장 유지 여부 점검.",
-      "총자산 4,905만원, 누적수익률 -1.88%."
+      "총자산 4,905만원, 누적수익률 -1.88%.",
+      "미체결: no-trade 모드"
     ],
     "holdingCount": 6,
-    "orderCount": 1,
+    "orderCount": 0,
     "cash": 38900450.0,
     "totalAssetAmount": 49057050.0,
     "totalReturnRate": -1.88
@@ -1129,9 +1127,7 @@
       }
     ]
   },
-  "aiFundTradeResult": {
-    "aiTradePicks": []
-  },
+  "aiFundTradeResult": {},
   "aiPortfolioSummary": {
     "initialCapital": 50000000.0,
     "cash": 25408885.0,
@@ -1415,7 +1411,7 @@
   },
   "aiPerformanceAnalysis": {
     "baseDate": "2026-06-02",
-    "generatedAt": "2026-06-02 08:48:34",
+    "generatedAt": "2026-06-02 20:01:56",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 25408885.0,
@@ -1680,7 +1676,6 @@
     },
     "tradePerformance": {
       "source": "portfolio.tradeLedger",
-      "tradeHistoryPath": "C:\\work\\kr-stock-agent-data-new\\trade-history.json",
       "totalTradeCount": 10,
       "closedTradeCount": 0,
       "winCount": 0,
@@ -2239,12 +2234,13 @@
   "aiDailyFundMemo": {
     "date": "2026-06-02",
     "title": "와바바AI펀드 운용 메모",
-    "status": "NO_TRADE",
-    "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
+    "status": "NO_TRADE_MODE",
+    "summary": "--no-trade 모드: AI펀드 자동매매 스킵. portfolio 변경 없음.",
     "lines": [
-      "오늘은 기준을 만족하는 신규 매수 체결 없음.",
+      "--no-trade 모드: AI펀드 자동매매 스킵. portfolio 변경 없음.",
       "보유: 세명전기, 동아엘텍, SK스퀘어 중심으로 성장 유지 여부 점검.",
-      "총자산 4,733만원, 누적수익률 -5.23%."
+      "총자산 4,733만원, 누적수익률 -5.23%.",
+      "미체결: no-trade 모드"
     ],
     "holdingCount": 10,
     "orderCount": 0,
