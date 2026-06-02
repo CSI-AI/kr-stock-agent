@@ -144,6 +144,29 @@ function formatShortDate(value: unknown): string {
   return `${match[1].slice(2)}.${match[2]}.${match[3]}${match[4] ? ` ${match[4]}` : ""}`;
 }
 
+// 보유 이유 1줄 — 기존 position.action / sellSignal 신호에서 도출.
+// 펀드별 어휘 구분(와바바=성장 가설, AI=신호·리스크). 차트/거래량 등 미구현 신호어 미사용.
+function holdReasonLine(position: AnyRecord, isAi: boolean): string {
+  const signal = getObject(position.sellSignal);
+  const urgency = getString(signal.urgency).toUpperCase();
+  const action = getString(position.action).toUpperCase();
+  const watching = /SELL/.test(action) || urgency === "HIGH";
+  const checking = urgency === "MID" || /CHECK|REDUCE/.test(action);
+  if (watching) return isAi ? "리스크 확대 감지" : "리스크 확대";
+  if (checking) return isAi ? "신호 점검 중" : "성장 가설 점검";
+  return isAi ? "신호 유지" : "성장 가설 유지";
+}
+
+// 매도 이유 1줄 — 기존 trade.reason 우선, 내부 엔진/점수 표현은 읽기 쉬운 문구로 정리.
+function sellReasonLine(trade: AnyRecord, isAi: boolean): string {
+  const raw = getString(trade.reason) || getString(trade.sellReason);
+  if (!raw) return isAi ? "기대수익 저하" : "매도 사유 발생";
+  if (/엔진|engine|score|점수/i.test(raw)) {
+    return isAi ? "리스크 확대" : "매도 신호 발생";
+  }
+  return raw.length > 22 ? `${raw.slice(0, 22)}…` : raw;
+}
+
 function getCode(item: AnyRecord): string {
   return (
     getString(item.code) || getString(item.symbol) || getString(item.stockCode)
@@ -849,6 +872,7 @@ function HoldingTable({
     const profitRate = getPositionProfitRate(position);
     const weight = getPositionWeight(position, totalAsset);
     const holdingDays = getHoldingDays(position);
+    const holdReason = holdReasonLine(position, theme.key === "ai");
     return {
       key: `${theme.key}-${code}-${index}`,
       name,
@@ -862,6 +886,7 @@ function HoldingTable({
       profitRate,
       weight,
       holdingDays,
+      holdReason,
     };
   });
 
@@ -889,6 +914,7 @@ function HoldingTable({
                 <td>
                   <b>{r.name}</b>
                   <span>{r.code}</span>
+                  <span className="holdReasonInline">보유 · {r.holdReason}</span>
                 </td>
                 <td>{formatNumber(r.quantity, 0)}주</td>
                 <td>{formatKrw(r.buyPrice)}</td>
@@ -921,6 +947,7 @@ function HoldingTable({
                 {formatPercent(r.profitRate)}
               </span>
             </div>
+            <div className="holdRowReason">보유 이유 · {r.holdReason}</div>
             <div className="holdRowSub">
               <span>평가 {formatKrw(r.evalAmount)}</span>
               <span>비중 {formatPercent(r.weight, 1)}</span>
@@ -1167,7 +1194,12 @@ function DashboardHoldings({ history }: { history: AnyRecord }) {
         const weight = getPositionWeight(position, data.totalAsset);
         return (
           <div className="holdStripRow" key={`hold-${getCode(position)}-${index}`}>
-            <span className="holdStripName">{getName(position)}</span>
+            <div className="holdStripMain">
+              <span className="holdStripName">{getName(position)}</span>
+              <span className="holdStripReason">
+                보유 이유 · {holdReasonLine(position, false)}
+              </span>
+            </div>
             <span className="holdStripWeight">{formatPercent(weight, 1)}</span>
             <span className="holdStripRate" style={{ color: toneColor(rate) }}>
               {formatPercent(rate)}
@@ -1198,7 +1230,12 @@ function DashboardSold({ history }: { history: AnyRecord }) {
         const rate = getPositionProfitRate(trade);
         return (
           <div className="holdStripRow" key={`sold-${getCode(trade)}-${index}`}>
-            <span className="holdStripName">{getName(trade)}</span>
+            <div className="holdStripMain">
+              <span className="holdStripName">{getName(trade)}</span>
+              <span className="holdStripReason">
+                매도 이유 · {sellReasonLine(trade, false)}
+              </span>
+            </div>
             <span className="holdStripWeight">
               {formatShortDate(trade.date || trade.sellDate)}
             </span>
@@ -1564,7 +1601,9 @@ const dashboardCss = `
     border-radius: 10px;
     padding: 10px 14px;
   }
+  .holdStripMain { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .holdStripName { font-size: 14px; font-weight: 850; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .holdStripReason { font-size: 11px; color: #94a3b8; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdStripWeight { font-size: 12px; color: #94a3b8; font-weight: 750; white-space: nowrap; }
   .holdStripRate { font-size: 14px; font-weight: 900; min-width: 56px; text-align: right; }
   .bestHeroReason {
@@ -1628,6 +1667,7 @@ const dashboardCss = `
   .holdRowMain { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
   .holdRowName { color: #0f172a; font-size: 14px; font-weight: 900; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdRowRate { font-size: 14px; font-weight: 950; letter-spacing: -0.02em; white-space: nowrap; }
+  .holdRowReason { margin-top: 3px; color: #94a3b8; font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdRowSub { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: 800; }
   .holdRowSub span { white-space: nowrap; }
   .holdingTableWrap, .candidateTableWrap { width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #e2e8f0; border-radius: 16px; }
@@ -1639,6 +1679,7 @@ const dashboardCss = `
   .holdingTable td, .candidateTable td, .compareTable td { padding: 13px 12px; border-bottom: 1px solid #eef2f7; font-size: 13px; font-weight: 900; white-space: nowrap; }
   .holdingTable td b, .candidateTable td b { display: block; color: #0f172a; font-size: 13px; }
   .holdingTable td span, .candidateTable td span { display: block; color: #64748b; font-size: 11px; margin-top: 3px; }
+  .holdingTable td span.holdReasonInline { color: #94a3b8; font-weight: 800; margin-top: 2px; }
   .qualityPill { display: inline-flex !important; border-radius: 999px; padding: 5px 9px; font-size: 12px !important; font-weight: 950; margin-top: 0 !important; }
   .holdingJudgeCell { min-width: 160px; max-width: 240px; }
   .holdingJudgeRow { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
