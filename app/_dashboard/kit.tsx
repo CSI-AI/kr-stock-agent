@@ -149,10 +149,22 @@ function humanizeReason(text: unknown): string {
   return getString(text)
     .replace(/매도\s*엔진\s*(HIGH|MID|LOW)?/gi, "매도 신호 확대")
     .replace(/방어선/g, "리스크")
+    .replace(/매수\s*가설\s*재확인/g, "매수 가설 재점검")
     .replace(/\bscore\b/gi, "")
     .replace(/점수\s*기준\s*충족/g, "기준 충족")
     .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+// 손실/리스크 종목의 보유 이유 꼬리 문구 — sellSignal에서 위험 요인 감지.
+function holdRiskTail(signal: AnyRecord, isAi: boolean): string {
+  const text =
+    getStringArray(signal.reasons).join(" ") + " " + getString(signal.summary);
+  if (/부채/.test(text)) return isAi ? "재무 리스크 확인 필요" : "부채 부담 확인 필요";
+  if (/매출\s*감소|성장\s*지속성/.test(text))
+    return isAi ? "실적 신호 점검 필요" : "실적 흐름 점검 필요";
+  if (/품질/.test(text)) return "리스크 점검 필요";
+  return isAi ? "리스크 점검 필요" : "매수 가설 재점검 구간";
 }
 
 function clamp(text: string, max: number): string {
@@ -231,17 +243,15 @@ function buildHoldReason(
   const nextCheck = getString(reviewItem.nextCheck);
   if (nextCheck) evidence.push(`다음 점검 · ${nextCheck}`);
 
+  // 손실 머리말(손실일 때만) + 위험 요인 꼬리말로 자연스러운 문장 구성.
+  const lossHead =
+    rate !== null && rate < 0 ? `손실 ${formatPercent(Math.abs(rate))}` : "";
+  const tail = holdRiskTail(signal, isAi);
+
   let line: string;
-  if (watching) {
-    const sum =
-      humanizeReason(signal.summary) ||
-      (rate !== null ? `손실 ${formatPercent(rate)}로 점검 필요` : "리스크 점검 필요");
-    line = isAi ? `${sum} · 리스크 점검` : sum;
-  } else if (checking) {
-    const sum = humanizeReason(signal.summary);
-    line =
-      sum ||
-      (isAi ? "실적 신호 유지, 리스크 점검 필요" : "성장 유지, 밸류 부담 점검");
+  if (watching || checking) {
+    // 손실이 있으면 "손실 X%, 위험요인", 없으면 위험요인 문구만(중복 표현 방지).
+    line = lossHead ? `${lossHead}, ${tail}` : tail;
   } else {
     const parts = [metrics.opGrowth, metrics.roe].filter(Boolean);
     if (parts.length > 0) {
@@ -1651,7 +1661,7 @@ const dashboardCss = `
   }
   .dashboardRoot {
     width: 100%;
-    max-width: 1480px;
+    max-width: 1280px;
     min-height: 100vh;
     margin: 0 auto;
     overflow-x: hidden;
@@ -1716,7 +1726,8 @@ const dashboardCss = `
   /* Phase 38-B: 종목 우선 섹션 (사고/보유/판/펀드) */
   .dashSection { margin-bottom: 12px; }
   .dashSectionTitle { margin: 0 0 7px; font-size: 13px; font-weight: 900; color: #475569; }
-  .holdStrip { display: flex; flex-direction: column; gap: 6px; }
+  /* PC에서 가로로 길게 퍼지지 않도록 다중 컬럼으로 밀도 확보. 좁은 폭에선 auto-fill로 1컬럼. */
+  .holdStrip { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 6px 10px; }
   .holdStripRow {
     display: grid;
     grid-template-columns: 1fr auto auto;
@@ -2087,6 +2098,7 @@ const dashboardCss = `
   }
   @media (max-width: 900px) {
     .dashboardRoot { padding: 0 12px 24px; }
+    .holdStrip { grid-template-columns: 1fr; }
     .topBar { grid-template-columns: 1fr; height: auto; gap: 8px; padding: 9px 0; }
     nav { justify-content: flex-start; gap: 16px; height: auto; overflow-x: auto; }
     nav a { padding: 4px 0; }
