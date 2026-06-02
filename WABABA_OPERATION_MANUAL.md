@@ -240,15 +240,47 @@ python scripts\qa\check_public_data_freshness.py
 - **FAIL: ... 커밋/푸시 필요** → 데이터는 신선한데 배포만 안 됨. §4 절차로 push하면 해소.
 - **FAIL: 로컬 경로(C:\...) 노출 필드** → 아래 §2-D-1 알려진 이슈 참조.
 
-### 2-D-1. 알려진 이슈 — `tradeHistoryPath` 로컬 경로 노출 (미해결, 별도 Phase)
+### 2-D-1. (해결됨, Phase 41-B) `tradeHistoryPath` 로컬 경로 노출
 
-현재 공개 JSON에 로컬 절대경로가 노출되어 있다(Phase 41-A에서 점검 스크립트로 발견):
+과거 공개 JSON에 로컬 절대경로가 노출됐었다(Phase 41-A 점검 스크립트로 발견):
 - `performanceAnalysis.tradePerformance.tradeHistoryPath`
 - `aiPerformanceAnalysis.tradePerformance.tradeHistoryPath`
-- 값 예: `C:\work\kr-stock-agent-data-new\trade-history.json`
 
-이 값은 공개 URL(`/data/recommendation-history.json`)로 그대로 노출되어 운영 PC 경로 구조가 드러난다(민감도 낮으나 불필요).
-**해결은 REPO2 `build_recommendation_history.py`의 sanitize 단계에서 해당 필드를 제거**해야 하며, REPO2 수정이 필요하므로 별도 Phase로 진행한다. 그전까지 freshness 점검은 이 항목으로 FAIL을 띄운다(의도된 알림).
+**Phase 41-B에서 해결**: REPO2 `build_recommendation_history.py`의 public sanitize 단계에
+`_drop_internal_keys_for_public()`(denylist `{"tradeHistoryPath"}`)를 추가해 공개 payload에서만 제거.
+원본 운영 JSON은 해당 필드를 유지한다. 현재 freshness 점검은 PASS다(공개 JSON에 `C:\`/`tradeHistoryPath` 0건).
+
+---
+
+## 2-E. 자동 publish (commit/push 자동화) — Phase 41-C
+
+매일 수동 commit/push를 없애기 위한 구조. 기존 "Wababa Auto Daily"(08:45 데이터 생성)는 그대로 두고,
+별도 작업 "Wababa Auto Publish"(평일 08:55)가 공개 JSON만 자동 commit/push 한다(실패 격리).
+
+스크립트 (`scripts/ops/`):
+- `publish-public-data.ps1` — 핵심. freshness gate + 안전장치 통과 시 `public/data/recommendation-history.json` 단일 파일만 commit/push.
+  - 기본=검사만, `-Commit`=커밋까지, `-Push`=푸시까지.
+- `register-wababa-auto-publish.ps1` — 작업 스케줄러 등록. 기본 PREVIEW, `-Apply`로만 실제 등록, `-Unregister`로 해제.
+- `run-public-data-publish-once.cmd` — 더블클릭 원클릭 fallback(= `publish-public-data.ps1 -Commit -Push`, 실패 시 창 유지).
+
+작업 스케줄러 등록(1회):
+```powershell
+cd C:\work\kr-stock-agent
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\ops\register-wababa-auto-publish.ps1          # 미리보기
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\ops\register-wababa-auto-publish.ps1 -Apply   # 실제 등록
+```
+
+수동 원클릭 fallback: 파일 탐색기에서 `scripts\ops\run-public-data-publish-once.cmd` 더블클릭.
+
+안전장치(모두 통과해야 commit): 브랜치 master / freshness gate PASS(`--allow-unpublished`) /
+허용 외 dirty 없음(허용=public JSON·next-env.d.ts) / 공개 JSON에 `C:\`·`tradeHistoryPath`·`kr-stock-agent-data-new` 0건 /
+origin 대비 diverged 아님 / 변경 없으면 정상 종료. push 실패 시 재시도 없음(commit은 로컬에 남음).
+
+실패 확인 파일:
+- `logs/wababa-auto-publish.log` (매 실행 기록)
+- `logs/wababa-auto-publish-error.log` (실패만)
+- ⚠ git push가 자격증명 오류면 **Git Credential Manager 로그인**이 필요(사용자 컨텍스트에서 1회 `git push` 수동 실행해 캐시).
+- `next-env.d.ts`는 항상 무시 대상(절대 stage 안 함).
 
 ---
 

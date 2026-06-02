@@ -15,6 +15,9 @@
 사용:
   cd C:\\work\\kr-stock-agent
   python scripts\\qa\\check_public_data_freshness.py
+  python scripts\\qa\\check_public_data_freshness.py --allow-unpublished
+    (자동 publish 사전점검용 - '미반영(새 데이터 미커밋)'을 NOTE로 처리하고
+     누출/sanitize/원본불일치만 FAIL로 본다.)
 """
 
 from __future__ import annotations
@@ -115,6 +118,10 @@ def git_head_public() -> dict[str, Any] | None:
 def main() -> int:
     problems: list[str] = []
     notes: list[str] = []
+    # 자동 publish 사전점검: 작업본이 배포본보다 최신(아직 미반영)인 상태는
+    # 정상(=publish 대상)이므로 FAIL이 아닌 NOTE로 처리한다. 누출/sanitize/원본불일치는
+    # 이 플래그와 무관하게 그대로 FAIL로 남겨 publish를 차단한다.
+    allow_unpublished = "--allow-unpublished" in sys.argv
 
     if not PUBLIC_PATH.exists():
         print(f"ERROR: 공개 JSON이 없습니다: {PUBLIC_PATH}")
@@ -151,10 +158,14 @@ def main() -> int:
         h_base, h_gen = get_dates(head)
         print(f"[git HEAD/배포] baseDate={h_base}  generatedAt={h_gen}")
         if h_base != pub_base:
-            problems.append(
+            message = (
                 f"배포본 baseDate({h_base}) != 공개 작업본({pub_base}) "
                 f"- '{PUBLIC_REL}' 커밋/푸시 필요(아직 Vercel 미반영)"
             )
+            if allow_unpublished:
+                notes.append(message + " [자동 publish 대상]")
+            else:
+                problems.append(message)
     else:
         notes.append("git HEAD 공개본 조회 실패 - 배포 대조 생략")
 
