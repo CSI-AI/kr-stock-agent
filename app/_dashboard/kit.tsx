@@ -144,27 +144,132 @@ function formatShortDate(value: unknown): string {
   return `${match[1].slice(2)}.${match[2]}.${match[3]}${match[4] ? ` ${match[4]}` : ""}`;
 }
 
-// 보유 이유 1줄 — 기존 position.action / sellSignal 신호에서 도출.
-// 펀드별 어휘 구분(와바바=성장 가설, AI=신호·리스크). 차트/거래량 등 미구현 신호어 미사용.
-function holdReasonLine(position: AnyRecord, isAi: boolean): string {
+// 내부 엔진/점수 표현을 사용자용 문장으로 정리. (엔진/score/점수/방어선 → 일반 문장)
+function humanizeReason(text: unknown): string {
+  return getString(text)
+    .replace(/매도\s*엔진\s*(HIGH|MID|LOW)?/gi, "매도 신호 확대")
+    .replace(/방어선/g, "리스크")
+    .replace(/\bscore\b/gi, "")
+    .replace(/점수\s*기준\s*충족/g, "기준 충족")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function clamp(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
+
+// 문자열 배열 추출 (getArray는 객체 배열만 통과시키므로 문자열 배열엔 사용 불가).
+function getStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((x) => getString(x)).filter(Boolean);
+}
+
+// 보유 종목의 구체 지표 bullet 추출 — holdingReview.holdReason 문자열에서.
+function extractHoldMetrics(reviewItem: AnyRecord): {
+  opGrowth: string;
+  roe: string;
+  bullets: string[];
+} {
+  const arr = getStringArray(reviewItem.holdReason);
+  const find = (re: RegExp) => arr.find((s) => re.test(s)) || "";
+  // "영업이익 증가율 668.7%" → "영업이익 +668.7%"
+  const opGrowth = find(/영업이익/).replace(/영업이익\s*증가율\s*/, "영업이익 +");
+  const roe = find(/ROE/);
+  // 구체 숫자 bullet만(모호한 헤드라인 제외)
+  const bullets = arr.filter((s) =>
+    /ROE|영업이익|PER|PBR|매출|배당|CAGR|증가율|%/.test(s),
+  );
+  return { opGrowth, roe, bullets };
+}
+
+// 매수 이유 — 구체 1줄 + 근거 bullet (companySummary / coreCatalyst / investmentPoints / risk).
+function buildBuyReason(item: AnyRecord): { line: string; evidence: string[] } {
+  const report = getObject(item.investmentReport);
+  const decisionEngine = getObject(item.decisionEngine);
+  const line =
+    getString(decisionEngine.buyTrigger) ||
+    getString(report.fact) ||
+    getString(item.companySummary) ||
+    "성장성과 밸류를 함께 점검";
+  const catalyst = getStringArray(item.coreCatalyst);
+  const points = getStringArray(item.investmentPoints);
+  const summary = getString(item.companySummary);
+  const evidence: string[] = [];
+  if (summary) evidence.push(summary);
+  (catalyst.length ? catalyst : points)
+    .filter((b) => b !== summary)
+    .slice(0, 2)
+    .forEach((b) => evidence.push(b));
+  const risk = getString(item.riskSummary);
+  if (risk) evidence.push(`⚠ ${risk}`);
+  return { line: clamp(line, 44), evidence: evidence.slice(0, 4) };
+}
+
+// 보유 이유 — 구체 1줄 + 근거. 펀드별 어휘(와바바=실적/성장/밸류, AI=신호/리스크).
+function buildHoldReason(
+  position: AnyRecord,
+  reviewItem: AnyRecord,
+  isAi: boolean,
+): { line: string; evidence: string[] } {
   const signal = getObject(position.sellSignal);
   const urgency = getString(signal.urgency).toUpperCase();
   const action = getString(position.action).toUpperCase();
+  const rate = getPositionProfitRate(position);
+  const metrics = extractHoldMetrics(reviewItem);
   const watching = /SELL/.test(action) || urgency === "HIGH";
   const checking = urgency === "MID" || /CHECK|REDUCE/.test(action);
-  if (watching) return isAi ? "리스크 확대 감지" : "리스크 확대";
-  if (checking) return isAi ? "신호 점검 중" : "성장 가설 점검";
-  return isAi ? "신호 유지" : "성장 가설 유지";
+
+  const evidence: string[] = [];
+  metrics.bullets.forEach((b) => evidence.push(b));
+  getStringArray(signal.reasons)
+    .map((r) => humanizeReason(r))
+    .filter(Boolean)
+    .forEach((r) => {
+      if (!evidence.includes(r)) evidence.push(r);
+    });
+  const nextCheck = getString(reviewItem.nextCheck);
+  if (nextCheck) evidence.push(`다음 점검 · ${nextCheck}`);
+
+  let line: string;
+  if (watching) {
+    const sum =
+      humanizeReason(signal.summary) ||
+      (rate !== null ? `손실 ${formatPercent(rate)}로 점검 필요` : "리스크 점검 필요");
+    line = isAi ? `${sum} · 리스크 점검` : sum;
+  } else if (checking) {
+    const sum = humanizeReason(signal.summary);
+    line =
+      sum ||
+      (isAi ? "실적 신호 유지, 리스크 점검 필요" : "성장 유지, 밸류 부담 점검");
+  } else {
+    const parts = [metrics.opGrowth, metrics.roe].filter(Boolean);
+    if (parts.length > 0) {
+      line = isAi
+        ? `실적 신호 유지 · ${parts.join(" · ")}`
+        : `${parts.join(" · ")}로 실적 흐름 유지`;
+    } else {
+      line = isAi
+        ? "실적 신호 유지, 리스크 허용 범위"
+        : "실적 성장 흐름 유지";
+    }
+  }
+  return { line: clamp(line, 46), evidence: evidence.slice(0, 4) };
 }
 
-// 매도 이유 1줄 — 기존 trade.reason 우선, 내부 엔진/점수 표현은 읽기 쉬운 문구로 정리.
-function sellReasonLine(trade: AnyRecord, isAi: boolean): string {
-  const raw = getString(trade.reason) || getString(trade.sellReason);
-  if (!raw) return isAi ? "기대수익 저하" : "매도 사유 발생";
-  if (/엔진|engine|score|점수/i.test(raw)) {
-    return isAi ? "리스크 확대" : "매도 신호 발생";
-  }
-  return raw.length > 22 ? `${raw.slice(0, 22)}…` : raw;
+// 매도 이유 — 구체 1줄 + 근거. 내부 엔진 표현은 정리.
+function buildSellReason(
+  trade: AnyRecord,
+  isAi: boolean,
+): { line: string; evidence: string[] } {
+  const raw = humanizeReason(getString(trade.reason) || getString(trade.sellReason));
+  const rate = getPositionProfitRate(trade);
+  const line =
+    raw || (isAi ? "기대수익 저하로 매도" : "리스크 확대로 매도");
+  const evidence: string[] = [];
+  if (raw) evidence.push(raw);
+  if (rate !== null) evidence.push(`실현 수익률 ${formatPercent(rate)}`);
+  return { line: clamp(line, 40), evidence };
 }
 
 function getCode(item: AnyRecord): string {
@@ -872,7 +977,8 @@ function HoldingTable({
     const profitRate = getPositionProfitRate(position);
     const weight = getPositionWeight(position, totalAsset);
     const holdingDays = getHoldingDays(position);
-    const holdReason = holdReasonLine(position, theme.key === "ai");
+    const reviewItem = getObject(holdReviewMap[code]);
+    const hold = buildHoldReason(position, reviewItem, theme.key === "ai");
     return {
       key: `${theme.key}-${code}-${index}`,
       name,
@@ -886,7 +992,8 @@ function HoldingTable({
       profitRate,
       weight,
       holdingDays,
-      holdReason,
+      holdLine: hold.line,
+      holdEvidence: hold.evidence,
     };
   });
 
@@ -914,7 +1021,7 @@ function HoldingTable({
                 <td>
                   <b>{r.name}</b>
                   <span>{r.code}</span>
-                  <span className="holdReasonInline">보유 · {r.holdReason}</span>
+                  <span className="holdReasonInline">보유 · {r.holdLine}</span>
                 </td>
                 <td>{formatNumber(r.quantity, 0)}주</td>
                 <td>{formatKrw(r.buyPrice)}</td>
@@ -947,7 +1054,8 @@ function HoldingTable({
                 {formatPercent(r.profitRate)}
               </span>
             </div>
-            <div className="holdRowReason">보유 이유 · {r.holdReason}</div>
+            <div className="holdRowReason">보유 · {r.holdLine}</div>
+            <ReasonDetails items={r.holdEvidence} label="근거 보기" theme={theme} />
             <div className="holdRowSub">
               <span>평가 {formatKrw(r.evalAmount)}</span>
               <span>비중 {formatPercent(r.weight, 1)}</span>
@@ -1116,28 +1224,44 @@ function SimpleLineChart({ wababa, ai }: { wababa: number; ai: number }) {
   );
 }
 
+// 근거 보기 — 접힘. 기본 노출은 1줄, 자세한 근거는 여기로.
+function ReasonDetails({
+  items,
+  label = "근거 보기",
+  theme,
+}: {
+  items: string[];
+  label?: string;
+  theme?: FundTheme;
+}) {
+  if (!items || items.length === 0) return null;
+  return (
+    <details className="reasonDetails">
+      <summary
+        className="reasonDetailsSummary"
+        style={theme ? { color: theme.primary } : undefined}
+      >
+        {label}
+      </summary>
+      <ul className="reasonDetailsList">
+        {items.map((it, i) => (
+          <li key={`${label}-${i}`}>{it}</li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 function BestPickHero({ history }: { history: AnyRecord }) {
   const finalBest = getObject(history.finalBestPick);
   if (Object.keys(finalBest).length === 0) return null;
 
   const name = getName(finalBest);
   const code = getCode(finalBest);
-  const investmentReport = getObject(finalBest.investmentReport);
   const decisionEngine = getObject(finalBest.decisionEngine);
-  const headline =
-    getString(investmentReport.fact) ||
-    getString(finalBest.companySummary) ||
-    getString(finalBest.growthStory) ||
-    getString(finalBest.rankReason) ||
-    "성장성과 밸류를 함께 점검";
-  const whyText =
-    getString(investmentReport.decision) ||
-    getString(investmentReport.businessImpact);
-  const buyTrigger = getString(decisionEngine.buyTrigger);
-  // 운용앱 원칙: 이유는 한 줄(40자 전후). 긴 설명은 전략랩으로.
-  const reasonRaw = buyTrigger || whyText || headline;
-  const reasonLine =
-    reasonRaw.length > 40 ? `${reasonRaw.slice(0, 40)}…` : reasonRaw;
+  // 운용앱 원칙: 기본은 구체 1줄, 자세한 근거는 "근거 보기"로 접어 제공.
+  const buy = buildBuyReason(finalBest);
+  const reasonLine = buy.line;
   const confidence = getNumber(decisionEngine.confidence);
   const score =
     getNumber(finalBest.aiFundScore) ??
@@ -1176,6 +1300,8 @@ function BestPickHero({ history }: { history: AnyRecord }) {
           <span className="bestHeroMetricBadge">ROE {formatPercent(roe, 1)}</span>
         ) : null}
       </div>
+
+      <ReasonDetails items={buy.evidence} label="매수 근거 보기" />
     </section>
   );
 }
@@ -1192,13 +1318,13 @@ function DashboardHoldings({ history }: { history: AnyRecord }) {
       {positions.map((position, index) => {
         const rate = getPositionProfitRate(position);
         const weight = getPositionWeight(position, data.totalAsset);
+        const reviewItem = getObject(data.holdReviewMap[getCode(position)]);
+        const hold = buildHoldReason(position, reviewItem, false);
         return (
           <div className="holdStripRow" key={`hold-${getCode(position)}-${index}`}>
             <div className="holdStripMain">
               <span className="holdStripName">{getName(position)}</span>
-              <span className="holdStripReason">
-                보유 이유 · {holdReasonLine(position, false)}
-              </span>
+              <span className="holdStripReason">보유 · {hold.line}</span>
             </div>
             <span className="holdStripWeight">{formatPercent(weight, 1)}</span>
             <span className="holdStripRate" style={{ color: toneColor(rate) }}>
@@ -1233,7 +1359,7 @@ function DashboardSold({ history }: { history: AnyRecord }) {
             <div className="holdStripMain">
               <span className="holdStripName">{getName(trade)}</span>
               <span className="holdStripReason">
-                매도 이유 · {sellReasonLine(trade, false)}
+                매도 · {buildSellReason(trade, false).line}
               </span>
             </div>
             <span className="holdStripWeight">
@@ -1670,6 +1796,13 @@ const dashboardCss = `
   .holdRowReason { margin-top: 3px; color: #94a3b8; font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .holdRowSub { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 4px; color: #64748b; font-size: 11px; font-weight: 800; }
   .holdRowSub span { white-space: nowrap; }
+  .reasonDetails { margin-top: 6px; }
+  .reasonDetailsSummary { cursor: pointer; list-style: none; font-size: 11px; font-weight: 850; color: #64748b; }
+  .reasonDetailsSummary::-webkit-details-marker { display: none; }
+  .reasonDetailsSummary::before { content: "▸ "; }
+  details[open] > .reasonDetailsSummary::before { content: "▾ "; }
+  .reasonDetailsList { margin: 6px 0 2px; padding-left: 16px; display: flex; flex-direction: column; gap: 3px; }
+  .reasonDetailsList li { color: #475569; font-size: 11px; font-weight: 750; line-height: 1.5; }
   .holdingTableWrap, .candidateTableWrap { width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #e2e8f0; border-radius: 16px; }
   .candidateTableWrap { border: none; border-radius: 0; }
   .holdingTable, .candidateTable, .compareTable { width: 100%; border-collapse: collapse; table-layout: auto; }
