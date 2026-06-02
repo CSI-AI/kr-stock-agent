@@ -1457,10 +1457,9 @@ function GlobalSummary({ history }: { history: AnyRecord }) {
         tone={toneColor(totalProfit)}
       />
       <SmallMetricCard
-        label="오늘 자동운용"
-        value="완료"
-        sub={formatShortDate(history.baseDate)}
-        tone="#059669"
+        label="데이터 기준"
+        value={formatShortDate(history.baseDate)}
+        sub="최근 운용 기준"
       />
       <SmallMetricCard
         label="보유 종목 수"
@@ -1532,6 +1531,7 @@ const dashboardCss = `
   nav a.active { color: #2563eb; border-bottom-color: #2563eb; }
   .topStatus { display: flex; justify-content: flex-end; align-items: center; gap: 8px; color: #64748b; font-size: 12px; font-weight: 850; white-space: nowrap; }
   .autoOn { color: #059669; font-weight: 950; }
+  .dataStaleNote { color: #94a3b8; font-size: 11px; font-weight: 800; }
   .globalSummary {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));

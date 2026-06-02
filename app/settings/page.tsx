@@ -24,8 +24,8 @@ export default function SettingsPage() {
           <div className="sectionTitle">데이터 기준</div>
           <p>
             마지막 데이터 생성: {formatShortDate(history.generatedAt)} · 기준일{" "}
-            {formatShortDate(history.baseDate)}. 두 펀드 자동운용은 매일 같은
-            파이프라인에서 함께 실행됩니다.
+            {formatShortDate(history.baseDate)}. 두 펀드 데이터는 같은
+            파이프라인에서 함께 생성됩니다.
           </p>
         </div>
         <div className="actionPanelButtons">
