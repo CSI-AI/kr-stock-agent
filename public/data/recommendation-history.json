@@ -1,6 +1,6 @@
 {
-  "baseDate": "2026-06-04",
-  "generatedAt": "2026-06-04 08:45:03",
+  "baseDate": "2026-06-05",
+  "generatedAt": "2026-06-05 08:45:05",
   "portfolioSummary": {
     "initialCapital": 50000000.0,
     "cash": 36914450.0,
@@ -202,8 +202,8 @@
     ]
   },
   "performanceAnalysis": {
-    "baseDate": "2026-06-04",
-    "generatedAt": "2026-06-04 08:45:03",
+    "baseDate": "2026-06-05",
+    "generatedAt": "2026-06-05 08:45:05",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 36914450.0,
@@ -211,8 +211,8 @@
       "totalAssetAmount": 49057050.0,
       "realizedProfit": -640200.0,
       "unrealizedProfit": -302750.0,
-      "totalProfitAmount": -936687.0,
-      "estimatedDividendIncome": 6263.0,
+      "totalProfitAmount": -935783.0,
+      "estimatedDividendIncome": 7167.0,
       "totalProfitRate": -1.87,
       "dailyReturnRate": -0.61,
       "cumulativeReturnRate": -1.89,
@@ -310,7 +310,7 @@
           "realizedProfitChange": 0
         },
         {
-          "date": "2026-06-04",
+          "date": "2026-06-05",
           "totalAssetAmount": 49057050.0,
           "profitAmount": -942950.0,
           "dailyReturnRate": -0.61,
@@ -330,14 +330,14 @@
       "averageReturnRate": -5.76,
       "maxProfitRate": 5.78,
       "maxLossRate": -20.97,
-      "averageHoldingDays": 13.7,
+      "averageHoldingDays": 14.4,
       "bestItem": {
         "code": "019180",
         "name": "티에이치엔",
         "status": "OPEN",
         "buyDate": "2026-05-08",
         "sellDate": null,
-        "holdingDays": 27,
+        "holdingDays": 28,
         "buyPrice": 7780.0,
         "currentPrice": 8230.0,
         "quantity": 235.0,
@@ -363,7 +363,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 27,
+          "holdingDays": 28,
           "buyPrice": 7780.0,
           "currentPrice": 8230.0,
           "quantity": 235.0,
@@ -377,7 +377,7 @@
           "status": "OPEN",
           "buyDate": "2026-06-03",
           "sellDate": null,
-          "holdingDays": 1,
+          "holdingDays": 2,
           "buyPrice": 16550.0,
           "currentPrice": 16550.0,
           "quantity": 120.0,
@@ -391,7 +391,7 @@
           "status": "OPEN",
           "buyDate": "2026-06-02",
           "sellDate": null,
-          "holdingDays": 2,
+          "holdingDays": 3,
           "buyPrice": 7800.0,
           "currentPrice": 7800.0,
           "quantity": 235.0,
@@ -405,7 +405,7 @@
           "status": "OPEN",
           "buyDate": "2026-06-01",
           "sellDate": null,
-          "holdingDays": 3,
+          "holdingDays": 4,
           "buyPrice": 24150.0,
           "currentPrice": 24150.0,
           "quantity": 69.0,
@@ -419,7 +419,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 16,
+          "holdingDays": 17,
           "buyPrice": 29800.0,
           "currentPrice": 28500.0,
           "quantity": 55.0,
@@ -433,7 +433,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 17,
+          "holdingDays": 18,
           "buyPrice": 86700.0,
           "currentPrice": 79700.0,
           "quantity": 21.0,
@@ -447,7 +447,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-20",
           "sellDate": null,
-          "holdingDays": 15,
+          "holdingDays": 16,
           "buyPrice": 418000.0,
           "currentPrice": 370500.0,
           "quantity": 4.0,
@@ -696,42 +696,42 @@
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 6263.0,
+      "estimatedDividendIncome": 7167.0,
       "items": [
         {
           "code": "461300",
           "name": "아이스크림미디어",
           "dividendYield": 9.39,
-          "holdingDays": 1,
-          "estimatedDividendIncome": 511.0
+          "holdingDays": 2,
+          "estimatedDividendIncome": 1022.0
         },
         {
           "code": "088130",
           "name": "동아엘텍",
           "dividendYield": 1.92,
-          "holdingDays": 2,
-          "estimatedDividendIncome": 193.0
+          "holdingDays": 3,
+          "estimatedDividendIncome": 289.0
         },
         {
           "code": "039490",
           "name": "키움증권",
           "dividendYield": 3.1,
-          "holdingDays": 15,
-          "estimatedDividendIncome": 1888.0
+          "holdingDays": 16,
+          "estimatedDividendIncome": 2014.0
         },
         {
           "code": "041510",
           "name": "에스엠",
           "dividendYield": 2.03,
-          "holdingDays": 17,
-          "estimatedDividendIncome": 1582.0
+          "holdingDays": 18,
+          "estimatedDividendIncome": 1676.0
         },
         {
           "code": "019180",
           "name": "티에이치엔",
           "dividendYield": 1.46,
-          "holdingDays": 27,
-          "estimatedDividendIncome": 2089.0
+          "holdingDays": 28,
+          "estimatedDividendIncome": 2166.0
         }
       ]
     },
@@ -857,7 +857,7 @@
     },
     "recentEvents": [
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -866,11 +866,11 @@
         "amount": 105750.0,
         "profitRate": 5.78,
         "profitAmount": 105750.0,
-        "holdingDays": 27,
+        "holdingDays": 28,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -879,11 +879,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 1,
+        "holdingDays": 2,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -892,11 +892,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 2,
+        "holdingDays": 3,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "neutral",
@@ -905,11 +905,11 @@
         "amount": 0.0,
         "profitRate": 0.0,
         "profitAmount": 0.0,
-        "holdingDays": 3,
+        "holdingDays": 4,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -918,11 +918,11 @@
         "amount": -71500.0,
         "profitRate": -4.36,
         "profitAmount": -71500.0,
-        "holdingDays": 16,
+        "holdingDays": 17,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -931,11 +931,11 @@
         "amount": -147000.0,
         "profitRate": -8.07,
         "profitAmount": -147000.0,
-        "holdingDays": 17,
+        "holdingDays": 18,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -944,7 +944,7 @@
         "amount": -190000.0,
         "profitRate": -11.36,
         "profitAmount": -190000.0,
-        "holdingDays": 15,
+        "holdingDays": 16,
         "reason": "현재 보유 수익률 추적"
       },
       {
@@ -1016,7 +1016,7 @@
     ],
     "summary": {
       "totalReturnRate": -1.87,
-      "totalProfitAmount": -936687.0,
+      "totalProfitAmount": -935783.0,
       "winRate": 0.0,
       "averageReturnRate": -16.93,
       "maxLossRate": -20.97,
@@ -1029,8 +1029,8 @@
     }
   },
   "dailyFundMemo": {
-    "date": "2026-06-04",
-    "title": "2026-06-04 와바바 운용일지",
+    "date": "2026-06-05",
+    "title": "2026-06-05 와바바 운용일지",
     "status": "NO_TRADE",
     "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
     "lines": [
@@ -1045,7 +1045,7 @@
     "totalReturnRate": -1.87
   },
   "holdingReview": {
-    "date": "2026-06-04",
+    "date": "2026-06-05",
     "summary": "보유 종목 7개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
     "holdingCount": 7,
     "sellWatchCount": 0,
@@ -1056,7 +1056,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-03",
-        "holdingDays": 1,
+        "holdingDays": 2,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1078,7 +1078,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-02",
-        "holdingDays": 2,
+        "holdingDays": 3,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1100,7 +1100,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-01",
-        "holdingDays": 3,
+        "holdingDays": 4,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1122,7 +1122,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-20",
-        "holdingDays": 15,
+        "holdingDays": 16,
         "profitRate": -11.36,
         "growthConsistencyScore": 81.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1144,7 +1144,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 16,
+        "holdingDays": 17,
         "profitRate": -4.36,
         "growthConsistencyScore": 98.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1166,7 +1166,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 17,
+        "holdingDays": 18,
         "profitRate": -8.07,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1188,7 +1188,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 27,
+        "holdingDays": 28,
         "profitRate": 5.78,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1540,8 +1540,8 @@
     ]
   },
   "aiPerformanceAnalysis": {
-    "baseDate": "2026-06-04",
-    "generatedAt": "2026-06-04 08:45:03",
+    "baseDate": "2026-06-05",
+    "generatedAt": "2026-06-05 08:45:05",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 25408885.0,
@@ -1549,9 +1549,9 @@
       "totalAssetAmount": 47333845.0,
       "realizedProfit": 0.0,
       "unrealizedProfit": -2666155.0,
-      "totalProfitAmount": -2609119.0,
-      "estimatedDividendIncome": 57036.0,
-      "totalProfitRate": -5.22,
+      "totalProfitAmount": -2606557.0,
+      "estimatedDividendIncome": 59598.0,
+      "totalProfitRate": -5.21,
       "dailyReturnRate": -5.33,
       "cumulativeReturnRate": -5.33,
       "label": "약손실",
@@ -1612,7 +1612,7 @@
           "realizedProfitChange": 0
         },
         {
-          "date": "2026-06-04",
+          "date": "2026-06-05",
           "totalAssetAmount": 47333845.0,
           "profitAmount": -2666155.0,
           "dailyReturnRate": -5.33,
@@ -1632,14 +1632,14 @@
       "averageReturnRate": -10.6,
       "maxProfitRate": 10.88,
       "maxLossRate": -29.56,
-      "averageHoldingDays": 21.6,
+      "averageHoldingDays": 22.6,
       "bestItem": {
         "code": "402340",
         "name": "SK스퀘어",
         "status": "OPEN",
         "buyDate": "2026-05-18",
         "sellDate": null,
-        "holdingDays": 17,
+        "holdingDays": 18,
         "buyPrice": 1112000.0,
         "currentPrice": 1233000.0,
         "quantity": 2.0,
@@ -1653,7 +1653,7 @@
         "status": "OPEN",
         "buyDate": "2026-05-19",
         "sellDate": null,
-        "holdingDays": 16,
+        "holdingDays": 17,
         "buyPrice": 14040.0,
         "currentPrice": 9890.0,
         "quantity": 178.0,
@@ -1668,7 +1668,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 17,
+          "holdingDays": 18,
           "buyPrice": 1112000.0,
           "currentPrice": 1233000.0,
           "quantity": 2.0,
@@ -1682,7 +1682,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 28,
+          "holdingDays": 29,
           "buyPrice": 7780.0,
           "currentPrice": 8230.0,
           "quantity": 321.0,
@@ -1696,7 +1696,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 17,
+          "holdingDays": 18,
           "buyPrice": 43350.0,
           "currentPrice": 40800.0,
           "quantity": 57.0,
@@ -1710,7 +1710,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 27,
+          "holdingDays": 28,
           "buyPrice": 16360.0,
           "currentPrice": 15120.0,
           "quantity": 152.0,
@@ -1724,7 +1724,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 28,
+          "holdingDays": 29,
           "buyPrice": 3430.0,
           "currentPrice": 3055.0,
           "quantity": 728.0,
@@ -1738,7 +1738,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 20,
+          "holdingDays": 21,
           "buyPrice": 89700.0,
           "currentPrice": 79700.0,
           "quantity": 27.0,
@@ -1752,7 +1752,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 20,
+          "holdingDays": 21,
           "buyPrice": 4565.0,
           "currentPrice": 3870.0,
           "quantity": 547.0,
@@ -1766,7 +1766,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 16,
+          "holdingDays": 17,
           "buyPrice": 9870.0,
           "currentPrice": 7800.0,
           "quantity": 253.0,
@@ -1780,7 +1780,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 27,
+          "holdingDays": 28,
           "buyPrice": 5040.0,
           "currentPrice": 3965.0,
           "quantity": 496.0,
@@ -1794,7 +1794,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 16,
+          "holdingDays": 17,
           "buyPrice": 14040.0,
           "currentPrice": 9890.0,
           "quantity": 178.0,
@@ -1953,70 +1953,70 @@
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 57036.0,
+      "estimatedDividendIncome": 59598.0,
       "items": [
         {
           "code": "017510",
           "name": "세명전기",
           "dividendYield": 2.22,
-          "holdingDays": 16,
-          "estimatedDividendIncome": 1713.0
+          "holdingDays": 17,
+          "estimatedDividendIncome": 1820.0
         },
         {
           "code": "088130",
           "name": "동아엘텍",
           "dividendYield": 1.92,
-          "holdingDays": 16,
-          "estimatedDividendIncome": 1661.0
+          "holdingDays": 17,
+          "estimatedDividendIncome": 1765.0
         },
         {
           "code": "065710",
           "name": "서호전기",
           "dividendYield": 14.71,
-          "holdingDays": 17,
-          "estimatedDividendIncome": 15933.0
+          "holdingDays": 18,
+          "estimatedDividendIncome": 16870.0
         },
         {
           "code": "171090",
           "name": "선익시스템",
           "dividendYield": 1.25,
-          "holdingDays": 20,
-          "estimatedDividendIncome": 1474.0
+          "holdingDays": 21,
+          "estimatedDividendIncome": 1548.0
         },
         {
           "code": "037270",
           "name": "YG PLUS",
           "dividendYield": 0.78,
-          "holdingDays": 20,
-          "estimatedDividendIncome": 905.0
+          "holdingDays": 21,
+          "estimatedDividendIncome": 950.0
         },
         {
           "code": "015360",
           "name": "INVENI",
           "dividendYield": 7.14,
-          "holdingDays": 27,
-          "estimatedDividendIncome": 12138.0
+          "holdingDays": 28,
+          "estimatedDividendIncome": 12588.0
         },
         {
           "code": "020710",
           "name": "시공테크",
           "dividendYield": 8.55,
-          "holdingDays": 27,
-          "estimatedDividendIncome": 12438.0
+          "holdingDays": 28,
+          "estimatedDividendIncome": 12899.0
         },
         {
           "code": "021080",
           "name": "에이티넘인베스트",
           "dividendYield": 4.58,
-          "holdingDays": 28,
-          "estimatedDividendIncome": 7814.0
+          "holdingDays": 29,
+          "estimatedDividendIncome": 8093.0
         },
         {
           "code": "019180",
           "name": "티에이치엔",
           "dividendYield": 1.46,
-          "holdingDays": 28,
-          "estimatedDividendIncome": 2959.0
+          "holdingDays": 29,
+          "estimatedDividendIncome": 3065.0
         }
       ]
     },
@@ -2187,7 +2187,7 @@
     },
     "recentEvents": [
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -2196,11 +2196,11 @@
         "amount": 242000.0,
         "profitRate": 10.88,
         "profitAmount": 242000.0,
-        "holdingDays": 17,
+        "holdingDays": 18,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -2209,11 +2209,11 @@
         "amount": 144450.0,
         "profitRate": 5.78,
         "profitAmount": 144450.0,
-        "holdingDays": 28,
+        "holdingDays": 29,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2222,11 +2222,11 @@
         "amount": -145350.0,
         "profitRate": -5.88,
         "profitAmount": -145350.0,
-        "holdingDays": 17,
+        "holdingDays": 18,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2235,11 +2235,11 @@
         "amount": -188480.0,
         "profitRate": -7.58,
         "profitAmount": -188480.0,
-        "holdingDays": 27,
+        "holdingDays": 28,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2248,11 +2248,11 @@
         "amount": -273000.0,
         "profitRate": -10.93,
         "profitAmount": -273000.0,
-        "holdingDays": 28,
+        "holdingDays": 29,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2261,11 +2261,11 @@
         "amount": -270000.0,
         "profitRate": -11.15,
         "profitAmount": -270000.0,
-        "holdingDays": 20,
+        "holdingDays": 21,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2274,11 +2274,11 @@
         "amount": -380165.0,
         "profitRate": -15.22,
         "profitAmount": -380165.0,
-        "holdingDays": 20,
+        "holdingDays": 21,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2287,11 +2287,11 @@
         "amount": -523710.0,
         "profitRate": -20.97,
         "profitAmount": -523710.0,
-        "holdingDays": 16,
+        "holdingDays": 17,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2300,11 +2300,11 @@
         "amount": -533200.0,
         "profitRate": -21.33,
         "profitAmount": -533200.0,
-        "holdingDays": 27,
+        "holdingDays": 28,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-04",
+        "date": "2026-06-05",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2313,7 +2313,7 @@
         "amount": -738700.0,
         "profitRate": -29.56,
         "profitAmount": -738700.0,
-        "holdingDays": 16,
+        "holdingDays": 17,
         "reason": "현재 보유 수익률 추적"
       },
       {
@@ -2342,19 +2342,19 @@
       }
     ],
     "insights": [
-      "포트폴리오 누적 수익률은 -5.22%입니다. 손실 확대 여부를 매일 점검합니다.",
+      "포트폴리오 누적 수익률은 -5.21%입니다. 손실 확대 여부를 매일 점검합니다.",
       "실제 운용 성과는 자동 매수·매도 체결이 쌓이면 계산됩니다.",
       "현재 최고 성과 종목은 SK스퀘어입니다.",
       "현재 최저 성과 종목은 세명전기입니다."
     ],
     "summary": {
-      "totalReturnRate": -5.22,
-      "totalProfitAmount": -2609119.0,
+      "totalReturnRate": -5.21,
+      "totalProfitAmount": -2606557.0,
       "winRate": 20.0,
       "averageReturnRate": -10.6,
       "maxLossRate": -29.56,
       "evaluatedCount": 0,
-      "averageHoldingDays": 21.6,
+      "averageHoldingDays": 22.6,
       "totalTradeCount": 10,
       "closedTradeCount": 0,
       "recentEventCount": 12,
@@ -2362,23 +2362,23 @@
     }
   },
   "aiDailyFundMemo": {
-    "date": "2026-06-04",
+    "date": "2026-06-05",
     "title": "와바바AI펀드 운용 메모",
     "status": "NO_TRADE",
     "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
     "lines": [
       "오늘은 기준을 만족하는 신규 매수 체결 없음.",
       "보유: 세명전기, 동아엘텍, SK스퀘어 중심으로 성장 유지 여부 점검.",
-      "총자산 4,733만원, 누적수익률 -5.22%."
+      "총자산 4,733만원, 누적수익률 -5.21%."
     ],
     "holdingCount": 10,
     "orderCount": 0,
     "cash": 25408885.0,
     "totalAssetAmount": 47333845.0,
-    "totalReturnRate": -5.22
+    "totalReturnRate": -5.21
   },
   "aiHoldingReview": {
-    "date": "2026-06-04",
+    "date": "2026-06-05",
     "summary": "보유 종목 10개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
     "holdingCount": 10,
     "sellWatchCount": 0,
@@ -2389,7 +2389,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 16,
+        "holdingDays": 17,
         "profitRate": -29.56,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2411,7 +2411,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 16,
+        "holdingDays": 17,
         "profitRate": -20.97,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2433,7 +2433,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 17,
+        "holdingDays": 18,
         "profitRate": 10.88,
         "growthConsistencyScore": 60.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2455,7 +2455,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 17,
+        "holdingDays": 18,
         "profitRate": -5.88,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2477,7 +2477,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 20,
+        "holdingDays": 21,
         "profitRate": -11.15,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2499,7 +2499,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 20,
+        "holdingDays": 21,
         "profitRate": -15.22,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2521,7 +2521,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 27,
+        "holdingDays": 28,
         "profitRate": -7.58,
         "growthConsistencyScore": 69.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2543,7 +2543,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 27,
+        "holdingDays": 28,
         "profitRate": -21.33,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2565,7 +2565,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 28,
+        "holdingDays": 29,
         "profitRate": -10.93,
         "growthConsistencyScore": 88.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2587,7 +2587,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 28,
+        "holdingDays": 29,
         "profitRate": 5.78,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
