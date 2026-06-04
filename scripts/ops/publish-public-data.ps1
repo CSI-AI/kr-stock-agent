@@ -97,11 +97,26 @@ Write-Log "origin 동기화 상태 OK (behind=$behind ahead=$ahead)"
 
 if (-not $Commit) { Write-Log "검사 통과 (Commit 미지정) - stage/commit 생략, 종료"; exit 0 }
 
-# 7) 단일 파일 stage + 검증
+# 7) 단일 파일 stage + 검증 (git 기준 slash 상대경로 사용)
 & git add -- $PublicRel
+if ($LASTEXITCODE -ne 0) { Stop-Fail "git add 실패 (exit $LASTEXITCODE): $PublicRel" }
+
 $staged = @(& git diff --cached --name-only | ForEach-Object { ($_ -replace '\\','/').Trim() } | Where-Object { $_ })
+
+if ($staged.Count -eq 0) {
+  # core.autocrlf=true 환경에서는 working tree가 CRLF여도 정규화 후 내용이 index와
+  # 동일하면 git add가 아무것도 stage하지 않는다(= 실제 내용 변경 없음, EOL/stat 차이만).
+  # 이는 에러가 아니라 "오늘 새로 배포할 변경 없음"이므로 커밋 없이 정상 종료한다.
+  $diag = (& git status --porcelain -- $PublicRel) -join ' | '
+  $eol  = (& git ls-files --eol -- $PublicRel) -join ' | '
+  Write-Log "stage 결과 비어 있음 - 실제 내용 변경 없음(EOL/stat 차이로 추정). 커밋 없이 정상 종료."
+  Write-Log "진단: status=[$diag] eol=[$eol]"
+  exit 0
+}
+
 if ($staged.Count -ne 1 -or $staged[0] -ne $PublicRel) {
-  Stop-Fail "staged가 public JSON 1개가 아님: [$($staged -join ', ')]"
+  # public JSON 외 다른 파일이 staged됨 - 안전 중단(자동 reset 하지 않음).
+  Stop-Fail "staged가 public JSON 단일 파일이 아님: [$($staged -join ', ')]"
 }
 Write-Log "staged 확인: $PublicRel (1개)"
 
