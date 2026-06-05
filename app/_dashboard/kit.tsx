@@ -1292,10 +1292,6 @@ function BestPickHero({ history }: { history: AnyRecord }) {
   const buy = buildBuyReason(finalBest);
   const reasonLine = buy.line;
   const confidence = getNumber(decisionEngine.confidence);
-  const score =
-    getNumber(finalBest.aiFundScore) ??
-    getNumber(finalBest.finalBestScore) ??
-    getNumber(finalBest.score);
   const per = getNumber(finalBest.per) ?? getNumber(finalBest.PER);
   const roe = getNumber(finalBest.roe) ?? getNumber(finalBest.ROE);
 
@@ -1312,9 +1308,6 @@ function BestPickHero({ history }: { history: AnyRecord }) {
         <div className="bestHeroMeta">
           {confidence !== null ? (
             <span className="bestHeroConfidence">신뢰도 {confidence}%</span>
-          ) : null}
-          {score !== null ? (
-            <span className="bestHeroScore">스코어 {formatNumber(score, 0)}</span>
           ) : null}
         </div>
       </div>
