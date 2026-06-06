@@ -47,7 +47,8 @@ REPO2_ORIGINAL_CANDIDATES = [
 ]
 
 # sanitize 후 기대 top-level 키 수 (WABABA_OPERATION_MANUAL.md §1).
-EXPECTED_TOP_KEYS = 16
+# Phase 43-C: 마법공식 공개 최소 5키(magicPortfolio/Summary/RecentActions/FundPolicy/Formula) 추가 -> 16+5=21
+EXPECTED_TOP_KEYS = 21
 # 기준일이 이만큼 지나면 정보성 경고(연속 휴장이 아니면 daily_run 점검 권장).
 STALE_DAYS = 3
 
