@@ -4,11 +4,10 @@ import {
   readRecommendationHistory,
   formatShortDate,
   FundCard,
-  ComparisonSection,
   WABABA_THEME,
   AI_THEME,
 } from "../_dashboard/kit";
-import { MagicFundCard } from "../_dashboard/magic";
+import { FundSummaryGrid, FundComparisonTable } from "../_dashboard/funds";
 import { loadPortfolioSnapshots } from "@/lib/wababa/snapshot/portfolio-snapshot";
 
 export const dynamic = "force-dynamic";
@@ -23,13 +22,23 @@ export default function PerformancePage() {
       <DashboardStyles />
       <AppNav updatedAt={formatShortDate(history.generatedAt)} />
 
-      <section className="fundsGrid">
-        <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
-        <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
-        <MagicFundCard history={history} />
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">펀드 성과 요약</h2>
+        <FundSummaryGrid history={history} />
       </section>
 
-      <ComparisonSection history={history} />
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">3펀드 비교</h2>
+        <FundComparisonTable history={history} />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">펀드별 상세</h2>
+        <div className="fundsGrid">
+          <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
+          <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
+        </div>
+      </section>
     </main>
   );
 }

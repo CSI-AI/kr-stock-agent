@@ -177,3 +177,57 @@ export function FundSummaryGrid({ history }: { history: Rec }) {
     </div>
   );
 }
+
+const SHORT_LABEL: Record<FundKey, string> = { wababa: "와바바", ai: "AI", magic: "마법공식" };
+
+type CompRow = { label: string; get: (v: FundView) => string; color?: (v: FundView) => string };
+
+const COMP_ROWS: CompRow[] = [
+  { label: "운용상태", get: (v) => v.statusLabel, color: (v) => v.statusTone },
+  { label: "총자산", get: (v) => krw(v.totalAsset) },
+  { label: "누적수익률", get: (v) => pct(v.totalProfitRate), color: (v) => tone(v.totalProfitRate) },
+  { label: "누적손익", get: (v) => krw(v.totalProfit), color: (v) => tone(v.totalProfit) },
+  { label: "보유종목 수", get: (v) => `${v.holdingCount}개` },
+  { label: "현금", get: (v) => krw(v.cash) },
+  { label: "현금비중", get: (v) => pct(v.cashRate, 1) },
+];
+
+export function FundComparisonTable({ history }: { history: Rec }) {
+  const views = getFundViews(history);
+  const magicWaiting = views.some((v) => v.key === "magic" && v.holdingCount === 0);
+  return (
+    <div style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, minWidth: 0 }}>
+      <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+        <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 340 }}>
+          <thead>
+            <tr>
+              <th style={{ padding: "8px 10px", fontSize: 12, color: "#94a3b8", textAlign: "left", whiteSpace: "nowrap" }}>구분</th>
+              {views.map((v) => (
+                <th key={v.key} style={{ padding: "8px 10px", fontSize: 13, fontWeight: 900, color: v.accent, textAlign: "right", whiteSpace: "nowrap" }}>
+                  {SHORT_LABEL[v.key]}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {COMP_ROWS.map((r) => (
+              <tr key={r.label} style={{ borderTop: "1px solid #f1f5f9" }}>
+                <td style={{ padding: "8px 10px", fontSize: 12, color: "#64748b", textAlign: "left", whiteSpace: "nowrap" }}>{r.label}</td>
+                {views.map((v) => (
+                  <td key={v.key} style={{ padding: "8px 10px", fontSize: 13, fontWeight: 700, textAlign: "right", whiteSpace: "nowrap", color: r.color ? r.color(v) : "#0f172a" }}>
+                    {r.get(v)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {magicWaiting ? (
+        <p style={{ margin: "10px 4px 2px", fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>
+          마법공식 펀드는 아직 첫 매수 기록이 없습니다. 다음 개장일 daily_run 이후 보유·성과 비교에 반영됩니다.
+        </p>
+      ) : null}
+    </div>
+  );
+}
