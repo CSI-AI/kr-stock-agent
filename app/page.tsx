@@ -22,17 +22,17 @@ export default function DashboardPage() {
       <AppNav updatedAt={formatShortDate(history.generatedAt)} />
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">오늘 살 종목</h2>
+        <h2 className="dashSectionTitle">오늘 추천</h2>
         <BestPickHero history={history} />
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">현재 보유</h2>
+        <h2 className="dashSectionTitle">보유 종목</h2>
         <DashboardHoldings history={history} />
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">최근 매도/축소</h2>
+        <h2 className="dashSectionTitle">최근 조정</h2>
         <DashboardSold history={history} />
       </section>
 

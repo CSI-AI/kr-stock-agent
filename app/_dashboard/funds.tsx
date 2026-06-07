@@ -40,7 +40,7 @@ function pct(v: number | null, digits = 2): string {
 // 한국 시장 관례: 이익(+) 빨강 / 손실(-) 파랑.
 function tone(v: number | null): string {
   if (v === null || v === 0) return "#0f172a";
-  return v > 0 ? "#dc2626" : "#2563eb";
+  return v > 0 ? "#dc2626" : "#1d4ed8";
 }
 
 const ACCENTS: Record<FundKey, { primary: string; soft: string; title: string; subtitle: string }> = {
@@ -63,7 +63,7 @@ export function toFundView(history: Rec, key: FundKey): FundView {
     const active = holdingCount > 0 || openLot > 0;
     return {
       ...base,
-      statusLabel: !hasData ? "데이터 대기" : active ? "운용 중" : "운용 대기",
+      statusLabel: !hasData ? "데이터 준비 중" : active ? "운용 중" : "운용 준비 중",
       statusTone: !hasData || !active ? "#94a3b8" : a.primary,
       totalAsset,
       totalProfit: num(s.totalProfit),
@@ -81,7 +81,7 @@ export function toFundView(history: Rec, key: FundKey): FundView {
   const cash = num(s.cash);
   return {
     ...base,
-    statusLabel: hasData ? "운용 중" : "데이터 대기",
+    statusLabel: hasData ? "운용 중" : "데이터 준비 중",
     statusTone: hasData ? a.primary : "#94a3b8",
     totalAsset,
     totalProfit: num(s.totalProfitAmount),
@@ -201,9 +201,9 @@ export function FundComparisonTable({ history }: { history: Rec }) {
         <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 340 }}>
           <thead>
             <tr>
-              <th style={{ padding: "8px 10px", fontSize: 12, color: "#94a3b8", textAlign: "left", whiteSpace: "nowrap" }}>구분</th>
+              <th style={{ padding: "9px 10px", fontSize: 12, fontWeight: 800, color: "#64748b", textAlign: "left", whiteSpace: "nowrap", background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>구분</th>
               {views.map((v) => (
-                <th key={v.key} style={{ padding: "8px 10px", fontSize: 13, fontWeight: 900, color: v.accent, textAlign: "right", whiteSpace: "nowrap" }}>
+                <th key={v.key} style={{ padding: "9px 10px", fontSize: 13, fontWeight: 900, color: v.accent, textAlign: "right", whiteSpace: "nowrap", background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
                   {SHORT_LABEL[v.key]}
                 </th>
               ))}
@@ -211,7 +211,7 @@ export function FundComparisonTable({ history }: { history: Rec }) {
           </thead>
           <tbody>
             {COMP_ROWS.map((r) => (
-              <tr key={r.label} style={{ borderTop: "1px solid #f1f5f9" }}>
+              <tr key={r.label} style={{ borderTop: "1px solid #eceff3" }}>
                 <td style={{ padding: "8px 10px", fontSize: 12, color: "#64748b", textAlign: "left", whiteSpace: "nowrap" }}>{r.label}</td>
                 {views.map((v) => (
                   <td key={v.key} style={{ padding: "8px 10px", fontSize: 13, fontWeight: 700, textAlign: "right", whiteSpace: "nowrap", color: r.color ? r.color(v) : "#0f172a" }}>
@@ -247,7 +247,7 @@ export function MagicCandidateSection({ history }: { history: Rec }) {
       <div className="candidateHeader">
         <div>
           <h3>와바바 마법공식 펀드 후보</h3>
-          <p>정량 순위 후보</p>
+          <p>정량 후보</p>
         </div>
         <span className="pill" style={{ background: A.soft, color: A.text, borderColor: A.border }}>
           정량 순위 기준
@@ -266,7 +266,7 @@ export function MagicCandidateSection({ history }: { history: Rec }) {
           ))}
         </div>
       ) : (
-        <p style={{ marginTop: 4, fontSize: 13, color: "#64748b" }}>정량 후보 데이터 대기</p>
+        <p style={{ marginTop: 4, fontSize: 13, color: "#64748b" }}>정량 후보 데이터 준비 중</p>
       )}
       <p style={{ marginTop: 12, fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>
         {holdingCount === 0 ? "첫 실거래 lot은 다음 개장일 daily_run 이후 생성됩니다. " : ""}

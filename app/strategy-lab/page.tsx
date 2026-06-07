@@ -28,13 +28,13 @@ export default function StrategyLabPage() {
       <section className="candidatesGrid">
         <CandidateSection
           title="와바바 펀드 후보"
-          subtitle="가치성장 후보"
+          subtitle="가치 후보"
           items={wababaCandidates}
           theme={WABABA_THEME}
         />
         <CandidateSection
           title="와바바 AI 펀드 후보"
-          subtitle="AI 판단 후보"
+          subtitle="AI 후보"
           items={aiCandidates}
           theme={AI_THEME}
         />

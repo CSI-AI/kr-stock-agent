@@ -438,7 +438,7 @@ function readMemo(
 ): { title: string; lines: string[]; status: string } {
   const memo = getObject(history[key]);
   return {
-    title: getString(memo.title) || "오늘의 운용 메모",
+    title: getString(memo.title) || "오늘 메모",
     lines: readStringArray(memo, "lines"),
     status: getString(memo.status),
   };
@@ -919,7 +919,7 @@ function FundCard({
         }}
       >
         <summary className="memoTitle" style={{ color: theme.primary }}>
-          오늘의 운용 메모
+          오늘 메모
           {topReview ? (
             <span className="reviewHintInline">
               {" · "}

@@ -34,7 +34,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">펀드 운용 원칙</h2>
+        <h2 className="dashSectionTitle">운용 원칙</h2>
         <FundRulesGrid history={history} />
       </section>
     </main>
