@@ -275,3 +275,111 @@ export function MagicCandidateSection({ history }: { history: Rec }) {
     </section>
   );
 }
+
+// 설정 — 3펀드 운용 원칙 카드(공통 chrome). 마법공식 상세는 public magicFundPolicy/magicFormula를 접힘으로 흡수.
+function str(v: unknown): string {
+  return typeof v === "string" ? v : "";
+}
+function sarr(v: unknown): string[] {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+}
+
+const FUND_RULES: Record<FundKey, { nature: string; summary: string; rules: string[]; detail: string }> = {
+  wababa: {
+    nature: "가치성장 펀드",
+    summary: "성장하는 회사를 싸게 사서 오래 보유합니다.",
+    rules: [
+      "고성장 힌트와 실적 개선 가능성 확인",
+      "저평가 구간에서 매수 검토",
+      "성장 가설이 유지되면 장기 보유",
+      "성장 둔화·계산 오류·더 좋은 후보 발견 시 교체 검토",
+    ],
+    detail: "사람의 가치성장 원칙으로 운용합니다. 좋은 회사를 싼 값에 사서, 성장 가설이 살아 있는 동안 오래 보유하는 것을 기본으로 합니다.",
+  },
+  ai: {
+    nature: "AI 판단 펀드",
+    summary: "AI가 뉴스·실적·가격 흐름·리스크를 종합해 판단합니다.",
+    rules: [
+      "성장 신호와 최근 이슈를 함께 반영",
+      "과열·리스크·뉴스 악화를 함께 감시",
+      "가치성장 펀드보다 더 유연하게 후보 탐색",
+      "보유 종목도 AI 판단으로 유지·교체 검토",
+    ],
+    detail: "AI가 매일 후보와 보유 종목을 종합 점검합니다. 성장과 가격, 뉴스와 리스크를 함께 보고 더 유연하게 운용합니다.",
+  },
+  magic: {
+    nature: "정량 순위 펀드",
+    summary: "정해진 공식으로 매일 순위를 매기고 상위 후보를 기계적으로 운용합니다.",
+    rules: [
+      "정량 순위(book_faithful_v1) 기준 사용",
+      "상위 10개 종목을 매수 후보로 선정",
+      "각 매수분은 50거래일 보유 원칙",
+      "매수·매도 기준가는 시작가로 기록",
+      "수익·손실과 무관하게 규칙대로 운용",
+    ],
+    detail: "감정·인기·직관을 배제하고 정해진 공식만 따릅니다. 공식 변경 시 버전을 올리고 변경 로그에 기록합니다.",
+  },
+};
+
+function FundRuleCard({ fundKey, history }: { fundKey: FundKey; history: Rec }) {
+  const a = ACCENTS[fundKey];
+  const r = FUND_RULES[fundKey];
+  const policy = obj(history.magicFundPolicy);
+  const formula = obj(history.magicFormula);
+  const magicRules = sarr(policy.rules);
+  const magicDisclosure = sarr(policy.disclosure);
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${a.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+        <span style={{ width: 8, height: 8, borderRadius: 99, background: a.primary, flexShrink: 0 }} />
+        <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>{a.title}</span>
+        <span style={{ fontSize: 11, fontWeight: 800, color: a.primary, background: a.soft, border: `1px solid ${a.primary}`, borderRadius: 99, padding: "2px 9px" }}>
+          {r.nature}
+        </span>
+      </div>
+      <p style={{ margin: "0 0 8px", fontSize: 13, color: "#334155", lineHeight: 1.5 }}>{r.summary}</p>
+      <ul style={{ margin: 0, paddingLeft: 18 }}>
+        {r.rules.map((x, i) => (
+          <li key={i} style={{ fontSize: 13, color: "#475569", marginBottom: 4, lineHeight: 1.45 }}>{x}</li>
+        ))}
+      </ul>
+      <details className="philosophyDetails" style={{ marginTop: 10, marginBottom: 0 }}>
+        <summary className="philosophySummary">상세 보기</summary>
+        <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6, marginTop: 6 }}>
+          {fundKey === "magic" ? (
+            <>
+              <p style={{ margin: "0 0 6px" }}>{str(policy.shortDescription) || r.detail}</p>
+              {magicRules.length > 0 ? (
+                <ul style={{ paddingLeft: 16, margin: "0 0 6px" }}>
+                  {magicRules.map((x, i) => (
+                    <li key={i} style={{ marginBottom: 3 }}>{x}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {str(formula.formulaVersion) ? (
+                <p style={{ margin: "0 0 4px", color: "#94a3b8" }}>
+                  공식 버전: {str(formula.formulaVersion)}
+                  {str(formula.tradingRuleVersion) ? ` · ${str(formula.tradingRuleVersion)}` : ""}
+                </p>
+              ) : null}
+              {magicDisclosure.length > 0 ? <p style={{ color: "#94a3b8", margin: 0 }}>{magicDisclosure.join(" ")}</p> : null}
+            </>
+          ) : (
+            <p style={{ margin: 0 }}>{r.detail}</p>
+          )}
+        </div>
+      </details>
+    </section>
+  );
+}
+
+export function FundRulesGrid({ history }: { history: Rec }) {
+  const keys: FundKey[] = ["wababa", "ai", "magic"];
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, minWidth: 0 }}>
+      {keys.map((k) => (
+        <FundRuleCard key={k} fundKey={k} history={history} />
+      ))}
+    </div>
+  );
+}

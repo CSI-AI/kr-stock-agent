@@ -3,9 +3,8 @@ import {
   DashboardStyles,
   readRecommendationHistory,
   formatShortDate,
-  PhilosophySection,
 } from "../_dashboard/kit";
-import { MagicPolicyDetails } from "../_dashboard/magic";
+import { FundRulesGrid } from "../_dashboard/funds";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +24,7 @@ export default function SettingsPage() {
           <div className="sectionTitle">데이터 기준</div>
           <p>
             마지막 데이터 생성: {formatShortDate(history.generatedAt)} · 기준일{" "}
-            {formatShortDate(history.baseDate)}. 두 펀드 데이터는 같은
+            {formatShortDate(history.baseDate)}. 세 펀드 데이터는 같은
             파이프라인에서 함께 생성됩니다.
           </p>
         </div>
@@ -34,12 +33,10 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <MagicPolicyDetails history={history} />
-
-      <details className="philosophyDetails">
-        <summary className="philosophySummary">운용 원칙 보기</summary>
-        <PhilosophySection />
-      </details>
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">펀드 운용 원칙</h2>
+        <FundRulesGrid history={history} />
+      </section>
     </main>
   );
 }
