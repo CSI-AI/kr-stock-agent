@@ -231,3 +231,47 @@ export function FundComparisonTable({ history }: { history: Rec }) {
     </div>
   );
 }
+
+// 전략랩 — 마법공식 정량 순위 후보(2펀드 CandidateSection과 동일한 .candidateCard chrome 사용).
+// public의 magicRecentActions.top10Preview(rank/code/name)만 표시. 전체 순위는 내부 보관.
+export function MagicCandidateSection({ history }: { history: Rec }) {
+  const recent = obj(history.magicRecentActions);
+  const s = obj(history.magicPortfolioSummary);
+  const preview = Array.isArray(recent.top10Preview)
+    ? (recent.top10Preview as unknown[]).filter((x): x is Rec => !!x && typeof x === "object" && !Array.isArray(x))
+    : [];
+  const holdingCount = num(s.holdingCount) ?? 0;
+  const A = { accent: "#059669", soft: "#ecfdf5", text: "#065f46", border: "#a7f3d0" };
+  return (
+    <section className="candidateCard" style={{ borderColor: A.border }}>
+      <div className="candidateHeader">
+        <div>
+          <h3>와바바 마법공식 펀드 후보</h3>
+          <p>정량 순위 후보</p>
+        </div>
+        <span className="pill" style={{ background: A.soft, color: A.text, borderColor: A.border }}>
+          정량 순위 기준
+        </span>
+      </div>
+      {preview.length > 0 ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+          {preview.slice(0, 10).map((it, i) => (
+            <div key={String(it.code ?? i)} style={{ display: "flex", alignItems: "baseline", gap: 10, fontSize: 14, minWidth: 0 }}>
+              <span style={{ fontWeight: 900, color: A.accent, minWidth: 24, flexShrink: 0 }}>#{num(it.rank) ?? i + 1}</span>
+              <span style={{ fontWeight: 700, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {String(it.name ?? it.code ?? "")}
+              </span>
+              <span style={{ color: "#94a3b8", flexShrink: 0 }}>{String(it.code ?? "")}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p style={{ marginTop: 4, fontSize: 13, color: "#64748b" }}>정량 후보 데이터 대기</p>
+      )}
+      <p style={{ marginTop: 12, fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>
+        {holdingCount === 0 ? "첫 실거래 lot은 다음 개장일 daily_run 이후 생성됩니다. " : ""}
+        전체 순위와 세부 계산 로그는 운영 검증용으로 별도 보관됩니다.
+      </p>
+    </section>
+  );
+}

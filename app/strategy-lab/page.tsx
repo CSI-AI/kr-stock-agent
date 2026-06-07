@@ -10,7 +10,7 @@ import {
   WABABA_THEME,
   AI_THEME,
 } from "../_dashboard/kit";
-import { MagicLabSection } from "../_dashboard/magic";
+import { MagicCandidateSection } from "../_dashboard/funds";
 
 export const dynamic = "force-dynamic";
 
@@ -27,21 +27,18 @@ export default function StrategyLabPage() {
 
       <section className="candidatesGrid">
         <CandidateSection
-          title="오늘의 매수 후보 TOP 5"
-          subtitle="와바바 가치투자 기준"
+          title="와바바 펀드 후보"
+          subtitle="가치성장 후보"
           items={wababaCandidates}
           theme={WABABA_THEME}
         />
         <CandidateSection
-          title="AI 발굴 유망 종목 TOP 5"
-          subtitle="와바바AI 자율운용 기준"
+          title="와바바 AI 펀드 후보"
+          subtitle="AI 판단 후보"
           items={aiCandidates}
           theme={AI_THEME}
         />
-      </section>
-
-      <section style={{ marginBottom: 22 }}>
-        <MagicLabSection history={history} />
+        <MagicCandidateSection history={history} />
       </section>
 
       <details className="philosophyDetails">
