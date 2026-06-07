@@ -5,6 +5,7 @@ import {
   formatShortDate,
   PhilosophySection,
 } from "../_dashboard/kit";
+import { MagicPolicyDetails } from "../_dashboard/magic";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,8 @@ export default function SettingsPage() {
           <a href="/strategy-lab/reviewed">넘긴 종목 관리</a>
         </div>
       </section>
+
+      <MagicPolicyDetails history={history} />
 
       <details className="philosophyDetails">
         <summary className="philosophySummary">운용 원칙 보기</summary>

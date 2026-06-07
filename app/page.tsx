@@ -8,6 +8,7 @@ import {
   DashboardHoldings,
   DashboardSold,
 } from "./_dashboard/kit";
+import { MagicFundCard } from "./_dashboard/magic";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,11 @@ export default function DashboardPage() {
       <section className="dashSection">
         <h2 className="dashSectionTitle">펀드 현황</h2>
         <GlobalSummary history={history} />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">와바바 마법공식 펀드</h2>
+        <MagicFundCard history={history} />
       </section>
     </main>
   );

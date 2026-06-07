@@ -10,6 +10,7 @@ import {
   WABABA_THEME,
   AI_THEME,
 } from "../_dashboard/kit";
+import { MagicLabSection } from "../_dashboard/magic";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,10 @@ export default function StrategyLabPage() {
           items={aiCandidates}
           theme={AI_THEME}
         />
+      </section>
+
+      <section style={{ marginBottom: 22 }}>
+        <MagicLabSection history={history} />
       </section>
 
       <details className="philosophyDetails">

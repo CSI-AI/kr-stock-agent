@@ -8,6 +8,7 @@ import {
   WABABA_THEME,
   AI_THEME,
 } from "../_dashboard/kit";
+import { MagicFundCard } from "../_dashboard/magic";
 import { loadPortfolioSnapshots } from "@/lib/wababa/snapshot/portfolio-snapshot";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ export default function PerformancePage() {
       <section className="fundsGrid">
         <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
         <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
+        <MagicFundCard history={history} />
       </section>
 
       <ComparisonSection history={history} />
