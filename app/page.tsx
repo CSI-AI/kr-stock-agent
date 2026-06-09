@@ -5,15 +5,13 @@ import {
   readRecommendationHistory,
   formatShortDate,
   BestPickHero,
-  DashboardHoldings,
-  DashboardSold,
 } from "./_dashboard/kit";
-import { FundSummaryGrid } from "./_dashboard/funds";
+import { FundSummaryGrid, FundFlowChart } from "./_dashboard/funds";
 
 export const dynamic = "force-dynamic";
 
-// 대시보드 — 요약 중심(45-A 정보 다이어트): 오늘 추천 → 3펀드 현황 → 보유 미리보기 + 성과분석 유도.
-// 3펀드 보유 전체·매수/매도 기록 등 상세는 성과분석으로 분리한다.
+// 대시보드 — 요약+그래프 중심(45-B): 오늘 추천 → 3펀드 현황 → 3펀드 성과 흐름 그래프.
+// 개별 펀드 보유종목 나열은 두지 않고, 보유/거래 상세는 성과분석으로 유도한다.
 export default function DashboardPage() {
   const history = readRecommendationHistory();
 
@@ -44,8 +42,7 @@ export default function DashboardPage() {
           }}
         >
           <h2 className="dashSectionTitle" style={{ margin: 0 }}>
-            와바바 펀드 보유{" "}
-            <span style={{ color: "#94a3b8", fontWeight: 700 }}>미리보기</span>
+            3펀드 성과 흐름
           </h2>
           <Link
             href="/performance"
@@ -57,15 +54,10 @@ export default function DashboardPage() {
               textDecoration: "none",
             }}
           >
-            성과분석에서 3펀드 보유·거래 전체 보기 →
+            보유·거래기록 자세히는 성과분석에서 →
           </Link>
         </div>
-        <DashboardHoldings history={history} limit={5} />
-      </section>
-
-      <section className="dashSection">
-        <h2 className="dashSectionTitle">최근 매도·조정</h2>
-        <DashboardSold history={history} limit={3} />
+        <FundFlowChart history={history} />
       </section>
     </main>
   );

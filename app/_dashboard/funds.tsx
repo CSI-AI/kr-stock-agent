@@ -235,6 +235,102 @@ export function FundComparisonTable({ history }: { history: Rec }) {
   );
 }
 
+// 대시보드 — 3펀드 누적수익률 흐름(실데이터). 와바바/AI: performanceAnalysis…portfolioPerformance.dailyReturns의
+// 일별 누적수익률 라인. 마법공식: 운용 1일차라 현재 누적수익률 점으로 표시. 신규 차트 라이브러리 없이 인라인 SVG.
+function dayOrd(date: string): number | null {
+  const t = Date.parse(`${date}T00:00:00Z`);
+  return Number.isFinite(t) ? Math.round(t / 86400000) : null;
+}
+type FlowPt = { ord: number; date: string; v: number };
+function flowSeries(node: Rec): FlowPt[] {
+  const out: FlowPt[] = [];
+  for (const p of arr(obj(node.portfolioPerformance).dailyReturns)) {
+    const date = str(p.date);
+    const ord = dayOrd(date);
+    const v = num(p.cumulativeReturnRate);
+    if (ord !== null && v !== null) out.push({ ord, date, v });
+  }
+  return out.sort((x, y) => x.ord - y.ord);
+}
+function FlowLegend({ color, label, rate }: { color: string; label: string; rate: number | null }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, color: "#475569" }}>
+      <span style={{ width: 10, height: 10, borderRadius: 99, background: color, flexShrink: 0 }} />
+      {label} <b style={{ color: tone(rate) }}>{pct(rate)}</b>
+    </span>
+  );
+}
+
+export function FundFlowChart({ history }: { history: Rec }) {
+  const w = flowSeries(obj(history.performanceAnalysis));
+  const a = flowSeries(obj(history.aiPerformanceAnalysis));
+  const ms = obj(history.magicPortfolioSummary);
+  const mDate = str(ms.dataDate) || str(history.baseDate);
+  const mOrd = dayOrd(mDate);
+  const mV = num(ms.totalReturnRate);
+  const magic: FlowPt | null = mOrd !== null && mV !== null ? { ord: mOrd, date: mDate, v: mV } : null;
+  // 캡션용 첫 운용일은 보유 lot의 최초 매수일에서 도출(데이터 기반).
+  const mFirstBuy =
+    arr(obj(history.magicPortfolio).holdings)
+      .map((h) => str(h.oldestBuyDate))
+      .filter(Boolean)
+      .sort()[0] || mDate;
+  const allPts = [...w, ...a, ...(magic ? [magic] : [])];
+
+  if (allPts.length === 0) {
+    return (
+      <div className="chartCard">
+        <div className="chartTitle">3펀드 누적수익률 흐름</div>
+        <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>성과 흐름은 운용일이 쌓이면 더 선명해집니다.</p>
+      </div>
+    );
+  }
+
+  const W = 520, H = 200, padL = 40, padR = 14, padT = 16, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const ords = allPts.map((p) => p.ord);
+  const minOrd = Math.min(...ords), maxOrd = Math.max(...ords);
+  const vals = allPts.map((p) => p.v).concat(0);
+  let minV = Math.min(...vals), maxV = Math.max(...vals);
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  const xpos = (ord: number) => padL + ((ord - minOrd) / (maxOrd - minOrd || 1)) * plotW;
+  const ypos = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
+  const pathOf = (s: FlowPt[]) => s.map((p, i) => `${i === 0 ? "M" : "L"}${xpos(p.ord).toFixed(1)},${ypos(p.v).toFixed(1)}`).join(" ");
+  const minDate = allPts.reduce((m, p) => (p.ord < m.ord ? p : m)).date;
+  const maxDate = allPts.reduce((m, p) => (p.ord > m.ord ? p : m)).date;
+  const fmtMD = (d: string) => d.slice(5).replace("-", "/");
+  const zeroY = ypos(0);
+  const C = { w: "#2563eb", a: "#7c3aed", m: "#059669" };
+  const last = (s: FlowPt[]) => (s.length ? s[s.length - 1] : null);
+
+  return (
+    <div className="chartCard">
+      <div className="chartTitle">3펀드 누적수익률 흐름</div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="lineChart" role="img" aria-label="3펀드 누적수익률 흐름 차트">
+        <line x1={padL} x2={W - padR} y1={zeroY} y2={zeroY} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
+        <text x={padL - 6} y={zeroY + 4} textAnchor="end" fill="#94a3b8" fontSize="11">0%</text>
+        {w.length >= 2 ? <path d={pathOf(w)} fill="none" stroke={C.w} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
+        {a.length >= 2 ? <path d={pathOf(a)} fill="none" stroke={C.a} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
+        {last(w) ? <circle cx={xpos(last(w)!.ord)} cy={ypos(last(w)!.v)} r="3.5" fill={C.w} /> : null}
+        {last(a) ? <circle cx={xpos(last(a)!.ord)} cy={ypos(last(a)!.v)} r="3.5" fill={C.a} /> : null}
+        {magic ? <circle cx={xpos(magic.ord)} cy={ypos(magic.v)} r="4" fill={C.m} stroke="#fff" strokeWidth="1.5" /> : null}
+        <text x={padL} y={H - 6} fill="#94a3b8" fontSize="11">{fmtMD(minDate)}</text>
+        <text x={W - padR} y={H - 6} textAnchor="end" fill="#94a3b8" fontSize="11">{fmtMD(maxDate)}</text>
+      </svg>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 8 }}>
+        <FlowLegend color={C.w} label="와바바" rate={last(w)?.v ?? null} />
+        <FlowLegend color={C.a} label="AI" rate={last(a)?.v ?? null} />
+        <FlowLegend color={C.m} label="마법공식" rate={magic ? magic.v : null} />
+      </div>
+      {magic ? (
+        <p style={{ margin: "8px 0 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
+          마법공식은 {mFirstBuy} 첫 운용을 시작했습니다. 운용일이 쌓이면 흐름이 더 선명해집니다.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 // 성과분석 — 마법공식 펀드 보유 종목(public magicPortfolio.holdings 기반).
 // 와바바/AI는 기존 kit.FundCard 보유표를 그대로 쓰고, 마법공식만 자체 표로 표시한다.
 function qty(v: number | null): string {
@@ -348,10 +444,12 @@ function normalizeTrades(raw: Rec[]): TradeRow[] {
 
 function TradeHistoryDetails({ rows }: { rows: TradeRow[] }) {
   const cols = ["날짜", "구분", "종목명", "수량", "단가", "금액"];
+  const buyN = rows.filter((r) => r.kind === "매수").length;
+  const sellN = rows.filter((r) => r.kind === "매도").length;
   return (
     <details style={{ marginTop: 10, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", padding: "0 12px" }}>
       <summary style={{ cursor: "pointer", padding: "11px 2px", fontSize: 13, fontWeight: 800, color: "#475569" }}>
-        매수·매도 기록 보기{rows.length > 0 ? ` (${rows.length}건)` : ""}
+        {rows.length > 0 ? `매수 ${buyN}건 · 매도 ${sellN}건 보기` : "매수·매도 기록 보기"}
       </summary>
       {rows.length === 0 ? (
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#94a3b8" }}>표시할 거래 기록이 아직 없습니다.</p>

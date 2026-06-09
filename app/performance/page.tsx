@@ -8,7 +8,6 @@ import {
   AI_THEME,
 } from "../_dashboard/kit";
 import {
-  FundSummaryGrid,
   FundComparisonTable,
   MagicHoldingsCard,
   FundTradeHistory,
@@ -26,11 +25,6 @@ export default function PerformancePage() {
     <main className="dashboardRoot">
       <DashboardStyles />
       <AppNav updatedAt={formatShortDate(history.generatedAt)} />
-
-      <section className="dashSection">
-        <h2 className="dashSectionTitle">펀드 성과 요약</h2>
-        <FundSummaryGrid history={history} />
-      </section>
 
       <section className="dashSection">
         <h2 className="dashSectionTitle">3펀드 비교</h2>
