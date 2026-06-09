@@ -235,11 +235,19 @@ export function FundComparisonTable({ history }: { history: Rec }) {
   );
 }
 
-// 대시보드 — 3펀드 누적수익률 흐름(실데이터). 와바바/AI: performanceAnalysis…portfolioPerformance.dailyReturns의
-// 일별 누적수익률 라인. 마법공식: 운용 1일차라 현재 누적수익률 점으로 표시. 신규 차트 라이브러리 없이 인라인 SVG.
+// 대시보드 — 3펀드 총자산 흐름(실데이터). 와바바/AI: performanceAnalysis…portfolioPerformance.dailyReturns의
+// 일별 totalAssetAmount 라인. 마법공식: 운용 1일차라 현재 총자산(magicPortfolioSummary.totalAsset) 점으로 표시.
+// 신규 차트 라이브러리 없이 인라인 SVG. 가짜 과거 총자산은 만들지 않는다.
 function dayOrd(date: string): number | null {
   const t = Date.parse(`${date}T00:00:00Z`);
   return Number.isFinite(t) ? Math.round(t / 86400000) : null;
+}
+function manLabel(v: number): string {
+  // 원 단위 금액을 만원 단위로 축약(축 라벨용). 예: 47,971,850 → "4,797만"
+  return `${new Intl.NumberFormat("ko-KR").format(Math.round(v / 10000))}만`;
+}
+function manwon(v: number | null): string {
+  return v === null ? "-" : `${manLabel(v)}원`;
 }
 type FlowPt = { ord: number; date: string; v: number };
 function flowSeries(node: Rec): FlowPt[] {
@@ -247,16 +255,16 @@ function flowSeries(node: Rec): FlowPt[] {
   for (const p of arr(obj(node.portfolioPerformance).dailyReturns)) {
     const date = str(p.date);
     const ord = dayOrd(date);
-    const v = num(p.cumulativeReturnRate);
+    const v = num(p.totalAssetAmount);
     if (ord !== null && v !== null) out.push({ ord, date, v });
   }
   return out.sort((x, y) => x.ord - y.ord);
 }
-function FlowLegend({ color, label, rate }: { color: string; label: string; rate: number | null }) {
+function FlowLegend({ color, label, asset }: { color: string; label: string; asset: number | null }) {
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, color: "#475569" }}>
       <span style={{ width: 10, height: 10, borderRadius: 99, background: color, flexShrink: 0 }} />
-      {label} <b style={{ color: tone(rate) }}>{pct(rate)}</b>
+      {label} <b style={{ color: "#0f172a" }}>{manwon(asset)}</b>
     </span>
   );
 }
@@ -267,8 +275,10 @@ export function FundFlowChart({ history }: { history: Rec }) {
   const ms = obj(history.magicPortfolioSummary);
   const mDate = str(ms.dataDate) || str(history.baseDate);
   const mOrd = dayOrd(mDate);
-  const mV = num(ms.totalReturnRate);
+  const mV = num(ms.totalAsset);
   const magic: FlowPt | null = mOrd !== null && mV !== null ? { ord: mOrd, date: mDate, v: mV } : null;
+  const initial =
+    num(obj(history.portfolioSummary).initialCapital) ?? num(ms.initialCapital) ?? 50000000;
   // 캡션용 첫 운용일은 보유 lot의 최초 매수일에서 도출(데이터 기반).
   const mFirstBuy =
     arr(obj(history.magicPortfolio).holdings)
@@ -280,35 +290,39 @@ export function FundFlowChart({ history }: { history: Rec }) {
   if (allPts.length === 0) {
     return (
       <div className="chartCard">
-        <div className="chartTitle">3펀드 누적수익률 흐름</div>
-        <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>성과 흐름은 운용일이 쌓이면 더 선명해집니다.</p>
+        <div className="chartTitle">3펀드 총자산 흐름</div>
+        <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>총자산 흐름은 운용일이 쌓이면 더 선명해집니다.</p>
       </div>
     );
   }
 
-  const W = 520, H = 200, padL = 40, padR = 14, padT = 16, padB = 26;
+  const W = 520, H = 260, padL = 52, padR = 16, padT = 16, padB = 26;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const ords = allPts.map((p) => p.ord);
   const minOrd = Math.min(...ords), maxOrd = Math.max(...ords);
-  const vals = allPts.map((p) => p.v).concat(0);
+  // 초기자본을 범위에 포함해 기준선이 항상 보이게 한다.
+  const vals = allPts.map((p) => p.v).concat(initial);
   let minV = Math.min(...vals), maxV = Math.max(...vals);
   if (minV === maxV) { minV -= 1; maxV += 1; }
+  const padV = (maxV - minV) * 0.08 || 1;
+  minV -= padV; maxV += padV;
   const xpos = (ord: number) => padL + ((ord - minOrd) / (maxOrd - minOrd || 1)) * plotW;
   const ypos = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
   const pathOf = (s: FlowPt[]) => s.map((p, i) => `${i === 0 ? "M" : "L"}${xpos(p.ord).toFixed(1)},${ypos(p.v).toFixed(1)}`).join(" ");
   const minDate = allPts.reduce((m, p) => (p.ord < m.ord ? p : m)).date;
   const maxDate = allPts.reduce((m, p) => (p.ord > m.ord ? p : m)).date;
   const fmtMD = (d: string) => d.slice(5).replace("-", "/");
-  const zeroY = ypos(0);
+  const refY = ypos(initial);
   const C = { w: "#2563eb", a: "#7c3aed", m: "#059669" };
   const last = (s: FlowPt[]) => (s.length ? s[s.length - 1] : null);
 
   return (
     <div className="chartCard">
-      <div className="chartTitle">3펀드 누적수익률 흐름</div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="lineChart" role="img" aria-label="3펀드 누적수익률 흐름 차트">
-        <line x1={padL} x2={W - padR} y1={zeroY} y2={zeroY} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
-        <text x={padL - 6} y={zeroY + 4} textAnchor="end" fill="#94a3b8" fontSize="11">0%</text>
+      <div className="chartTitle">3펀드 총자산 흐름</div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="lineChart" style={{ height: "clamp(220px, 40vw, 260px)" }} role="img" aria-label="3펀드 총자산 흐름 차트">
+        {/* 초기자본 기준선 */}
+        <line x1={padL} x2={W - padR} y1={refY} y2={refY} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
+        <text x={padL - 6} y={refY + 4} textAnchor="end" fill="#94a3b8" fontSize="11">{manLabel(initial)}</text>
         {w.length >= 2 ? <path d={pathOf(w)} fill="none" stroke={C.w} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
         {a.length >= 2 ? <path d={pathOf(a)} fill="none" stroke={C.a} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
         {last(w) ? <circle cx={xpos(last(w)!.ord)} cy={ypos(last(w)!.v)} r="3.5" fill={C.w} /> : null}
@@ -318,15 +332,14 @@ export function FundFlowChart({ history }: { history: Rec }) {
         <text x={W - padR} y={H - 6} textAnchor="end" fill="#94a3b8" fontSize="11">{fmtMD(maxDate)}</text>
       </svg>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 8 }}>
-        <FlowLegend color={C.w} label="와바바" rate={last(w)?.v ?? null} />
-        <FlowLegend color={C.a} label="AI" rate={last(a)?.v ?? null} />
-        <FlowLegend color={C.m} label="마법공식" rate={magic ? magic.v : null} />
+        <FlowLegend color={C.w} label="와바바" asset={last(w)?.v ?? null} />
+        <FlowLegend color={C.a} label="AI" asset={last(a)?.v ?? null} />
+        <FlowLegend color={C.m} label="마법공식" asset={magic ? magic.v : null} />
       </div>
-      {magic ? (
-        <p style={{ margin: "8px 0 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
-          마법공식은 {mFirstBuy} 첫 운용을 시작했습니다. 운용일이 쌓이면 흐름이 더 선명해집니다.
-        </p>
-      ) : null}
+      <p style={{ margin: "8px 0 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
+        각 펀드의 총자산 흐름입니다(점선 = 초기자본 {manwon(initial)}).
+        {magic ? ` 마법공식은 ${mFirstBuy} 첫 운용을 시작했습니다.` : ""} 운용일이 쌓이면 흐름이 더 선명해집니다.
+      </p>
     </div>
   );
 }
