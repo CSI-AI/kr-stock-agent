@@ -25,6 +25,9 @@ export type FundView = {
 function obj(v: unknown): Rec {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : {};
 }
+function arr(v: unknown): Rec[] {
+  return Array.isArray(v) ? v.filter((x): x is Rec => !!x && typeof x === "object" && !Array.isArray(x)) : [];
+}
 function num(v: unknown): number | null {
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
@@ -230,6 +233,177 @@ export function FundComparisonTable({ history }: { history: Rec }) {
       ) : null}
     </div>
   );
+}
+
+// 성과분석 — 마법공식 펀드 보유 종목(public magicPortfolio.holdings 기반).
+// 와바바/AI는 기존 kit.FundCard 보유표를 그대로 쓰고, 마법공식만 자체 표로 표시한다.
+function qty(v: number | null): string {
+  return v === null ? "-" : `${new Intl.NumberFormat("ko-KR").format(v)}주`;
+}
+
+export function MagicHoldingsCard({ history }: { history: Rec }) {
+  const s = obj(history.magicPortfolioSummary);
+  const p = obj(history.magicPortfolio);
+  const hasData = typeof s.fundName === "string" || num(s.initialCapital) !== null;
+  if (!hasData) return null;
+  const a = ACCENTS.magic;
+  const holdings = arr(p.holdings);
+  const holdingCount = num(s.holdingCount) ?? holdings.length;
+  const active = holdingCount > 0;
+  const firstBuy = holdings.map((h) => str(h.oldestBuyDate)).filter(Boolean).sort()[0] || "";
+  const nextSell = holdings.map((h) => str(h.nextSellDateEstimate)).filter(Boolean).sort()[0] || "";
+  const cols = ["종목명", "수량", "평균단가", "평가가", "평가금액", "평가손익", "수익률", "매도예정"];
+
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${a.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: a.primary, flexShrink: 0 }} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{a.title}</div>
+            <div style={{ fontSize: 12, color: "#94a3b8" }}>{a.subtitle}</div>
+          </div>
+        </div>
+        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: active ? a.primary : "#94a3b8", background: active ? a.soft : "#f1f5f9", border: `1px solid ${active ? a.primary : "#e2e8f0"}`, borderRadius: 99, padding: "2px 9px" }}>
+          {active ? "운용 중" : "운용 준비 중"}
+        </span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8, marginBottom: 12 }}>
+        <Metric label="총자산" value={krw(num(s.totalAsset))} />
+        <Metric label="누적수익률" value={pct(num(s.totalReturnRate))} color={tone(num(s.totalReturnRate))} />
+        <Metric label="평가금액" value={krw(num(s.evaluationAmount))} />
+        <Metric label="현금" value={krw(num(s.cash))} />
+      </div>
+
+      {active && firstBuy ? (
+        <p style={{ margin: "0 0 10px", fontSize: 12, color: "#64748b", lineHeight: 1.55 }}>
+          첫 lot은 {firstBuy} 시가 기준으로 기록되었습니다. 각 lot은 50거래일 보유 원칙{nextSell ? `(예정 매도 ${nextSell})` : ""}으로 운용됩니다.
+        </p>
+      ) : null}
+
+      {active ? (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#334155", marginBottom: 8 }}>보유 종목 ({holdingCount}개)</div>
+          <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+            <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 560 }}>
+              <thead>
+                <tr>
+                  {cols.map((h, i) => (
+                    <th key={h} style={{ padding: "9px 10px", fontSize: 12, fontWeight: 800, color: "#64748b", textAlign: i === 0 ? "left" : "right", whiteSpace: "nowrap", background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {holdings.map((h, i) => {
+                  const rate = num(h.unrealizedReturnRate);
+                  const profit = num(h.unrealizedProfit);
+                  return (
+                    <tr key={str(h.code) || String(i)} style={{ borderTop: "1px solid #eceff3" }}>
+                      <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap" }}>
+                        <b style={{ color: "#0f172a", fontWeight: 850 }}>{str(h.name) || str(h.code)}</b>{" "}
+                        <span style={{ color: "#94a3b8", fontSize: 11 }}>{str(h.code)}</span>
+                      </td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{qty(num(h.quantity))}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(num(h.averageBuyPrice))}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(num(h.evaluationPrice))}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(num(h.evaluationAmount))}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700, color: tone(profit) }}>{krw(profit)}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 800, color: tone(rate) }}>{pct(rate)}</td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", color: "#94a3b8", fontWeight: 700 }}>{str(h.nextSellDateEstimate) || "-"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>아직 보유 종목이 없습니다. 다음 개장일 daily_run 이후 첫 매수가 반영됩니다.</p>
+      )}
+    </section>
+  );
+}
+
+// 성과분석 — 펀드별 매수·매도 기록(기본 닫힘 접힘목록). public에 있는 거래 필드만 사용.
+// 와바바/AI: performanceAnalysis.tradeHistory. 마법공식: magicPortfolio.holdings의 매수 기록.
+type TradeRow = { date: string; kind: string; name: string; code: string; quantity: number | null; price: number | null; amount: number | null };
+
+function normalizeTrades(raw: Rec[]): TradeRow[] {
+  return raw
+    .map((t) => {
+      const typeText = (str(t.type) || str(t.action) || str(t.side)).toUpperCase();
+      return {
+        date: str(t.date) || str(t.sellDate) || str(t.buyDate),
+        kind: /SELL|매도/.test(typeText) ? "매도" : "매수",
+        name: str(t.name) || str(t.code),
+        code: str(t.code) || str(t.stockCode),
+        quantity: num(t.quantity),
+        price: num(t.price),
+        amount: num(t.amount),
+      };
+    })
+    .sort((x, y) => (x.date < y.date ? 1 : x.date > y.date ? -1 : 0));
+}
+
+function TradeHistoryDetails({ rows }: { rows: TradeRow[] }) {
+  const cols = ["날짜", "구분", "종목명", "수량", "단가", "금액"];
+  return (
+    <details style={{ marginTop: 10, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", padding: "0 12px" }}>
+      <summary style={{ cursor: "pointer", padding: "11px 2px", fontSize: 13, fontWeight: 800, color: "#475569" }}>
+        매수·매도 기록 보기{rows.length > 0 ? ` (${rows.length}건)` : ""}
+      </summary>
+      {rows.length === 0 ? (
+        <p style={{ margin: "0 0 12px", fontSize: 13, color: "#94a3b8" }}>표시할 거래 기록이 아직 없습니다.</p>
+      ) : (
+        <div style={{ overflowX: "auto", maxWidth: "100%", paddingBottom: 12 }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 480 }}>
+            <thead>
+              <tr>
+                {cols.map((h, i) => (
+                  <th key={h} style={{ padding: "8px 10px", fontSize: 12, fontWeight: 800, color: "#64748b", textAlign: i <= 2 ? "left" : "right", whiteSpace: "nowrap", background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={`${r.code}-${r.date}-${i}`} style={{ borderTop: "1px solid #eceff3" }}>
+                  <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap", color: "#64748b", fontWeight: 700 }}>{r.date || "-"}</td>
+                  <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap", fontWeight: 800, color: r.kind === "매도" ? "#ea580c" : "#059669" }}>{r.kind}</td>
+                  <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap" }}>
+                    <b style={{ color: "#0f172a", fontWeight: 800 }}>{r.name}</b>{" "}
+                    <span style={{ color: "#94a3b8", fontSize: 11 }}>{r.code}</span>
+                  </td>
+                  <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{qty(r.quantity)}</td>
+                  <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(r.price)}</td>
+                  <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(r.amount)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </details>
+  );
+}
+
+export function FundTradeHistory({ history, fundKey }: { history: Rec; fundKey: FundKey }) {
+  let raw: Rec[];
+  if (fundKey === "magic") {
+    raw = arr(obj(history.magicPortfolio).holdings).map((h) => ({
+      date: str(h.oldestBuyDate),
+      type: "BUY",
+      name: str(h.name) || str(h.code),
+      code: str(h.code),
+      quantity: num(h.quantity),
+      price: num(h.averageBuyPrice),
+      amount: num(h.investedAmount),
+    }));
+  } else {
+    const perfKey = fundKey === "ai" ? "aiPerformanceAnalysis" : "performanceAnalysis";
+    raw = arr(obj(history[perfKey]).tradeHistory);
+  }
+  return <TradeHistoryDetails rows={normalizeTrades(raw)} />;
 }
 
 // 전략랩 — 마법공식 정량 순위 후보(2펀드 CandidateSection과 동일한 .candidateCard chrome 사용).

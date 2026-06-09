@@ -7,7 +7,12 @@ import {
   WABABA_THEME,
   AI_THEME,
 } from "../_dashboard/kit";
-import { FundSummaryGrid, FundComparisonTable } from "../_dashboard/funds";
+import {
+  FundSummaryGrid,
+  FundComparisonTable,
+  MagicHoldingsCard,
+  FundTradeHistory,
+} from "../_dashboard/funds";
 import { loadPortfolioSnapshots } from "@/lib/wababa/snapshot/portfolio-snapshot";
 
 export const dynamic = "force-dynamic";
@@ -33,10 +38,20 @@ export default function PerformancePage() {
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">펀드별 상세</h2>
-        <div className="fundsGrid">
-          <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
-          <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
+        <h2 className="dashSectionTitle">펀드별 보유 종목</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22, minWidth: 0 }}>
+          <div style={{ minWidth: 0 }}>
+            <FundCard history={history} theme={WABABA_THEME} snapshots={snapshots} />
+            <FundTradeHistory history={history} fundKey="wababa" />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <FundCard history={history} theme={AI_THEME} snapshots={snapshots} />
+            <FundTradeHistory history={history} fundKey="ai" />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <MagicHoldingsCard history={history} />
+            <FundTradeHistory history={history} fundKey="magic" />
+          </div>
         </div>
       </section>
     </main>

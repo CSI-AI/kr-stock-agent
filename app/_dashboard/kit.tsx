@@ -1329,9 +1329,16 @@ function BestPickHero({ history }: { history: AnyRecord }) {
 }
 
 // 대시보드 전용 — 현재 보유 종목 압축 1줄 목록(와바바 펀드 기준).
-function DashboardHoldings({ history }: { history: AnyRecord }) {
+function DashboardHoldings({
+  history,
+  limit,
+}: {
+  history: AnyRecord;
+  limit?: number;
+}) {
   const data = getFundData(history, WABABA_THEME);
-  const positions = data.positions;
+  const positions =
+    typeof limit === "number" ? data.positions.slice(0, limit) : data.positions;
   if (positions.length === 0) {
     return <div className="emptyCell">현재 보유 중인 종목이 없습니다.</div>;
   }
@@ -1360,7 +1367,13 @@ function DashboardHoldings({ history }: { history: AnyRecord }) {
 }
 
 // 대시보드 전용 — 최근 매도/축소. 일부 매도 후 잔여 보유면 "판 종목"으로 단정하지 않음.
-function DashboardSold({ history }: { history: AnyRecord }) {
+function DashboardSold({
+  history,
+  limit = 5,
+}: {
+  history: AnyRecord;
+  limit?: number;
+}) {
   const analysis = getObject(history.performanceAnalysis);
   const sold = getArray(analysis.tradeHistory).filter((trade) =>
     /매도|sell/i.test(
@@ -1381,7 +1394,7 @@ function DashboardSold({ history }: { history: AnyRecord }) {
   );
   return (
     <div className="holdStrip">
-      {sold.slice(0, 5).map((trade, index) => {
+      {sold.slice(0, limit).map((trade, index) => {
         const rate = getPositionProfitRate(trade);
         const code = getCode(trade);
         // 매도 이력은 와바바펀드 기준(tradeHistory). 잔여 보유 여부로 라벨 결정.
