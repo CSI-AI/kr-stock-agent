@@ -296,40 +296,67 @@ export function FundFlowChart({ history }: { history: Rec }) {
     );
   }
 
-  const W = 520, H = 260, padL = 52, padR = 16, padT = 16, padB = 26;
+  const W = 460, H = 280, padL = 64, padR = 16, padT = 16, padB = 40;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const ords = allPts.map((p) => p.ord);
   const minOrd = Math.min(...ords), maxOrd = Math.max(...ords);
-  // 초기자본을 범위에 포함해 기준선이 항상 보이게 한다.
-  const vals = allPts.map((p) => p.v).concat(initial);
-  let minV = Math.min(...vals), maxV = Math.max(...vals);
-  if (minV === maxV) { minV -= 1; maxV += 1; }
-  const padV = (maxV - minV) * 0.08 || 1;
-  minV -= padV; maxV += padV;
+  // Y범위/눈금: 데이터+초기자본을 100만원 단위로 내림/올림(여백 최소). tick=100만원(8개 초과 시 step 확대).
+  const STEP0 = 1_000_000;
+  const dataVals = allPts.map((p) => p.v).concat(initial);
+  let minV = Math.floor(Math.min(...dataVals) / STEP0) * STEP0;
+  let maxV = Math.ceil(Math.max(...dataVals) / STEP0) * STEP0;
+  if (minV === maxV) { minV -= STEP0; maxV += STEP0; }
+  let step = STEP0;
+  while ((maxV - minV) / step + 1 > 8) step += STEP0;
+  minV = Math.floor(minV / step) * step;
+  maxV = Math.ceil(maxV / step) * step;
+  const ticks: number[] = [];
+  for (let t = minV; t <= maxV + 1; t += step) ticks.push(t);
   const xpos = (ord: number) => padL + ((ord - minOrd) / (maxOrd - minOrd || 1)) * plotW;
   const ypos = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
   const pathOf = (s: FlowPt[]) => s.map((p, i) => `${i === 0 ? "M" : "L"}${xpos(p.ord).toFixed(1)},${ypos(p.v).toFixed(1)}`).join(" ");
-  const minDate = allPts.reduce((m, p) => (p.ord < m.ord ? p : m)).date;
-  const maxDate = allPts.reduce((m, p) => (p.ord > m.ord ? p : m)).date;
   const fmtMD = (d: string) => d.slice(5).replace("-", "/");
+  // X축 날짜 라벨: 시작/최근 + 중간(최대 4개, 데이터 ord 기준, 겹침 방지).
+  const uniqDates = Array.from(new Map(allPts.map((p) => [p.ord, p.date] as [number, string])).entries()).sort((x, y) => x[0] - y[0]);
+  const nD = uniqDates.length;
+  const dateIdx = Array.from(new Set(nD <= 4 ? uniqDates.map((_, i) => i) : [0, Math.round((nD - 1) / 3), Math.round((2 * (nD - 1)) / 3), nD - 1]));
+  const dateTicks = dateIdx.map((i) => uniqDates[i]);
   const refY = ypos(initial);
+  const midX = padL + plotW / 2;
   const C = { w: "#2563eb", a: "#7c3aed", m: "#059669" };
   const last = (s: FlowPt[]) => (s.length ? s[s.length - 1] : null);
 
   return (
     <div className="chartCard">
       <div className="chartTitle">3펀드 총자산 흐름</div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="lineChart" style={{ height: "clamp(220px, 40vw, 260px)" }} role="img" aria-label="3펀드 총자산 흐름 차트">
-        {/* 초기자본 기준선 */}
-        <line x1={padL} x2={W - padR} y1={refY} y2={refY} stroke="#cbd5e1" strokeWidth="1" strokeDasharray="4 4" />
-        <text x={padL - 6} y={refY + 4} textAnchor="end" fill="#94a3b8" fontSize="11">{manLabel(initial)}</text>
+      <svg viewBox={`0 0 ${W} ${H}`} className="lineChart" style={{ height: "clamp(240px, 44vw, 280px)" }} role="img" aria-label="3펀드 총자산 흐름 차트">
+        {/* Y축 눈금(100만원) + 옅은 grid line + 만원 라벨 */}
+        {ticks.map((t) => {
+          const ty = ypos(t);
+          return (
+            <g key={t}>
+              <line x1={padL} x2={W - padR} y1={ty} y2={ty} stroke="#eef2f7" strokeWidth="1" />
+              <text x={padL - 6} y={ty + 3} textAnchor="end" fill="#94a3b8" fontSize="10">{manLabel(t)}</text>
+            </g>
+          );
+        })}
+        {/* 초기자본 기준선(점선) */}
+        <line x1={padL} x2={W - padR} y1={refY} y2={refY} stroke="#cbd5e1" strokeWidth="1.2" strokeDasharray="4 3" />
+        {/* Y축 제목(세로) */}
+        <text transform={`rotate(-90 13 ${padT + plotH / 2})`} x={13} y={padT + plotH / 2} textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="700">총자산(만원)</text>
+        {/* 라인/점 */}
         {w.length >= 2 ? <path d={pathOf(w)} fill="none" stroke={C.w} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
         {a.length >= 2 ? <path d={pathOf(a)} fill="none" stroke={C.a} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /> : null}
         {last(w) ? <circle cx={xpos(last(w)!.ord)} cy={ypos(last(w)!.v)} r="3.5" fill={C.w} /> : null}
         {last(a) ? <circle cx={xpos(last(a)!.ord)} cy={ypos(last(a)!.v)} r="3.5" fill={C.a} /> : null}
         {magic ? <circle cx={xpos(magic.ord)} cy={ypos(magic.v)} r="4" fill={C.m} stroke="#fff" strokeWidth="1.5" /> : null}
-        <text x={padL} y={H - 6} fill="#94a3b8" fontSize="11">{fmtMD(minDate)}</text>
-        <text x={W - padR} y={H - 6} textAnchor="end" fill="#94a3b8" fontSize="11">{fmtMD(maxDate)}</text>
+        {/* X축 날짜 라벨 */}
+        {dateTicks.map(([ord, date], i) => {
+          const anchor: "start" | "middle" | "end" = i === 0 ? "start" : i === dateTicks.length - 1 ? "end" : "middle";
+          return <text key={ord} x={xpos(ord)} y={H - 24} textAnchor={anchor} fill="#94a3b8" fontSize="10">{fmtMD(date)}</text>;
+        })}
+        {/* X축 제목 */}
+        <text x={midX} y={H - 6} textAnchor="middle" fill="#64748b" fontSize="11" fontWeight="700">날짜</text>
       </svg>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 8 }}>
         <FlowLegend color={C.w} label="와바바" asset={last(w)?.v ?? null} />
