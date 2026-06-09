@@ -348,7 +348,11 @@ export function MagicHoldingsCard({ history }: { history: Rec }) {
   const active = holdingCount > 0;
   const firstBuy = holdings.map((h) => str(h.oldestBuyDate)).filter(Boolean).sort()[0] || "";
   const nextSell = holdings.map((h) => str(h.nextSellDateEstimate)).filter(Boolean).sort()[0] || "";
-  const cols = ["종목명", "수량", "평균단가", "평가가", "평가금액", "평가손익", "수익률", "매도예정"];
+  const cols = ["종목명", "매수순위", "수량", "평균단가", "평가가", "평가금액", "평가손익", "수익률", "매도예정"];
+  // [45-C] 매수시점 순위(buyRank)로 정렬해 1위→10위 순서로 보여준다. rank 데이터 없으면 기존 순서 유지.
+  const sorted = [...holdings].sort((x, y) => (num(x.buyRank) ?? 99) - (num(y.buyRank) ?? 99));
+  const hasRank = holdings.some((h) => num(h.buyRank) !== null);
+  const detailCols = ["종목명", "매수순위", "종합순위", "수익성순위", "저평가순위", "수익성지표", "저평가지표"];
 
   return (
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${a.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
@@ -382,7 +386,7 @@ export function MagicHoldingsCard({ history }: { history: Rec }) {
         <>
           <div style={{ fontSize: 13, fontWeight: 800, color: "#334155", marginBottom: 8 }}>보유 종목 ({holdingCount}개)</div>
           <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-            <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 560 }}>
+            <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 620 }}>
               <thead>
                 <tr>
                   {cols.map((h, i) => (
@@ -391,15 +395,17 @@ export function MagicHoldingsCard({ history }: { history: Rec }) {
                 </tr>
               </thead>
               <tbody>
-                {holdings.map((h, i) => {
+                {sorted.map((h, i) => {
                   const rate = num(h.unrealizedReturnRate);
                   const profit = num(h.unrealizedProfit);
+                  const br = num(h.buyRank);
                   return (
                     <tr key={str(h.code) || String(i)} style={{ borderTop: "1px solid #eceff3" }}>
                       <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap" }}>
                         <b style={{ color: "#0f172a", fontWeight: 850 }}>{str(h.name) || str(h.code)}</b>{" "}
                         <span style={{ color: "#94a3b8", fontSize: 11 }}>{str(h.code)}</span>
                       </td>
+                      <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 800, color: a.primary }}>{br !== null ? `${br}위` : "-"}</td>
                       <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{qty(num(h.quantity))}</td>
                       <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(num(h.averageBuyPrice))}</td>
                       <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(num(h.evaluationPrice))}</td>
@@ -413,6 +419,51 @@ export function MagicHoldingsCard({ history }: { history: Rec }) {
               </tbody>
             </table>
           </div>
+
+          {hasRank ? (
+            <details style={{ marginTop: 10, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", padding: "0 12px" }}>
+              <summary style={{ cursor: "pointer", padding: "11px 2px", fontSize: 13, fontWeight: 800, color: "#475569" }}>
+                매수시점 마법공식 순위·구성값 보기
+              </summary>
+              <p style={{ margin: "0 0 8px", fontSize: 11, color: "#94a3b8", lineHeight: 1.55 }}>
+                수익성순위와 저평가순위를 더한 종합순위로 줄세워 상위 10개를 매수했습니다. 수익성지표=자본 대비 영업이익,
+                저평가지표=기업가치 대비 영업이익(클수록 우수). 순위는 매수시점(전체 상장사 기준) 값입니다.
+              </p>
+              <div style={{ overflowX: "auto", maxWidth: "100%", paddingBottom: 12 }}>
+                <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 520 }}>
+                  <thead>
+                    <tr>
+                      {detailCols.map((h, i) => (
+                        <th key={h} style={{ padding: "8px 10px", fontSize: 12, fontWeight: 800, color: "#64748b", textAlign: i === 0 ? "left" : "right", whiteSpace: "nowrap", background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sorted.map((h, i) => {
+                      const br = num(h.buyRank);
+                      const roc = num(h.returnOnCapital);
+                      const ey = num(h.earningsYield);
+                      const cellR = { padding: "8px 10px", textAlign: "right" as const, whiteSpace: "nowrap" as const, fontWeight: 700 };
+                      return (
+                        <tr key={str(h.code) || String(i)} style={{ borderTop: "1px solid #eceff3" }}>
+                          <td style={{ padding: "8px 10px", textAlign: "left", whiteSpace: "nowrap" }}>
+                            <b style={{ color: "#0f172a", fontWeight: 800 }}>{str(h.name) || str(h.code)}</b>{" "}
+                            <span style={{ color: "#94a3b8", fontSize: 11 }}>{str(h.code)}</span>
+                          </td>
+                          <td style={{ ...cellR, fontWeight: 800, color: a.primary }}>{br !== null ? `${br}위` : "-"}</td>
+                          <td style={cellR}>{num(h.combinedRank) !== null ? num(h.combinedRank) : "-"}</td>
+                          <td style={cellR}>{num(h.profitabilityRank) !== null ? num(h.profitabilityRank) : "-"}</td>
+                          <td style={cellR}>{num(h.valueRank) !== null ? num(h.valueRank) : "-"}</td>
+                          <td style={cellR}>{roc !== null ? pct(roc * 100, 1) : "-"}</td>
+                          <td style={cellR}>{ey !== null ? pct(ey * 100, 1) : "-"}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ) : null}
         </>
       ) : (
         <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>아직 보유 종목이 없습니다. 다음 개장일 daily_run 이후 첫 매수가 반영됩니다.</p>
