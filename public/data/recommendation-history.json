@@ -1,21 +1,47 @@
 {
-  "baseDate": "2026-06-09",
-  "generatedAt": "2026-06-09 12:09:54",
+  "baseDate": "2026-06-10",
+  "generatedAt": "2026-06-10 08:45:04",
   "portfolioSummary": {
     "initialCapital": 50000000.0,
-    "cash": 40968550.0,
-    "positionCount": 4,
-    "totalBuyAmount": 7102650.0,
-    "totalEvaluationAmount": 7003300.0,
+    "cash": 39140630.0,
+    "positionCount": 5,
+    "totalBuyAmount": 8930570.0,
+    "totalEvaluationAmount": 8831220.0,
     "totalProfitAmount": -99350.0,
     "realizedProfit": -1928800.0,
     "totalAssetAmount": 47971850.0,
     "totalProfitRate": -4.06,
-    "investedRate": 14.6,
-    "cashRate": 85.4,
+    "investedRate": 18.41,
+    "cashRate": 81.59,
     "performanceLabel": "약손실",
     "performanceTone": "warning",
     "positions": [
+      {
+        "code": "088130",
+        "name": "동아엘텍",
+        "buyPrice": 6260.0,
+        "quantity": 292.0,
+        "currentPrice": 6260.0,
+        "buyAmount": 1827920.0,
+        "evaluationAmount": 1827920.0,
+        "profitAmount": 0.0,
+        "profitRate": 0.0,
+        "action": "HOLD",
+        "label": "보유 유지",
+        "reason": "보유 종목. 현재는 매도보다 유지 판단이 우선입니다. 확인: 핵심 리스크 급증 없음",
+        "sellSignal": {
+          "action": "HOLD",
+          "trigger": "monitor",
+          "urgency": "LOW",
+          "reasons": [
+            "매도 급한 신호 없음"
+          ],
+          "summary": "매도 급한 신호 없음",
+          "profitRate": 0.0,
+          "confidence": 0,
+          "qualityPenalty": 0
+        }
+      },
       {
         "code": "100840",
         "name": "SNT에너지",
@@ -123,19 +149,19 @@
     ]
   },
   "performanceAnalysis": {
-    "baseDate": "2026-06-09",
-    "generatedAt": "2026-06-09 12:09:54",
+    "baseDate": "2026-06-10",
+    "generatedAt": "2026-06-10 08:45:04",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
-      "cash": 40968550.0,
-      "totalEvaluationAmount": 7003300.0,
+      "cash": 39140630.0,
+      "totalEvaluationAmount": 8831220.0,
       "totalAssetAmount": 47971850.0,
       "realizedProfit": -1928800.0,
       "unrealizedProfit": -99350.0,
-      "totalProfitAmount": -2025085.0,
-      "estimatedDividendIncome": 3065.0,
+      "totalProfitAmount": -2024388.0,
+      "estimatedDividendIncome": 3762.0,
       "totalProfitRate": -4.05,
-      "dailyReturnRate": -2.81,
+      "dailyReturnRate": -0.21,
       "cumulativeReturnRate": -4.06,
       "label": "약손실",
       "tone": "warning",
@@ -232,33 +258,42 @@
         },
         {
           "date": "2026-06-09",
-          "totalAssetAmount": 47971850.0,
-          "profitAmount": -2028150.0,
-          "dailyReturnRate": -2.81,
-          "cumulativeReturnRate": -4.06,
+          "totalAssetAmount": 48071200.0,
+          "profitAmount": -1928800.0,
+          "dailyReturnRate": -2.61,
+          "cumulativeReturnRate": -3.86,
           "tradeCount": 5,
           "realizedProfitChange": -1288600.0
+        },
+        {
+          "date": "2026-06-10",
+          "totalAssetAmount": 47971850.0,
+          "profitAmount": -2028150.0,
+          "dailyReturnRate": -0.21,
+          "cumulativeReturnRate": -4.06,
+          "tradeCount": 1,
+          "realizedProfitChange": 0
         }
       ],
-      "dailyReturnCount": 11
+      "dailyReturnCount": 12
     },
     "recommendationPerformance": {
-      "recommendedCount": 10,
-      "evaluatedCount": 10,
+      "recommendedCount": 11,
+      "evaluatedCount": 11,
       "winCount": 1,
       "lossCount": 8,
-      "winRate": 10.0,
-      "averageReturnRate": -11.14,
+      "winRate": 9.09,
+      "averageReturnRate": -10.13,
       "maxProfitRate": 1.34,
       "maxLossRate": -20.97,
-      "averageHoldingDays": 17.6,
+      "averageHoldingDays": 16.4,
       "bestItem": {
         "code": "462870",
         "name": "시프트업",
         "status": "OPEN",
         "buyDate": "2026-05-19",
         "sellDate": null,
-        "holdingDays": 21,
+        "holdingDays": 22,
         "buyPrice": 29800.0,
         "currentPrice": 30200.0,
         "quantity": 55.0,
@@ -284,7 +319,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 21,
+          "holdingDays": 22,
           "buyPrice": 29800.0,
           "currentPrice": 30200.0,
           "quantity": 55.0,
@@ -293,12 +328,26 @@
           "reason": "현재 보유 중"
         },
         {
+          "code": "088130",
+          "name": "동아엘텍",
+          "status": "OPEN",
+          "buyDate": "2026-06-10",
+          "sellDate": null,
+          "holdingDays": 0,
+          "buyPrice": 6260.0,
+          "currentPrice": 6260.0,
+          "quantity": 292.0,
+          "profitRate": 0.0,
+          "profitAmount": 0.0,
+          "reason": "현재 보유 중"
+        },
+        {
           "code": "100840",
           "name": "SNT에너지",
           "status": "OPEN",
           "buyDate": "2026-06-09",
           "sellDate": null,
-          "holdingDays": 0,
+          "holdingDays": 1,
           "buyPrice": 30700.0,
           "currentPrice": 30700.0,
           "quantity": 59.0,
@@ -312,7 +361,7 @@
           "status": "OPEN",
           "buyDate": "2026-06-01",
           "sellDate": null,
-          "holdingDays": 8,
+          "holdingDays": 9,
           "buyPrice": 24150.0,
           "currentPrice": 23400.0,
           "quantity": 69.0,
@@ -326,7 +375,7 @@
           "status": "OPEN",
           "buyDate": "2026-06-03",
           "sellDate": null,
-          "holdingDays": 6,
+          "holdingDays": 7,
           "buyPrice": 16550.0,
           "currentPrice": 15970.0,
           "quantity": 120.0,
@@ -404,7 +453,7 @@
     },
     "tradePerformance": {
       "source": "portfolio.tradeLedger",
-      "totalTradeCount": 16,
+      "totalTradeCount": 17,
       "closedTradeCount": 6,
       "winCount": 0,
       "lossCount": 6,
@@ -741,17 +790,37 @@
         "reason": "매도 엔진 HIGH",
         "profitAmount": -361900.0,
         "profitRate": -19.74
+      },
+      {
+        "id": "2026-06-10::BUY::088130",
+        "date": "2026-06-10",
+        "type": "BUY",
+        "action": "BUY",
+        "stockCode": "088130",
+        "code": "088130",
+        "name": "동아엘텍",
+        "price": 6260.0,
+        "quantity": 292.0,
+        "amount": 1827920.0,
+        "reason": "오늘 1종목 · 신뢰도 87% · 목표 비중 11%"
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 3065.0,
+      "estimatedDividendIncome": 3762.0,
       "items": [
+        {
+          "code": "100840",
+          "name": "SNT에너지",
+          "dividendYield": 3.75,
+          "holdingDays": 1,
+          "estimatedDividendIncome": 186.0
+        },
         {
           "code": "461300",
           "name": "아이스크림미디어",
           "dividendYield": 9.73,
-          "holdingDays": 6,
-          "estimatedDividendIncome": 3065.0
+          "holdingDays": 7,
+          "estimatedDividendIncome": 3576.0
         }
       ]
     },
@@ -767,6 +836,21 @@
         "기준 미달이면 하루 0건 매수 가능"
       ],
       "holdChecks": [
+        {
+          "code": "088130",
+          "name": "동아엘텍",
+          "holdReason": [
+            "성장 가설 유지",
+            "ROE 39.8%",
+            "영업이익 증가율 668.7%",
+            "PER 2.2배는 단독 매도 사유 아님",
+            "평가수익률 0.0%"
+          ],
+          "sellReason": [
+            "성장 가설 유지, 매도 사유 없음"
+          ],
+          "profitRate": 0.0
+        },
         {
           "code": "100840",
           "name": "SNT에너지",
@@ -832,6 +916,83 @@
     },
     "recentEvents": [
       {
+        "date": "2026-06-10",
+        "type": "BUY",
+        "label": "매수",
+        "tone": "buy",
+        "code": "088130",
+        "name": "동아엘텍",
+        "amount": 1827920.0,
+        "profitRate": null,
+        "profitAmount": null,
+        "reason": "오늘 1종목 · 신뢰도 87% · 목표 비중 11%"
+      },
+      {
+        "date": "2026-06-10",
+        "type": "OPEN_POSITION",
+        "label": "보유중",
+        "tone": "positive",
+        "code": "462870",
+        "name": "시프트업",
+        "amount": 22000.0,
+        "profitRate": 1.34,
+        "profitAmount": 22000.0,
+        "holdingDays": 22,
+        "reason": "현재 보유 수익률 추적"
+      },
+      {
+        "date": "2026-06-10",
+        "type": "OPEN_POSITION",
+        "label": "보유중",
+        "tone": "neutral",
+        "code": "088130",
+        "name": "동아엘텍",
+        "amount": 0.0,
+        "profitRate": 0.0,
+        "profitAmount": 0.0,
+        "holdingDays": 0,
+        "reason": "현재 보유 수익률 추적"
+      },
+      {
+        "date": "2026-06-10",
+        "type": "OPEN_POSITION",
+        "label": "보유중",
+        "tone": "neutral",
+        "code": "100840",
+        "name": "SNT에너지",
+        "amount": 0.0,
+        "profitRate": 0.0,
+        "profitAmount": 0.0,
+        "holdingDays": 1,
+        "reason": "현재 보유 수익률 추적"
+      },
+      {
+        "date": "2026-06-10",
+        "type": "OPEN_POSITION",
+        "label": "보유중",
+        "tone": "negative",
+        "code": "419530",
+        "name": "SAMG엔터",
+        "amount": -51750.0,
+        "profitRate": -3.11,
+        "profitAmount": -51750.0,
+        "holdingDays": 9,
+        "reason": "현재 보유 수익률 추적"
+      },
+      {
+        "date": "2026-06-10",
+        "type": "OPEN_POSITION",
+        "label": "보유중",
+        "tone": "negative",
+        "code": "461300",
+        "name": "아이스크림미디어",
+        "amount": -69600.0,
+        "profitRate": -3.5,
+        "profitAmount": -69600.0,
+        "holdingDays": 7,
+        "reason": "현재 보유 수익률 추적"
+      },
+      {
         "date": "2026-06-09",
         "type": "SELL",
         "label": "매도",
@@ -892,58 +1053,6 @@
         "reason": "오늘 1종목 · 신뢰도 85% · 목표 비중 11%"
       },
       {
-        "date": "2026-06-09",
-        "type": "OPEN_POSITION",
-        "label": "보유중",
-        "tone": "positive",
-        "code": "462870",
-        "name": "시프트업",
-        "amount": 22000.0,
-        "profitRate": 1.34,
-        "profitAmount": 22000.0,
-        "holdingDays": 21,
-        "reason": "현재 보유 수익률 추적"
-      },
-      {
-        "date": "2026-06-09",
-        "type": "OPEN_POSITION",
-        "label": "보유중",
-        "tone": "neutral",
-        "code": "100840",
-        "name": "SNT에너지",
-        "amount": 0.0,
-        "profitRate": 0.0,
-        "profitAmount": 0.0,
-        "holdingDays": 0,
-        "reason": "현재 보유 수익률 추적"
-      },
-      {
-        "date": "2026-06-09",
-        "type": "OPEN_POSITION",
-        "label": "보유중",
-        "tone": "negative",
-        "code": "419530",
-        "name": "SAMG엔터",
-        "amount": -51750.0,
-        "profitRate": -3.11,
-        "profitAmount": -51750.0,
-        "holdingDays": 8,
-        "reason": "현재 보유 수익률 추적"
-      },
-      {
-        "date": "2026-06-09",
-        "type": "OPEN_POSITION",
-        "label": "보유중",
-        "tone": "negative",
-        "code": "461300",
-        "name": "아이스크림미디어",
-        "amount": -69600.0,
-        "profitRate": -3.5,
-        "profitAmount": -69600.0,
-        "holdingDays": 6,
-        "reason": "현재 보유 수익률 추적"
-      },
-      {
         "date": "2026-06-03",
         "type": "BUY",
         "label": "매수",
@@ -954,30 +1063,6 @@
         "profitRate": null,
         "profitAmount": null,
         "reason": "오늘 1종목 · 신뢰도 85% · 목표 비중 12%"
-      },
-      {
-        "date": "2026-06-02",
-        "type": "BUY",
-        "label": "매수",
-        "tone": "buy",
-        "code": "088130",
-        "name": "동아엘텍",
-        "amount": 1833000.0,
-        "profitRate": null,
-        "profitAmount": null,
-        "reason": "오늘 1종목 · 신뢰도 87% · 목표 비중 11%"
-      },
-      {
-        "date": "2026-06-01",
-        "type": "SELL",
-        "label": "매도",
-        "tone": "sell",
-        "code": "088130",
-        "name": "동아엘텍",
-        "amount": 1443000.0,
-        "profitRate": -20.97,
-        "profitAmount": -382950.0,
-        "reason": "매도 엔진 HIGH"
       }
     ],
     "insights": [
@@ -988,48 +1073,71 @@
     ],
     "summary": {
       "totalReturnRate": -4.05,
-      "totalProfitAmount": -2025085.0,
+      "totalProfitAmount": -2024388.0,
       "winRate": 0.0,
       "averageReturnRate": -17.69,
       "maxLossRate": -20.97,
       "evaluatedCount": 6,
       "averageHoldingDays": 20.5,
-      "totalTradeCount": 16,
+      "totalTradeCount": 17,
       "closedTradeCount": 6,
       "recentEventCount": 12,
-      "dailyReturnCount": 11
+      "dailyReturnCount": 12
     }
   },
   "dailyFundMemo": {
-    "date": "2026-06-09",
-    "title": "2026-06-09 와바바 운용일지",
-    "status": "ALREADY_EXECUTED",
-    "summary": "오늘 자동운용은 이미 실행되어 추가 매수하지 않음.",
+    "date": "2026-06-10",
+    "title": "2026-06-10 와바바 운용일지",
+    "status": "TRADED",
+    "summary": "동아엘텍 신규 매수.",
     "lines": [
-      "오늘 자동운용은 이미 실행되어 추가 매수하지 않음.",
-      "검토 후보: 동아엘텍 · 와바바 가치매수 기준 통과",
-      "보유: SNT에너지, 아이스크림미디어, SAMG엔터 중심으로 성장 유지 여부 점검.",
+      "동아엘텍 신규 매수.",
+      "오늘 1종목 · 신뢰도 87% · 목표 비중 11%",
+      "선정 근거: 동아엘텍이 가치매수 후보로 통과.",
+      "보유: 동아엘텍, SNT에너지, 아이스크림미디어 중심으로 성장 유지 여부 점검.",
       "총자산 4,797만원, 누적수익률 -4.05%."
     ],
-    "holdingCount": 4,
-    "orderCount": 0,
-    "cash": 40968550.0,
+    "holdingCount": 5,
+    "orderCount": 1,
+    "cash": 39140630.0,
     "totalAssetAmount": 47971850.0,
     "totalReturnRate": -4.05
   },
   "holdingReview": {
-    "date": "2026-06-09",
-    "summary": "보유 종목 4개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
-    "holdingCount": 4,
+    "date": "2026-06-10",
+    "summary": "보유 종목 5개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
+    "holdingCount": 5,
     "sellWatchCount": 0,
     "items": [
+      {
+        "code": "088130",
+        "name": "동아엘텍",
+        "action": "HOLD",
+        "actionLabel": "보유 유지",
+        "buyDate": "2026-06-10",
+        "holdingDays": 0,
+        "profitRate": 0.0,
+        "growthConsistencyScore": 100.0,
+        "growthConsistencyLabel": "장기보유 후보",
+        "holdReason": [
+          "성장 가설 유지",
+          "ROE 39.8%",
+          "영업이익 증가율 668.7%",
+          "PER 2.2배는 단독 매도 사유 아님"
+        ],
+        "sellReason": [
+          "성장 가설 유지, 매도 사유 없음"
+        ],
+        "dividendYield": 2.4,
+        "nextCheck": "장기 보유 가능성 유지 여부 · 배당수익률 2.4% 반영"
+      },
       {
         "code": "100840",
         "name": "SNT에너지",
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-09",
-        "holdingDays": 0,
+        "holdingDays": 1,
         "profitRate": 0.0,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1051,7 +1159,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-03",
-        "holdingDays": 6,
+        "holdingDays": 7,
         "profitRate": -3.5,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1073,7 +1181,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-06-01",
-        "holdingDays": 8,
+        "holdingDays": 9,
         "profitRate": -3.11,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1095,7 +1203,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 21,
+        "holdingDays": 22,
         "profitRate": 1.34,
         "growthConsistencyScore": 98.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -1115,14 +1223,20 @@
   },
   "portfolio": {
     "initialCapital": 50000000.0,
-    "cash": 40968550.0,
+    "cash": 39140630.0,
     "realizedProfit": -1928800.0,
     "positions": [
+      {
+        "code": "088130",
+        "name": "동아엘텍",
+        "buyPrice": 6260.0,
+        "quantity": 292
+      },
       {
         "code": "100840",
         "name": "SNT에너지",
         "buyPrice": 30700.0,
-        "quantity": 59
+        "quantity": 59.0
       },
       {
         "code": "461300",
@@ -1144,7 +1258,9 @@
       }
     ]
   },
-  "aiFundTradeResult": {},
+  "aiFundTradeResult": {
+    "aiTradePicks": []
+  },
   "aiPortfolioSummary": {
     "initialCapital": 50000000.0,
     "cash": 25408885.0,
@@ -1428,8 +1544,8 @@
     ]
   },
   "aiPerformanceAnalysis": {
-    "baseDate": "2026-06-09",
-    "generatedAt": "2026-06-09 12:09:54",
+    "baseDate": "2026-06-10",
+    "generatedAt": "2026-06-10 08:45:04",
     "portfolioPerformance": {
       "initialCapital": 50000000.0,
       "cash": 25408885.0,
@@ -1437,8 +1553,8 @@
       "totalAssetAmount": 44713020.0,
       "realizedProfit": 0.0,
       "unrealizedProfit": -5286980.0,
-      "totalProfitAmount": -5217122.0,
-      "estimatedDividendIncome": 69858.0,
+      "totalProfitAmount": -5214560.0,
+      "estimatedDividendIncome": 72420.0,
       "totalProfitRate": -10.43,
       "dailyReturnRate": -10.57,
       "cumulativeReturnRate": -10.57,
@@ -1500,7 +1616,7 @@
           "realizedProfitChange": 0
         },
         {
-          "date": "2026-06-09",
+          "date": "2026-06-10",
           "totalAssetAmount": 44713020.0,
           "profitAmount": -5286980.0,
           "dailyReturnRate": -10.57,
@@ -1520,14 +1636,14 @@
       "averageReturnRate": -21.24,
       "maxProfitRate": 0.54,
       "maxLossRate": -41.31,
-      "averageHoldingDays": 26.6,
+      "averageHoldingDays": 27.6,
       "bestItem": {
         "code": "402340",
         "name": "SK스퀘어",
         "status": "OPEN",
         "buyDate": "2026-05-18",
         "sellDate": null,
-        "holdingDays": 22,
+        "holdingDays": 23,
         "buyPrice": 1112000.0,
         "currentPrice": 1118000.0,
         "quantity": 2.0,
@@ -1541,7 +1657,7 @@
         "status": "OPEN",
         "buyDate": "2026-05-19",
         "sellDate": null,
-        "holdingDays": 21,
+        "holdingDays": 22,
         "buyPrice": 14040.0,
         "currentPrice": 8240.0,
         "quantity": 178.0,
@@ -1556,7 +1672,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 22,
+          "holdingDays": 23,
           "buyPrice": 1112000.0,
           "currentPrice": 1118000.0,
           "quantity": 2.0,
@@ -1570,7 +1686,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-18",
           "sellDate": null,
-          "holdingDays": 22,
+          "holdingDays": 23,
           "buyPrice": 43350.0,
           "currentPrice": 39950.0,
           "quantity": 57.0,
@@ -1584,7 +1700,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 33,
+          "holdingDays": 34,
           "buyPrice": 7780.0,
           "currentPrice": 6720.0,
           "quantity": 321.0,
@@ -1598,7 +1714,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 32,
+          "holdingDays": 33,
           "buyPrice": 16360.0,
           "currentPrice": 14010.0,
           "quantity": 152.0,
@@ -1612,7 +1728,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-07",
           "sellDate": null,
-          "holdingDays": 33,
+          "holdingDays": 34,
           "buyPrice": 3430.0,
           "currentPrice": 2690.0,
           "quantity": 728.0,
@@ -1626,7 +1742,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 25,
+          "holdingDays": 26,
           "buyPrice": 89700.0,
           "currentPrice": 68700.0,
           "quantity": 27.0,
@@ -1640,7 +1756,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-15",
           "sellDate": null,
-          "holdingDays": 25,
+          "holdingDays": 26,
           "buyPrice": 4565.0,
           "currentPrice": 3355.0,
           "quantity": 547.0,
@@ -1654,7 +1770,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-08",
           "sellDate": null,
-          "holdingDays": 32,
+          "holdingDays": 33,
           "buyPrice": 5040.0,
           "currentPrice": 3640.0,
           "quantity": 496.0,
@@ -1668,7 +1784,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 21,
+          "holdingDays": 22,
           "buyPrice": 9870.0,
           "currentPrice": 6260.0,
           "quantity": 253.0,
@@ -1682,7 +1798,7 @@
           "status": "OPEN",
           "buyDate": "2026-05-19",
           "sellDate": null,
-          "holdingDays": 21,
+          "holdingDays": 22,
           "buyPrice": 14040.0,
           "currentPrice": 8240.0,
           "quantity": 178.0,
@@ -1841,70 +1957,70 @@
       }
     ],
     "dividendIncome": {
-      "estimatedDividendIncome": 69858.0,
+      "estimatedDividendIncome": 72420.0,
       "items": [
         {
           "code": "017510",
           "name": "세명전기",
           "dividendYield": 2.67,
-          "holdingDays": 21,
-          "estimatedDividendIncome": 2253.0
+          "holdingDays": 22,
+          "estimatedDividendIncome": 2360.0
         },
         {
           "code": "088130",
           "name": "동아엘텍",
           "dividendYield": 2.4,
-          "holdingDays": 21,
-          "estimatedDividendIncome": 2187.0
+          "holdingDays": 22,
+          "estimatedDividendIncome": 2291.0
         },
         {
           "code": "065710",
           "name": "서호전기",
           "dividendYield": 15.02,
-          "holdingDays": 22,
-          "estimatedDividendIncome": 20615.0
+          "holdingDays": 23,
+          "estimatedDividendIncome": 21552.0
         },
         {
           "code": "171090",
           "name": "선익시스템",
           "dividendYield": 1.46,
-          "holdingDays": 25,
-          "estimatedDividendIncome": 1855.0
+          "holdingDays": 26,
+          "estimatedDividendIncome": 1929.0
         },
         {
           "code": "037270",
           "name": "YG PLUS",
           "dividendYield": 0.89,
-          "holdingDays": 25,
-          "estimatedDividendIncome": 1119.0
+          "holdingDays": 26,
+          "estimatedDividendIncome": 1163.0
         },
         {
           "code": "015360",
           "name": "INVENI",
           "dividendYield": 7.71,
-          "holdingDays": 32,
-          "estimatedDividendIncome": 14394.0
+          "holdingDays": 33,
+          "estimatedDividendIncome": 14844.0
         },
         {
           "code": "020710",
           "name": "시공테크",
           "dividendYield": 9.31,
-          "holdingDays": 32,
-          "estimatedDividendIncome": 14736.0
+          "holdingDays": 33,
+          "estimatedDividendIncome": 15197.0
         },
         {
           "code": "021080",
           "name": "에이티넘인베스트",
           "dividendYield": 5.2,
-          "holdingDays": 33,
-          "estimatedDividendIncome": 9207.0
+          "holdingDays": 34,
+          "estimatedDividendIncome": 9486.0
         },
         {
           "code": "019180",
           "name": "티에이치엔",
           "dividendYield": 1.79,
-          "holdingDays": 33,
-          "estimatedDividendIncome": 3491.0
+          "holdingDays": 34,
+          "estimatedDividendIncome": 3597.0
         }
       ]
     },
@@ -2075,7 +2191,7 @@
     },
     "recentEvents": [
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "positive",
@@ -2084,11 +2200,11 @@
         "amount": 12000.0,
         "profitRate": 0.54,
         "profitAmount": 12000.0,
-        "holdingDays": 22,
+        "holdingDays": 23,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2097,11 +2213,11 @@
         "amount": -193800.0,
         "profitRate": -7.84,
         "profitAmount": -193800.0,
-        "holdingDays": 22,
+        "holdingDays": 23,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2110,11 +2226,11 @@
         "amount": -340260.0,
         "profitRate": -13.62,
         "profitAmount": -340260.0,
-        "holdingDays": 33,
+        "holdingDays": 34,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2123,11 +2239,11 @@
         "amount": -357200.0,
         "profitRate": -14.36,
         "profitAmount": -357200.0,
-        "holdingDays": 32,
+        "holdingDays": 33,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2136,11 +2252,11 @@
         "amount": -538720.0,
         "profitRate": -21.57,
         "profitAmount": -538720.0,
-        "holdingDays": 33,
+        "holdingDays": 34,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2149,11 +2265,11 @@
         "amount": -567000.0,
         "profitRate": -23.41,
         "profitAmount": -567000.0,
-        "holdingDays": 25,
+        "holdingDays": 26,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2162,11 +2278,11 @@
         "amount": -661870.0,
         "profitRate": -26.51,
         "profitAmount": -661870.0,
-        "holdingDays": 25,
+        "holdingDays": 26,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2175,11 +2291,11 @@
         "amount": -694400.0,
         "profitRate": -27.78,
         "profitAmount": -694400.0,
-        "holdingDays": 32,
+        "holdingDays": 33,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2188,11 +2304,11 @@
         "amount": -913330.0,
         "profitRate": -36.58,
         "profitAmount": -913330.0,
-        "holdingDays": 21,
+        "holdingDays": 22,
         "reason": "현재 보유 수익률 추적"
       },
       {
-        "date": "2026-06-09",
+        "date": "2026-06-10",
         "type": "OPEN_POSITION",
         "label": "보유중",
         "tone": "negative",
@@ -2201,7 +2317,7 @@
         "amount": -1032400.0,
         "profitRate": -41.31,
         "profitAmount": -1032400.0,
-        "holdingDays": 21,
+        "holdingDays": 22,
         "reason": "현재 보유 수익률 추적"
       },
       {
@@ -2237,12 +2353,12 @@
     ],
     "summary": {
       "totalReturnRate": -10.43,
-      "totalProfitAmount": -5217122.0,
+      "totalProfitAmount": -5214560.0,
       "winRate": 10.0,
       "averageReturnRate": -21.24,
       "maxLossRate": -41.31,
       "evaluatedCount": 0,
-      "averageHoldingDays": 26.6,
+      "averageHoldingDays": 27.6,
       "totalTradeCount": 10,
       "closedTradeCount": 0,
       "recentEventCount": 12,
@@ -2250,12 +2366,12 @@
     }
   },
   "aiDailyFundMemo": {
-    "date": "2026-06-09",
+    "date": "2026-06-10",
     "title": "와바바AI펀드 운용 메모",
-    "status": "ALREADY_EXECUTED",
-    "summary": "오늘 자동운용은 이미 실행되어 추가 매수하지 않음.",
+    "status": "NO_TRADE",
+    "summary": "오늘은 기준을 만족하는 신규 매수 체결 없음.",
     "lines": [
-      "오늘 자동운용은 이미 실행되어 추가 매수하지 않음.",
+      "오늘은 기준을 만족하는 신규 매수 체결 없음.",
       "보유: 세명전기, 동아엘텍, SK스퀘어 중심으로 성장 유지 여부 점검.",
       "총자산 4,471만원, 누적수익률 -10.43%."
     ],
@@ -2266,7 +2382,7 @@
     "totalReturnRate": -10.43
   },
   "aiHoldingReview": {
-    "date": "2026-06-09",
+    "date": "2026-06-10",
     "summary": "보유 종목 10개 정기 점검 완료. 현재 매도 점검 종목 없음. 성장 유지 여부 중심으로 보유.",
     "holdingCount": 10,
     "sellWatchCount": 0,
@@ -2277,7 +2393,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 21,
+        "holdingDays": 22,
         "profitRate": -41.31,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2299,7 +2415,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-19",
-        "holdingDays": 21,
+        "holdingDays": 22,
         "profitRate": -36.58,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2321,7 +2437,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 22,
+        "holdingDays": 23,
         "profitRate": 0.54,
         "growthConsistencyScore": 60.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2343,7 +2459,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-18",
-        "holdingDays": 22,
+        "holdingDays": 23,
         "profitRate": -7.84,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2365,7 +2481,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 25,
+        "holdingDays": 26,
         "profitRate": -23.41,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2387,7 +2503,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-15",
-        "holdingDays": 25,
+        "holdingDays": 26,
         "profitRate": -26.51,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2409,7 +2525,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 32,
+        "holdingDays": 33,
         "profitRate": -14.36,
         "growthConsistencyScore": 69.0,
         "growthConsistencyLabel": "지속성 양호",
@@ -2431,7 +2547,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-08",
-        "holdingDays": 32,
+        "holdingDays": 33,
         "profitRate": -27.78,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2453,7 +2569,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 33,
+        "holdingDays": 34,
         "profitRate": -21.57,
         "growthConsistencyScore": 88.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -2475,7 +2591,7 @@
         "action": "HOLD",
         "actionLabel": "보유 유지",
         "buyDate": "2026-05-07",
-        "holdingDays": 33,
+        "holdingDays": 34,
         "profitRate": -13.62,
         "growthConsistencyScore": 100.0,
         "growthConsistencyLabel": "장기보유 후보",
@@ -4086,23 +4202,31 @@
         "isMainPick": false,
         "rankReason": "고ROE, 저PER, 영업이익률 양호, 비교 종목",
         "portfolioDecision": {
-          "status": "NOT_HELD",
-          "action": "BUY",
-          "label": "신규 매수 검토",
-          "profitRate": null,
-          "reason": "보유 전 종목. 성장·밸류·품질 조건이 매수권에 들어왔습니다.",
-          "position": null,
+          "status": "HELD",
+          "action": "ADD_OR_HOLD",
+          "label": "보유 유지 / 추가 검토",
+          "profitRate": 0.0,
+          "reason": "보유 종목의 매수 논리가 유지됩니다. 가격 부담과 비중만 확인합니다.",
           "sellSignal": {
-            "action": "BUY_CHECK",
+            "action": "HOLD_OR_ADD",
             "trigger": "thesis_alive",
             "urgency": "LOW",
             "reasons": [
               "성장·밸류·품질 조합이 유지"
             ],
             "summary": "성장·밸류·품질 조합이 유지",
-            "profitRate": null,
+            "profitRate": 0.0,
             "confidence": 87,
             "qualityPenalty": 0
+          },
+          "position": {
+            "code": "088130",
+            "name": "동아엘텍",
+            "buyPrice": 6260.0,
+            "quantity": 292.0,
+            "buyDate": "2026-06-10",
+            "currentPrice": 6260.0,
+            "evaluationAmount": 1827920.0
           }
         }
       },
@@ -5319,23 +5443,31 @@
         "isMainPick": false,
         "rankReason": "안정형, ROE 안정, PER 부담 낮음, 영업이익률 안정",
         "portfolioDecision": {
-          "status": "NOT_HELD",
-          "action": "BUY",
-          "label": "신규 매수 검토",
-          "profitRate": null,
-          "reason": "보유 전 종목. 성장·밸류·품질 조건이 매수권에 들어왔습니다.",
-          "position": null,
+          "status": "HELD",
+          "action": "ADD_OR_HOLD",
+          "label": "보유 유지 / 추가 검토",
+          "profitRate": 0.0,
+          "reason": "보유 종목의 매수 논리가 유지됩니다. 가격 부담과 비중만 확인합니다.",
           "sellSignal": {
-            "action": "BUY_CHECK",
+            "action": "HOLD_OR_ADD",
             "trigger": "thesis_alive",
             "urgency": "LOW",
             "reasons": [
               "성장·밸류·품질 조합이 유지"
             ],
             "summary": "성장·밸류·품질 조합이 유지",
-            "profitRate": null,
+            "profitRate": 0.0,
             "confidence": 87,
             "qualityPenalty": 0
+          },
+          "position": {
+            "code": "088130",
+            "name": "동아엘텍",
+            "buyPrice": 6260.0,
+            "quantity": 292.0,
+            "buyDate": "2026-06-10",
+            "currentPrice": 6260.0,
+            "evaluationAmount": 1827920.0
           }
         }
       },
@@ -7445,23 +7577,31 @@
         "isMainPick": false,
         "rankReason": "성장형, 이익 성장 강함, ROE 기준 통과, 성장 대비 PER 허용",
         "portfolioDecision": {
-          "status": "NOT_HELD",
-          "action": "BUY",
-          "label": "신규 매수 검토",
-          "profitRate": null,
-          "reason": "보유 전 종목. 성장·밸류·품질 조건이 매수권에 들어왔습니다.",
-          "position": null,
+          "status": "HELD",
+          "action": "ADD_OR_HOLD",
+          "label": "보유 유지 / 추가 검토",
+          "profitRate": 0.0,
+          "reason": "보유 종목의 매수 논리가 유지됩니다. 가격 부담과 비중만 확인합니다.",
           "sellSignal": {
-            "action": "BUY_CHECK",
+            "action": "HOLD_OR_ADD",
             "trigger": "thesis_alive",
             "urgency": "LOW",
             "reasons": [
               "성장·밸류·품질 조합이 유지"
             ],
             "summary": "성장·밸류·품질 조합이 유지",
-            "profitRate": null,
+            "profitRate": 0.0,
             "confidence": 87,
             "qualityPenalty": 0
+          },
+          "position": {
+            "code": "088130",
+            "name": "동아엘텍",
+            "buyPrice": 6260.0,
+            "quantity": 292.0,
+            "buyDate": "2026-06-10",
+            "currentPrice": 6260.0,
+            "evaluationAmount": 1827920.0
           }
         }
       },
@@ -10050,23 +10190,31 @@
         "isMainPick": false,
         "rankReason": "기회형, PER 부담 낮음, PBR 안정",
         "portfolioDecision": {
-          "status": "NOT_HELD",
-          "action": "BUY",
-          "label": "신규 매수 검토",
-          "profitRate": null,
-          "reason": "보유 전 종목. 성장·밸류·품질 조건이 매수권에 들어왔습니다.",
-          "position": null,
+          "status": "HELD",
+          "action": "ADD_OR_HOLD",
+          "label": "보유 유지 / 추가 검토",
+          "profitRate": 0.0,
+          "reason": "보유 종목의 매수 논리가 유지됩니다. 가격 부담과 비중만 확인합니다.",
           "sellSignal": {
-            "action": "BUY_CHECK",
+            "action": "HOLD_OR_ADD",
             "trigger": "thesis_alive",
             "urgency": "LOW",
             "reasons": [
               "성장·밸류·품질 조합이 유지"
             ],
             "summary": "성장·밸류·품질 조합이 유지",
-            "profitRate": null,
+            "profitRate": 0.0,
             "confidence": 87,
             "qualityPenalty": 0
+          },
+          "position": {
+            "code": "088130",
+            "name": "동아엘텍",
+            "buyPrice": 6260.0,
+            "quantity": 292.0,
+            "buyDate": "2026-06-10",
+            "currentPrice": 6260.0,
+            "evaluationAmount": 1827920.0
           }
         }
       },
