@@ -12,6 +12,7 @@ import {
   MagicHoldingsCard,
   FundTradeHistory,
 } from "../_dashboard/funds";
+import { MagicOfficialCard } from "../_dashboard/magic-official";
 import { loadPortfolioSnapshots } from "@/lib/wababa/snapshot/portfolio-snapshot";
 
 export const dynamic = "force-dynamic";
@@ -43,8 +44,18 @@ export default function PerformancePage() {
             <FundTradeHistory history={history} fundKey="ai" />
           </div>
           <div style={{ minWidth: 0 }}>
-            <MagicHoldingsCard history={history} />
-            <FundTradeHistory history={history} fundKey="magic" />
+            <MagicOfficialCard history={history} />
+            {/* PILOT(2026-06-08 검증용) 기록은 공식 화면과 분리해 접힘으로만 보존(혼합 금지). */}
+            <details style={{ marginTop: 10, border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", padding: "0 12px" }}>
+              <summary style={{ cursor: "pointer", padding: "11px 2px", fontSize: 13, fontWeight: 800, color: "#475569" }}>
+                파일럿 기록 보기 · 2026.06.08 검증용
+              </summary>
+              <p style={{ margin: "0 0 10px", fontSize: 12, color: "#94a3b8", lineHeight: 1.55 }}>
+                아래는 공식 운용 이전 파일럿(검증용) 기록입니다. 공식 자산·수익률·거래일수에는 포함되지 않습니다.
+              </p>
+              <MagicHoldingsCard history={history} />
+              <FundTradeHistory history={history} fundKey="magic" />
+            </details>
           </div>
         </div>
       </section>

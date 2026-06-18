@@ -57,6 +57,26 @@ export function toFundView(history: Rec, key: FundKey): FundView {
   const base = { key, title: a.title, subtitle: a.subtitle, accent: a.primary, accentSoft: a.soft };
 
   if (key === "magic") {
+    // [45-E9] OFFICIAL(공식 운용) 우선. magicOfficialSummary가 있으면 그것을 기준으로,
+    // 없으면 legacy PILOT(magicPortfolioSummary)로 fallback하며 "(파일럿)" 표시. PILOT/OFFICIAL 미혼합.
+    const off = obj(history.magicOfficialSummary);
+    const hasOfficial = str(off.officialStartDate) !== "" && (num(off.officialSequence) ?? 0) >= 1;
+    if (hasOfficial) {
+      const totalAsset = num(off.totalAsset);
+      const cash = num(off.totalCash);
+      const initial = num(off.totalAsset) !== null ? 50000000 : null;
+      return {
+        ...base,
+        statusLabel: "운용 중",
+        statusTone: a.primary,
+        totalAsset,
+        totalProfit: totalAsset !== null && initial !== null ? totalAsset - initial : null,
+        totalProfitRate: num(off.cumulativeReturn),
+        holdingCount: num(off.openItemLotCount) ?? 0,
+        cash,
+        cashRate: cash !== null && totalAsset ? (cash / totalAsset) * 100 : null,
+      };
+    }
     const s = obj(history.magicPortfolioSummary);
     const hasData = typeof s.fundName === "string" || num(s.initialCapital) !== null;
     const holdingCount = num(s.holdingCount) ?? 0;
@@ -66,7 +86,7 @@ export function toFundView(history: Rec, key: FundKey): FundView {
     const active = holdingCount > 0 || openLot > 0;
     return {
       ...base,
-      statusLabel: !hasData ? "데이터 준비 중" : active ? "운용 중" : "운용 준비 중",
+      statusLabel: !hasData ? "데이터 준비 중" : active ? "운용 중(파일럿)" : "운용 준비 중",
       statusTone: !hasData || !active ? "#94a3b8" : a.primary,
       totalAsset,
       totalProfit: num(s.totalProfit),
