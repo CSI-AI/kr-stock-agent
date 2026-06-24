@@ -289,7 +289,7 @@ function FlowLegend({ color, label, asset }: { color: string; label: string; ass
   );
 }
 
-export function FundFlowChart({ history }: { history: Rec }) {
+export function FundFlowChart({ history, hideCaption = false }: { history: Rec; hideCaption?: boolean }) {
   const w = flowSeries(obj(history.performanceAnalysis));
   const a = flowSeries(obj(history.aiPerformanceAnalysis));
   const ms = obj(history.magicPortfolioSummary);
@@ -383,10 +383,12 @@ export function FundFlowChart({ history }: { history: Rec }) {
         <FlowLegend color={C.a} label="AI" asset={last(a)?.v ?? null} />
         <FlowLegend color={C.m} label="마법공식" asset={magic ? magic.v : null} />
       </div>
-      <p style={{ margin: "8px 0 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
-        각 펀드의 총자산 흐름입니다(점선 = 초기자본 {manwon(initial)}).
-        {magic ? ` 마법공식은 ${mFirstBuy} 첫 운용을 시작했습니다.` : ""} 운용일이 쌓이면 흐름이 더 선명해집니다.
-      </p>
+      {hideCaption ? null : (
+        <p style={{ margin: "8px 0 0", fontSize: 11, color: "#94a3b8", lineHeight: 1.5 }}>
+          각 펀드의 총자산 흐름입니다(점선 = 초기자본 {manwon(initial)}).
+          {magic ? ` 마법공식은 ${mFirstBuy} 첫 운용을 시작했습니다.` : ""} 운용일이 쌓이면 흐름이 더 선명해집니다.
+        </p>
+      )}
     </div>
   );
 }
@@ -625,17 +627,22 @@ export function MagicCandidateSection({ history }: { history: Rec }) {
     : [];
   const holdingCount = num(s.holdingCount) ?? 0;
   const A = { accent: "#059669", soft: "#ecfdf5", text: "#065f46", border: "#a7f3d0" };
+  // 마법공식은 규칙 기반 기계적 운용이라 후보를 강조하지 않는다(기본 접힘·낮은 우선순위).
+  // 매일 확인은 운용기록(대시보드 magic-official / 성과분석) 중심으로 유도한다.
   return (
-    <section className="candidateCard" style={{ borderColor: A.border }}>
-      <div className="candidateHeader">
-        <div>
-          <h3>와바바 마법공식 펀드 후보</h3>
-          <p>정량 후보</p>
+    <details className="candidateCard candidateDetails candidateDetailsMuted" style={{ borderColor: A.border }}>
+      <summary className="candidateHeader candidateSummary">
+        <div className="candidateSummaryLead">
+          <h3>
+            와바바 마법공식 펀드 후보{" "}
+            <span className="candidateCount" style={{ color: A.accent }}>{preview.length}개</span>
+          </h3>
+          <p>정량 순위 · 기계적 운용(후보는 참고용 · 운용기록 중심)</p>
         </div>
         <span className="pill" style={{ background: A.soft, color: A.text, borderColor: A.border }}>
           정량 순위 기준
         </span>
-      </div>
+      </summary>
       {preview.length > 0 ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
           {preview.slice(0, 10).map((it, i) => (
@@ -652,10 +659,11 @@ export function MagicCandidateSection({ history }: { history: Rec }) {
         <p style={{ marginTop: 4, fontSize: 13, color: "#64748b" }}>정량 후보 데이터 준비 중</p>
       )}
       <p style={{ marginTop: 12, fontSize: 12, color: "#94a3b8", lineHeight: 1.5 }}>
+        마법공식은 규칙 기반 운용이라 후보보다 <b>운용기록</b>(대시보드·성과분석)을 중심으로 확인하세요.{" "}
         {holdingCount === 0 ? "첫 실거래 lot은 다음 개장일 daily_run 이후 생성됩니다. " : ""}
         전체 순위와 세부 계산 로그는 운영 검증용으로 별도 보관됩니다.
       </p>
-    </section>
+    </details>
   );
 }
 

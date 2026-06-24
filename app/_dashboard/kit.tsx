@@ -76,12 +76,31 @@ function readJsonObject(filePath: string): AnyRecord | null {
   return null;
 }
 
+function historyGeneratedTime(history: AnyRecord): number {
+  const raw = typeof history.generatedAt === "string" ? history.generatedAt : "";
+  const parsed = Date.parse(raw.replace(" ", "T"));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+// 두 소스를 합쳐 모든 탭(대시보드/전략랩/성과/설정)이 같은 '최신·완전' 데이터를 보게 한다.
+//  - public/data: 배포본. magicOfficial*/magic* 등 마법공식 키 보유.
+//  - REPO2 루트: daily_run 작업본. 2펀드 후보(todayPick/buyCandidates/newWababaPicks 등) 보유.
+// 두 파일은 키가 상호보완적이라 한쪽만 읽으면(기존 REPO2 우선) 로컬은 magic 누락, 배포는 후보 누락이 됐다.
+// 겹치는 키는 generatedAt이 더 최신인 소스를 우선(동시각이면 배포본 public 우선)해 stale 표시를 막는다.
+function mergeHistories(published: AnyRecord, working: AnyRecord): AnyRecord {
+  const primary =
+    historyGeneratedTime(working) > historyGeneratedTime(published)
+      ? working
+      : published;
+  const secondary = primary === working ? published : working;
+  return { ...secondary, ...primary };
+}
+
 function readRecommendationHistory(): AnyRecord {
-  return (
-    readJsonObject(RECOMMENDATION_HISTORY_PATH) ??
-    readJsonObject(PUBLIC_RECOMMENDATION_HISTORY_PATH) ??
-    {}
-  );
+  const published = readJsonObject(PUBLIC_RECOMMENDATION_HISTORY_PATH);
+  const working = readJsonObject(RECOMMENDATION_HISTORY_PATH);
+  if (published && working) return mergeHistories(published, working);
+  return published ?? working ?? {};
 }
 
 function getObject(value: unknown): AnyRecord {
@@ -1445,10 +1464,12 @@ function CandidateSection({
   theme: FundTheme;
 }) {
   return (
-    <section className="candidateCard" style={{ borderColor: theme.border }}>
-      <div className="candidateHeader">
-        <div>
-          <h3>{title}</h3>
+    <details className="candidateCard candidateDetails" style={{ borderColor: theme.border }}>
+      <summary className="candidateHeader candidateSummary">
+        <div className="candidateSummaryLead">
+          <h3>
+            {title} <span className="candidateCount">{items.length}개</span>
+          </h3>
           <p>{subtitle}</p>
         </div>
         <span
@@ -1461,7 +1482,7 @@ function CandidateSection({
         >
           {theme.key === "ai" ? "와바바 AI 기준" : "와바바 기준"}
         </span>
-      </div>
+      </summary>
       <div className="candidateCardList">
         {items.slice(0, 5).map((item, index) => {
           const name = getName(item);
@@ -1606,7 +1627,7 @@ function CandidateSection({
           <div className="emptyCell">표시할 후보가 없습니다.</div>
         ) : null}
       </div>
-    </section>
+    </details>
   );
 }
 
@@ -2108,6 +2129,28 @@ const dashboardCss = `
   .candidateHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
   .candidateHeader h3 { margin: 0; font-size: 20px; font-weight: 950; }
   .candidateHeader p { margin: 5px 0 0; color: #64748b; font-size: 13px; font-weight: 850; }
+  .candidateDetails > .candidateSummary { cursor: pointer; list-style: none; user-select: none; align-items: center; margin-bottom: 0; }
+  .candidateDetails[open] > .candidateSummary { margin-bottom: 12px; }
+  .candidateSummary::-webkit-details-marker { display: none; }
+  .candidateSummary::marker { display: none; content: ""; }
+  .candidateSummary::before { content: "▸"; align-self: center; margin-right: 8px; color: #94a3b8; font-size: 15px; flex-shrink: 0; transition: transform 0.18s; }
+  .candidateDetails[open] > .candidateSummary::before { transform: rotate(90deg); }
+  .candidateSummaryLead { min-width: 0; }
+  .candidateSummaryLead h3 { margin: 0; font-size: 18px; font-weight: 950; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .candidateSummaryLead p { margin: 4px 0 0; color: #64748b; font-size: 12px; font-weight: 850; }
+  .candidateCount { font-size: 13px; font-weight: 850; color: #2563eb; }
+  .candidateDetailsMuted { background: #f8fafc; }
+  .candidateDetailsMuted > .candidateSummary .candidateSummaryLead h3 { font-size: 16px; }
+  .perfDetails { margin-bottom: 14px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 4px 16px; }
+  .perfDetails[open] { padding: 4px 16px 16px; }
+  .perfSummary { cursor: pointer; list-style: none; user-select: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 2px; }
+  .perfSummary::-webkit-details-marker { display: none; }
+  .perfSummary::marker { display: none; content: ""; }
+  .perfSummaryTitle { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 950; color: #0f172a; min-width: 0; }
+  .perfSummaryTitle::before { content: "▸"; color: #94a3b8; font-size: 14px; flex-shrink: 0; transition: transform 0.18s; }
+  .perfDetails[open] > .perfSummary .perfSummaryTitle::before { transform: rotate(90deg); }
+  .perfSummaryMeta { font-size: 12px; font-weight: 850; color: #64748b; text-align: right; flex-shrink: 0; }
+  .perfBody { margin-top: 2px; }
   .rankCircle { display: inline-flex !important; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; font-weight: 950; margin: 0 !important; }
   .stars { color: #f59e0b !important; font-size: 15px !important; letter-spacing: 1px; margin: 0 !important; }
   .bottomGrid { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; margin-bottom: 18px; min-width: 0; }

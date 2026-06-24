@@ -9,17 +9,37 @@ type ExplorePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function readRecommendationHistory() {
+function readHistoryFile(filePath: string): Record<string, unknown> | null {
   try {
-    const historyPath = path.join(
-      "C:\\work\\kr-stock-agent-data-new",
-      "recommendation-history.json"
-    );
-
-    return JSON.parse(fs.readFileSync(historyPath, "utf-8"));
+    const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null;
   } catch {
     return null;
   }
+}
+
+// 대시보드/전략랩과 동일 소스 통일: public(배포본·magic) + REPO2(작업본·후보) 병합.
+// 겹치는 키는 generatedAt 최신 우선(동시각이면 public). 둘 다 없을 때만 null.
+function readRecommendationHistory() {
+  const working = readHistoryFile(
+    path.join("C:\\work\\kr-stock-agent-data-new", "recommendation-history.json")
+  );
+  const published = readHistoryFile(
+    path.join(process.cwd(), "public", "data", "recommendation-history.json")
+  );
+  if (working && published) {
+    const at = (h: Record<string, unknown>) => {
+      const raw = typeof h.generatedAt === "string" ? h.generatedAt : "";
+      const parsed = Date.parse(raw.replace(" ", "T"));
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+    const primary = at(working) > at(published) ? working : published;
+    const secondary = primary === working ? published : working;
+    return { ...secondary, ...primary };
+  }
+  return working ?? published ?? null;
 }
 
 function getObject(value: unknown): Record<string, unknown> {
