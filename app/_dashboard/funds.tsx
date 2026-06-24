@@ -45,6 +45,19 @@ function tone(v: number | null): string {
   if (v === null || v === 0) return "#0f172a";
   return v > 0 ? "#dc2626" : "#1d4ed8";
 }
+// 부호 포함 금액(실현손익용). null → "-", 0 → "0원".
+function krwSigned(v: number | null): string {
+  if (v === null) return "-";
+  const r = Math.round(v);
+  const body = new Intl.NumberFormat("ko-KR").format(Math.abs(r));
+  return r > 0 ? `+${body}원` : r < 0 ? `-${body}원` : "0원";
+}
+// 부호 포함 퍼센트(실현수익률용). null → "".
+function pctSigned(v: number | null): string {
+  if (v === null) return "";
+  const s = new Intl.NumberFormat("ko-KR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+  return v > 0 ? `+${s}%` : `${s}%`;
+}
 
 const ACCENTS: Record<FundKey, { primary: string; soft: string; title: string; subtitle: string }> = {
   wababa: { primary: "#2563eb", soft: "#eff6ff", title: "와바바 펀드", subtitle: "가치성장 원칙" },
@@ -536,27 +549,49 @@ export function MagicHoldingsCard({ history }: { history: Rec }) {
 
 // 성과분석 — 펀드별 매수·매도 기록(기본 닫힘 접힘목록). public에 있는 거래 필드만 사용.
 // 와바바/AI: performanceAnalysis.tradeHistory. 마법공식: magicPortfolio.holdings의 매수 기록.
-type TradeRow = { date: string; kind: string; name: string; code: string; quantity: number | null; price: number | null; amount: number | null };
+type TradeRow = {
+  date: string; kind: string; name: string; code: string;
+  quantity: number | null; price: number | null; amount: number | null;
+  realizedProfit: number | null; realizedReturn: number | null;
+};
 
 function normalizeTrades(raw: Rec[]): TradeRow[] {
   return raw
     .map((t) => {
       const typeText = (str(t.type) || str(t.action) || str(t.side)).toUpperCase();
+      const isSell = /SELL|매도/.test(typeText);
+      const quantity = num(t.quantity);
+      // 매도 실현손익/수익률: 이미 계산된 값 우선(realizedProfit/profitAmount/realizedPnl, realizedReturn/profitRate).
+      let realizedProfit = num(t.realizedProfit) ?? num(t.profitAmount) ?? num(t.realizedPnl);
+      let realizedReturn = num(t.realizedReturn) ?? num(t.profitRate);
+      // 계산값이 없으면 원가/매도금액/수량으로 표시단 계산(하나라도 없으면 계산 안 함 → "계산 준비 중").
+      if (isSell && realizedProfit === null) {
+        const sellPx = num(t.sellPrice) ?? num(t.price);
+        const buyPx = num(t.averageBuyPrice) ?? num(t.buyPrice) ?? num(t.costBasisPerShare);
+        const costBasis = num(t.costBasis) ?? (buyPx !== null && quantity !== null ? buyPx * quantity : null);
+        const sellAmount = num(t.sellAmount) ?? num(t.amount) ?? (sellPx !== null && quantity !== null ? sellPx * quantity : null);
+        if (costBasis !== null && costBasis > 0 && sellAmount !== null) {
+          realizedProfit = Math.round(sellAmount - costBasis);
+          if (realizedReturn === null) realizedReturn = Math.round(((sellAmount - costBasis) / costBasis) * 10000) / 100;
+        }
+      }
       return {
         date: str(t.date) || str(t.sellDate) || str(t.buyDate),
-        kind: /SELL|매도/.test(typeText) ? "매도" : "매수",
+        kind: isSell ? "매도" : "매수",
         name: str(t.name) || str(t.code),
         code: str(t.code) || str(t.stockCode),
-        quantity: num(t.quantity),
+        quantity,
         price: num(t.price),
         amount: num(t.amount),
+        realizedProfit: isSell ? realizedProfit : null,
+        realizedReturn: isSell ? realizedReturn : null,
       };
     })
     .sort((x, y) => (x.date < y.date ? 1 : x.date > y.date ? -1 : 0));
 }
 
 function TradeHistoryDetails({ rows }: { rows: TradeRow[] }) {
-  const cols = ["날짜", "구분", "종목명", "수량", "단가", "금액"];
+  const cols = ["날짜", "구분", "종목명", "수량", "단가", "금액", "실현손익"];
   const buyN = rows.filter((r) => r.kind === "매수").length;
   const sellN = rows.filter((r) => r.kind === "매도").length;
   return (
@@ -567,8 +602,9 @@ function TradeHistoryDetails({ rows }: { rows: TradeRow[] }) {
       {rows.length === 0 ? (
         <p style={{ margin: "0 0 12px", fontSize: 13, color: "#94a3b8" }}>표시할 거래 기록이 아직 없습니다.</p>
       ) : (
+        <>
         <div style={{ overflowX: "auto", maxWidth: "100%", paddingBottom: 12 }}>
-          <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 480 }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 560 }}>
             <thead>
               <tr>
                 {cols.map((h, i) => (
@@ -588,11 +624,36 @@ function TradeHistoryDetails({ rows }: { rows: TradeRow[] }) {
                   <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{qty(r.quantity)}</td>
                   <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(r.price)}</td>
                   <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap", fontWeight: 700 }}>{krw(r.amount)}</td>
+                  <td style={{ padding: "8px 10px", textAlign: "right", whiteSpace: "nowrap" }}>
+                    {r.kind === "매도" ? (
+                      r.realizedProfit !== null ? (
+                        <>
+                          <b style={{ color: tone(r.realizedProfit), fontWeight: 800 }}>{krwSigned(r.realizedProfit)}</b>
+                          {r.realizedReturn !== null ? (
+                            <div style={{ fontSize: 11, fontWeight: 700, color: tone(r.realizedReturn) }}>{pctSigned(r.realizedReturn)}</div>
+                          ) : null}
+                        </>
+                      ) : (
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>
+                          계산 준비 중
+                          <div style={{ fontSize: 10 }}>단가 정보 없음</div>
+                        </span>
+                      )
+                    ) : (
+                      <span style={{ color: "#cbd5e1" }}>-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {sellN > 0 ? (
+          <p style={{ margin: "0 0 12px", fontSize: 11, color: "#94a3b8" }}>
+            실현손익은 수수료·세금 제외 기준입니다.
+          </p>
+        ) : null}
+        </>
       )}
     </details>
   );
