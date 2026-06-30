@@ -106,11 +106,12 @@ export default function PerformancePage() {
         </div>
       </PerfSection>
 
-      <PerfSection title="와바바·AI 거래 기록" meta={`와바바 ${wTrades} · AI ${aTrades}건`}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 18, minWidth: 0 }}>
-          <FundTradeHistory history={history} fundKey="wababa" />
-          <FundTradeHistory history={history} fundKey="ai" />
-        </div>
+      <PerfSection title="와바바펀드 거래 기록" meta={`${wTrades}건`}>
+        <FundTradeHistory history={history} fundKey="wababa" />
+      </PerfSection>
+
+      <PerfSection title="AI펀드 거래 기록" meta={`${aTrades}건`}>
+        <FundTradeHistory history={history} fundKey="ai" />
       </PerfSection>
 
       <PerfSection
