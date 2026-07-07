@@ -20,6 +20,17 @@ function num(v: unknown): number | null {
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
+function boolOrNull(v: unknown): boolean | null {
+  return v === true ? true : v === false ? false : null;
+}
+// 비율(EBIT/EV, EBIT/투입자본) → 백분율 표시. 0.4522 → "45.2%".
+function ratioPct(v: number | null): string {
+  return v === null ? "-" : `${(v * 100).toFixed(1)}%`;
+}
+// 연결/별도 코드 → 한글.
+function fsDivLabel(v: string): string {
+  return v === "CFS" ? "연결" : v === "OFS" ? "별도" : "-";
+}
 function krw(v: number | null): string {
   return v === null ? "-" : `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.round(v))}원`;
 }
@@ -82,6 +93,12 @@ export type MagicOfficialBuyTrade = {
   tradeId: string; batchId: string; lotId: string; rank: number | null; code: string; name: string;
   executionPrice: number | null; quantity: number | null; amount: number | null;
   signalAsOfDate: string; executionDate: string; priceSource: string;
+  // MF-PUBLIC-1B: 공식 근거 요약(seq=12+ 신규 lot부터. 순위/점수/비율은 과거 seq에도 값 있음,
+  // EV 메타(evMethod/실적연도/종가/dartFsDiv/completeness)는 과거 seq에서 null).
+  finalRank: number | null; cheapRank: number | null; qualityRank: number | null; magicScore: number | null;
+  earningsYield: number | null; returnOnCapital: number | null; closePrice: number | null;
+  priceAsOfDate: string; financialStatementYear: number | null; dartFsDiv: string;
+  evMethod: string; evidenceCompleteness: boolean | null;
 };
 export type MagicOfficialSellTrade = {
   tradeId: string; batchId: string; lotId: string; code: string; name: string;
@@ -145,6 +162,11 @@ export function parseMagicOfficialTradeDays(history: Rec): MagicOfficialTradeDay
       code: str(b.code), name: str(b.name) || str(b.code), executionPrice: num(b.executionPrice),
       quantity: num(b.quantity), amount: num(b.amount), signalAsOfDate: str(b.signalAsOfDate),
       executionDate: str(b.executionDate), priceSource: str(b.priceSource),
+      finalRank: num(b.finalRank) ?? num(b.rank), cheapRank: num(b.cheapRank), qualityRank: num(b.qualityRank),
+      magicScore: num(b.magicScore), earningsYield: num(b.earningsYield), returnOnCapital: num(b.returnOnCapital),
+      closePrice: num(b.closePrice), priceAsOfDate: str(b.priceAsOfDate),
+      financialStatementYear: num(b.financialStatementYear), dartFsDiv: str(b.dartFsDiv),
+      evMethod: str(b.evMethod), evidenceCompleteness: boolOrNull(b.evidenceCompleteness),
     })).sort((x, y) => (x.rank ?? 99) - (y.rank ?? 99) || (x.code < y.code ? -1 : 1)),
     sells: arr(d.sells).map((b) => ({
       tradeId: str(b.tradeId), batchId: str(b.batchId), lotId: str(b.lotId), code: str(b.code),
@@ -337,6 +359,143 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
           ))}
         </div>
       )}
+    </section>
+  );
+}
+
+// ----- 마법공식펀드 전용 홈용 컴포넌트 -----
+
+// Hero — 사이트 정체성 + 실주문 아님 고지.
+export function MagicHero() {
+  return (
+    <section style={{ background: `linear-gradient(135deg, ${ACCENT.soft} 0%, #ffffff 100%)`, border: `1px solid ${ACCENT.border}`, borderRadius: 16, padding: "18px 18px 15px", minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+        <h1 style={{ margin: 0, fontSize: 21, fontWeight: 900, color: ACCENT.text, letterSpacing: "-0.01em" }}>와바바 마법공식펀드</h1>
+        <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.primary, background: "#fff", border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>공개 모의장부</span>
+      </div>
+      <p style={{ margin: "0 0 9px", fontSize: 13.5, color: "#334155", lineHeight: 1.6 }}>
+        매일 정해진 공식으로 한국 주식을 고르고, 50실거래일 보유 규칙에 따라 모의 운용하는 공개 장부입니다.
+      </p>
+      <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT.primary, background: "#fff", border: `1px dashed ${ACCENT.border}`, borderRadius: 10, padding: "7px 10px" }}>
+        실주문 아님 · 투자 참고용 · 모든 수익률은 장마감 종가 기준
+      </div>
+    </section>
+  );
+}
+
+function PickMini({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div style={{ minWidth: 0 }}>
+      <div style={{ fontSize: 10.5, color: "#94a3b8", fontWeight: 700, whiteSpace: "nowrap" }}>{label}</div>
+      <div style={{ fontSize: 13.5, fontWeight: 900, color: color ?? "#0f172a", whiteSpace: "nowrap" }}>{value}</div>
+    </div>
+  );
+}
+
+// 오늘의 마법공식 매수 근거 — 최신 거래일 buys를 카드형으로(모바일 가로스크롤 없음).
+export function MagicTodayPicks({ history }: { history: Rec }) {
+  const days = parseMagicOfficialTradeDays(history);
+  const latest = days[0];
+  const buys = latest?.buys ?? [];
+  const hasEvidenceMeta = buys.some((b) => b.evMethod || b.financialStatementYear !== null || b.closePrice !== null);
+
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>오늘의 마법공식 매수 근거</div>
+        {latest ? <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</div> : null}
+      </div>
+      <p style={{ margin: "0 0 10px", fontSize: 12, color: "#64748b" }}>
+        싼 순위(EBIT/EV) + 잘버는 순위(EBIT/투입자본) = 종합점수. 종합점수가 낮을수록 우수합니다.
+      </p>
+
+      {buys.length === 0 ? (
+        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>오늘의 매수 예정 종목이 아직 없어요.</p>
+      ) : (
+        <>
+          {!hasEvidenceMeta ? (
+            <div style={{ fontSize: 11.5, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "7px 10px", marginBottom: 10, lineHeight: 1.5 }}>
+              공식 근거 상세(기준 실적연도·EV 산식 등)는 evidence 스키마 도입 이후 신규 lot부터 표시됩니다. 순위·점수·비율은 그대로 확인할 수 있어요.
+            </div>
+          ) : null}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
+            {buys.map((b) => (
+              <div key={b.tradeId || b.lotId} style={{ border: "1px solid #eef2f7", borderRadius: 12, padding: "11px 12px", background: "#fbfdfc", minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: 8 }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", background: ACCENT.primary, borderRadius: 8, padding: "1px 7px", flexShrink: 0 }}>{b.finalRank !== null ? `${b.finalRank}위` : "-"}</span>
+                  <b style={{ fontSize: 14, fontWeight: 850, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}</b>
+                  <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0 }}>{b.code}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 8 }}>
+                  <PickMini label="싼 순위" value={b.cheapRank !== null ? `${b.cheapRank}위` : "-"} />
+                  <PickMini label="잘버는 순위" value={b.qualityRank !== null ? `${b.qualityRank}위` : "-"} />
+                  <PickMini label="종합점수" value={b.magicScore !== null ? `${b.magicScore}` : "-"} color={ACCENT.primary} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, marginBottom: 8 }}>
+                  <PickMini label="EBIT/EV" value={ratioPct(b.earningsYield)} />
+                  <PickMini label="EBIT/투입자본" value={ratioPct(b.returnOnCapital)} />
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", fontSize: 11, color: "#64748b", fontWeight: 700, borderTop: "1px dashed #e2e8f0", paddingTop: 7 }}>
+                  <span>매수 {krw(b.executionPrice)}</span>
+                  <span>{qty(b.quantity)}</span>
+                  <span>총 {krw(b.amount)}</span>
+                </div>
+                {(b.priceAsOfDate || b.financialStatementYear !== null || b.dartFsDiv) ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 5 }}>
+                    {b.priceAsOfDate ? <span>기준주가 {fmtDate(b.priceAsOfDate)}</span> : null}
+                    {b.financialStatementYear !== null ? <span>실적 {b.financialStatementYear}년</span> : null}
+                    {b.dartFsDiv ? <span>{fsDivLabel(b.dartFsDiv)}</span> : null}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+// 공식 설명 + EV 정의 고지 + 실주문 아님 안내(접힘).
+export function MagicFormulaExplainer() {
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 10 }}>마법공식 계산 방식</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10, marginBottom: 12 }}>
+        <div style={{ border: `1px solid ${ACCENT.border}`, background: ACCENT.soft, borderRadius: 10, padding: "10px 12px" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 900, color: ACCENT.text }}>싼 순위 · EBIT / EV</div>
+          <div style={{ fontSize: 11.5, color: "#475569", marginTop: 3, lineHeight: 1.5 }}>기업가치 대비 영업이익이 높을수록 저평가로 봅니다.</div>
+        </div>
+        <div style={{ border: `1px solid ${ACCENT.border}`, background: ACCENT.soft, borderRadius: 10, padding: "10px 12px" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 900, color: ACCENT.text }}>잘버는 순위 · EBIT / 투입자본</div>
+          <div style={{ fontSize: 11.5, color: "#475569", marginTop: 3, lineHeight: 1.5 }}>적은 자본으로 영업이익을 잘 낼수록 우량으로 봅니다.</div>
+        </div>
+        <div style={{ border: `1px solid ${ACCENT.border}`, background: ACCENT.soft, borderRadius: 10, padding: "10px 12px" }}>
+          <div style={{ fontSize: 12.5, fontWeight: 900, color: ACCENT.text }}>종합점수 = 싼 순위 + 잘버는 순위</div>
+          <div style={{ fontSize: 11.5, color: "#475569", marginTop: 3, lineHeight: 1.5 }}>두 순위를 더한 값이 낮을수록 우수하며, 상위 10종목을 매수합니다.</div>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: 8, fontSize: 12.5, color: "#475569", lineHeight: 1.55, marginBottom: 12 }}>
+        <div>· 매일 상위 10종목을 선정해 매수합니다.</div>
+        <div>· 각 매수 lot은 50실거래일 동안 보유합니다.</div>
+        <div>· 51번째 실거래일에 해당 lot을 매도하고 그날 상위 10종목에 재투자합니다.</div>
+        <div>· 수익률은 장마감 종가 기준으로 산정하며, 매수·매도 수량은 모의장부 기준입니다.</div>
+      </div>
+
+      <details style={{ border: "1px solid #e2e8f0", borderRadius: 10, background: "#f8fafc", padding: "0 12px" }}>
+        <summary style={{ cursor: "pointer", padding: "10px 2px", fontSize: 12.5, fontWeight: 800, color: "#475569" }}>EV(기업가치) 산식 안내</summary>
+        <p style={{ margin: "0 0 10px", fontSize: 12, color: "#64748b", lineHeight: 1.6 }}>
+          와바바 마법공식펀드는 EV(기업가치)를 <b>시가총액 + 총부채 - 현금성자산</b> 기준으로 계산합니다.
+          조엘 그린블라트의 원식은 이자부채 중심 순차입금을 쓰지만, 국내 전종목을 매일 자동 계산할 때
+          차입금 세부계정은 회사별 표준화가 불완전해 결측·오분류 위험이 있어, 재현성·운영안정성을 위해
+          총부채 기준 EV 근사값을 사용합니다.
+        </p>
+      </details>
+
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: "#64748b", marginTop: 12, textAlign: "center" }}>
+        공개 재무자료 기반 자동 계산값 · 실주문 아님 · 투자 판단은 본인 책임
+      </div>
     </section>
   );
 }
