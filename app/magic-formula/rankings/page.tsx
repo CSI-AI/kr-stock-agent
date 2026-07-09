@@ -36,6 +36,14 @@ function ratioPct(v: number | null): string {
 function krw(v: number | null): string {
   return v === null ? "—" : `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.round(v))}원`;
 }
+// 원 단위 금액 → 억원 표시(EBIT/EV/투입자본 등). 1e8로 나눠 소수 없이.
+function eok(v: number | null): string {
+  return v === null ? "—" : `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.round(v / 1e8))}억`;
+}
+// 시가총액(signal은 억원 단위) → 억원 표시.
+function eokMc(v: number | null): string {
+  return v === null ? "—" : `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.round(v))}억`;
+}
 function rankTxt(v: number | null): string {
   return v === null ? "—" : `${v}위`;
 }
@@ -52,6 +60,8 @@ type RankingItem = {
   code: string; name: string; cheapRank: number | null; qualityRank: number | null;
   magicScore: number | null; earningsYield: number | null; returnOnCapital: number | null;
   financialStatementYear: number | null;
+  ebit: number | null; enterpriseValue: number | null; investedCapital: number | null;
+  netWorkingCapital: number | null; propertyPlantAndEquipment: number | null; marketCap: number | null;
 };
 type OfficialRankings = {
   dataDate: string; cheapTop100: RankingItem[]; qualityTop100: RankingItem[];
@@ -64,6 +74,9 @@ function parseRankings(history: Rec): OfficialRankings | null {
     code: str(x.code), name: str(x.name) || str(x.code), cheapRank: num(x.cheapRank),
     qualityRank: num(x.qualityRank), magicScore: num(x.magicScore), earningsYield: num(x.earningsYield),
     returnOnCapital: num(x.returnOnCapital), financialStatementYear: num(x.financialStatementYear),
+    ebit: num(x.ebit), enterpriseValue: num(x.enterpriseValue), investedCapital: num(x.investedCapital),
+    netWorkingCapital: num(x.netWorkingCapital), propertyPlantAndEquipment: num(x.propertyPlantAndEquipment),
+    marketCap: num(x.marketCap),
   });
   return {
     dataDate: str(ro.dataDate),
@@ -139,24 +152,49 @@ function CombinedTop10({ buys, date, seq }: { buys: MagicOfficialBuyTrade[]; dat
 }
 
 // 섹션 3/4 — 싼 순위 100 / 잘버는 순위 100(magicOfficialRankings 도입 후).
+// cheap: 싼 순위/종목/EBIT·EV/EBIT/EV/시가총액/실적연도.
+// quality: 잘버는 순위/종목/EBIT·투입자본/EBIT/투입자본/순운전자본/유형자산/실적연도.
 function Top100Table({ items, kind }: { items: RankingItem[]; kind: "cheap" | "quality" }) {
   const isCheap = kind === "cheap";
   const rankKey = (x: RankingItem) => (isCheap ? x.cheapRank : x.qualityRank);
-  const metricLabel = isCheap ? "EBIT/EV" : "EBIT/투입자본";
   const rankLabel = isCheap ? "싼 순위" : "잘버는 순위";
   const sorted = [...items].sort((a, b) => (rankKey(a) ?? 1e9) - (rankKey(b) ?? 1e9)).slice(0, 100);
+  const cheapCols = ["EBIT/EV", "EBIT", "EV", "시가총액", "실적연도"];
+  const qualityCols = ["EBIT/투입자본", "EBIT", "투입자본", "순운전자본", "유형자산", "실적연도"];
+  const extraCols = isCheap ? cheapCols : qualityCols;
+  const minW = isCheap ? 560 : 640;
   return (
     <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-      <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 420 }}>
-        <thead><tr><th style={TH}>{rankLabel}</th><th style={THL}>종목명</th><th style={TH}>{metricLabel}</th><th style={TH}>종합점수</th><th style={TH}>실적연도</th></tr></thead>
+      <table style={{ borderCollapse: "collapse", width: "100%", minWidth: minW }}>
+        <thead>
+          <tr>
+            <th style={TH}>{rankLabel}</th><th style={THL}>종목명</th>
+            {extraCols.map((h) => <th key={h} style={TH}>{h}</th>)}
+          </tr>
+        </thead>
         <tbody>
           {sorted.map((x) => (
             <tr key={x.code} style={{ borderTop: "1px solid #eceff3" }}>
               <td style={{ ...TD, fontWeight: 800, color: ACCENT.primary }}>{rankTxt(rankKey(x))}</td>
               <td style={TDL}><b style={{ color: "#0f172a", fontWeight: 850 }}>{x.name}</b>{" "}<span style={{ color: "#94a3b8", fontSize: 11 }}>{x.code}</span></td>
-              <td style={TD}>{ratioPct(isCheap ? x.earningsYield : x.returnOnCapital)}</td>
-              <td style={{ ...TD, color: "#64748b" }}>{x.magicScore ?? "—"}</td>
-              <td style={{ ...TD, color: "#64748b" }}>{x.financialStatementYear !== null ? `${x.financialStatementYear}년` : "—"}</td>
+              {isCheap ? (
+                <>
+                  <td style={TD}>{ratioPct(x.earningsYield)}</td>
+                  <td style={TD}>{eok(x.ebit)}</td>
+                  <td style={TD}>{eok(x.enterpriseValue)}</td>
+                  <td style={TD}>{eokMc(x.marketCap)}</td>
+                  <td style={{ ...TD, color: "#64748b" }}>{x.financialStatementYear !== null ? `${x.financialStatementYear}년` : "—"}</td>
+                </>
+              ) : (
+                <>
+                  <td style={TD}>{ratioPct(x.returnOnCapital)}</td>
+                  <td style={TD}>{eok(x.ebit)}</td>
+                  <td style={TD}>{eok(x.investedCapital)}</td>
+                  <td style={TD}>{eok(x.netWorkingCapital)}</td>
+                  <td style={TD}>{eok(x.propertyPlantAndEquipment)}</td>
+                  <td style={{ ...TD, color: "#64748b" }}>{x.financialStatementYear !== null ? `${x.financialStatementYear}년` : "—"}</td>
+                </>
+              )}
             </tr>
           ))}
         </tbody>
