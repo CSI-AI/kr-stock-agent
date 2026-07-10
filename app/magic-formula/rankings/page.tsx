@@ -212,6 +212,18 @@ function Top100Pending({ label }: { label: string }) {
   );
 }
 
+// Case B 고지 — 현재 top100은 "종합 상위 100 후보"를 해당 순위로 정렬한 목록이라
+// 순위 값이 1,5,8,10…처럼 건너뛴다. 전체 시장 1~100 연속표는 별도 파이프라인(준비 중).
+function SubsetNotice({ kind }: { kind: "cheap" | "quality" }) {
+  const label = kind === "cheap" ? "싼 순위" : "잘버는 순위";
+  return (
+    <p style={{ margin: "0 0 10px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "9px 11px", lineHeight: 1.55 }}>
+      아래 목록은 <b>종합 상위 100 후보</b>를 {label}로 정렬한 것입니다. 각 종목의 {label}는 전체 시장에서 받은 순위 원값이라
+      1위·5위·8위처럼 건너뛸 수 있어요(후보에 들지 못한 회사는 빠져 있음). 전체 시장 {label} 1~100 연속표는 별도로 준비 중입니다.
+    </p>
+  );
+}
+
 export default function MagicRankingPage() {
   const history = readRecommendationHistory();
   const days = parseMagicOfficialTradeDays(history);
@@ -219,10 +231,10 @@ export default function MagicRankingPage() {
   const buys = latest?.buys ?? [];
   const rankings = parseRankings(history);
 
-  // 검증 메모: 합산 상위10이 싼/잘버는 순위에서 각각 몇 위인지 → 균형/편중 판단.
-  const balanced = buys.filter((b) => b.cheapRank !== null && b.qualityRank !== null && b.cheapRank <= 30 && b.qualityRank <= 30).length;
-  const cheapLean = buys.filter((b) => b.cheapRank !== null && b.qualityRank !== null && b.cheapRank <= 15 && b.qualityRank > 40).length;
-  const qualityLean = buys.filter((b) => b.cheapRank !== null && b.qualityRank !== null && b.qualityRank <= 15 && b.cheapRank > 40).length;
+  // 데이터 기준(원자료) — 최신 매수분의 실적연도·연결/별도·기준주가일에서 도출.
+  const fsYear = buys.map((b) => b.financialStatementYear).find((v) => v !== null) ?? null;
+  const fsDiv = buys.map((b) => b.dartFsDiv).find((v) => v) ?? "";
+  const priceDate = buys.map((b) => b.priceAsOfDate).find((v) => v) ?? latest?.date ?? "";
 
   return (
     <main className="dashboardRoot">
@@ -234,14 +246,9 @@ export default function MagicRankingPage() {
           <h1 style={{ margin: "0 0 6px", fontSize: 21, fontWeight: 900, color: ACCENT.text, letterSpacing: "-0.01em" }}>마법공식 순위 검증</h1>
           <p style={{ margin: 0, fontSize: 13.5, color: "#334155", lineHeight: 1.6 }}>
             마법공식은 싼 회사와 돈을 잘버는 회사를 각각 순위화한 뒤, 두 순위를 더해 종합점수가 낮은 종목을 선택합니다.
-            이 페이지에서 오늘의 상위 10개가 어느 순위에서 뽑혔는지 직접 확인할 수 있어요.
+            이 페이지는 순위 원자료를 그대로 보여줍니다. 해석과 판단은 직접 하세요.
           </p>
         </div>
-      </section>
-
-      <section className="dashSection">
-        <h2 className="dashSectionTitle">공식 근거</h2>
-        <MagicFormulaExplainer />
       </section>
 
       <section className="dashSection">
@@ -254,31 +261,48 @@ export default function MagicRankingPage() {
       <section className="dashSection">
         <h2 className="dashSectionTitle">싼 회사 순위 100등</h2>
         <SectionCard title="EBIT/EV 높은 순 · 기업가치 대비 영업이익">
-          {rankings && rankings.cheapTop100.length > 0 ? <Top100Table items={rankings.cheapTop100} kind="cheap" /> : <Top100Pending label="싼 회사" />}
+          {rankings && rankings.cheapTop100.length > 0 ? (
+            <>
+              <SubsetNotice kind="cheap" />
+              <Top100Table items={rankings.cheapTop100} kind="cheap" />
+            </>
+          ) : (
+            <Top100Pending label="싼 회사" />
+          )}
         </SectionCard>
       </section>
 
       <section className="dashSection">
         <h2 className="dashSectionTitle">돈 잘버는 회사 순위 100등</h2>
         <SectionCard title="EBIT/투입자본 높은 순 · 순운전자본 + 유형자산 대비 영업이익">
-          {rankings && rankings.qualityTop100.length > 0 ? <Top100Table items={rankings.qualityTop100} kind="quality" /> : <Top100Pending label="돈 잘버는 회사" />}
+          {rankings && rankings.qualityTop100.length > 0 ? (
+            <>
+              <SubsetNotice kind="quality" />
+              <Top100Table items={rankings.qualityTop100} kind="quality" />
+            </>
+          ) : (
+            <Top100Pending label="돈 잘버는 회사" />
+          )}
         </SectionCard>
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">검증 메모</h2>
-        <SectionCard title="오늘의 top10이 어떻게 뽑혔나">
-          {buys.length === 0 ? (
-            <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>검증할 매수 종목이 아직 없어요.</p>
-          ) : (
-            <div style={{ display: "grid", gap: 8, fontSize: 13, color: "#334155", lineHeight: 1.55 }}>
-              <div>· 양쪽 균형(싼 순위·잘버는 순위 모두 30위 이내): <b style={{ color: ACCENT.primary }}>{balanced}종목</b></div>
-              <div>· 싼 쪽 편중(싼 15위 이내·잘버는 40위 밖): <b>{cheapLean}종목</b></div>
-              <div>· 잘버는 쪽 편중(잘버는 15위 이내·싼 40위 밖): <b>{qualityLean}종목</b></div>
-              <div style={{ fontSize: 12, color: "#94a3b8" }}>한쪽만 극단적으로 좋은 종목보다, 두 순위가 균형 있게 높은 종목이 마법공식의 의도에 가깝습니다.</div>
+        <h2 className="dashSectionTitle">데이터 기준</h2>
+        <SectionCard title="어떤 자료로 계산했나">
+          <div style={{ display: "grid", gap: 7, fontSize: 13, color: "#334155", lineHeight: 1.55 }}>
+            <div>· 기준 주가: <b>{fmtDate(priceDate)}</b> 장마감 종가 기준</div>
+            <div>· 재무제표: <b>{fsYear !== null ? `${fsYear}년 결산` : "최근 확보 결산"}</b>{fsDiv ? ` · ${fsDivLabel(fsDiv)}` : ""} (DART 공시 기준)</div>
+            <div>· 순위 값은 전체 상장사(금융·지주 등 제외한 적격 universe)에서 매긴 원값입니다.</div>
+            <div style={{ fontSize: 12, color: "#94a3b8" }}>
+              현재는 연간 결산 기준으로 계산합니다. 최근 4개 분기(TTM) 반영은 분기 재무자료 수집·검증이 필요해 별도 단계로 준비 중입니다.
             </div>
-          )}
+          </div>
         </SectionCard>
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">공식 근거 · 산식</h2>
+        <MagicFormulaExplainer />
       </section>
     </main>
   );

@@ -6,15 +6,18 @@ import {
 } from "./_dashboard/kit";
 import {
   MagicHero,
+  MagicStatusStrip,
+  MagicNumberBoard,
+  MagicTrendCharts,
   MagicTodayPicks,
-  MagicOfficialCard,
   MagicFormulaExplainer,
 } from "./_dashboard/magic-official";
 
 export const dynamic = "force-dynamic";
 
-// 마법공식펀드 전용 홈: Hero → 오늘의 매수 근거 → 공식 운용 현황(상태/포트폴리오/거래내역) → 공식 설명.
-// public recommendation-history.json 의 magicOfficial* 키만 읽는다(2펀드 병렬 구조 제거).
+// 마법공식펀드 전용 요약 대시보드(Phase MF-UI-MASTER-REFINE):
+//  Hero → 상태 스트립(자산 현황) → 한눈 수치표 → 운용 추이 차트 → 매수 근거(접힘·세로) → 공식 설명.
+// 보유·거래 상세표는 성과분석, 전체 top100은 순위검증으로 분리(대시보드는 요약판).
 export default function DashboardPage() {
   const history = readRecommendationHistory();
 
@@ -28,12 +31,19 @@ export default function DashboardPage() {
       </section>
 
       <section className="dashSection">
-        <MagicTodayPicks history={history} />
+        <MagicStatusStrip history={history} />
       </section>
 
       <section className="dashSection">
-        <h2 className="dashSectionTitle">공식 운용 현황</h2>
-        <MagicOfficialCard history={history} />
+        <MagicNumberBoard history={history} />
+      </section>
+
+      <section className="dashSection">
+        <MagicTrendCharts history={history} />
+      </section>
+
+      <section className="dashSection">
+        <MagicTodayPicks history={history} />
       </section>
 
       <section className="dashSection">

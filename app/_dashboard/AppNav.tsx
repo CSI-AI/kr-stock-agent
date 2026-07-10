@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 const NAV_ITEMS = [
   { href: "/", label: "대시보드" },
   { href: "/magic-formula/rankings", label: "순위검증" },
-  { href: "/strategy-lab", label: "전략랩" },
   { href: "/performance", label: "성과분석" },
   { href: "/settings", label: "설정" },
 ];

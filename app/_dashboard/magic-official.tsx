@@ -392,66 +392,231 @@ function PickMini({ label, value, color }: { label: string; value: string; color
   );
 }
 
-// 오늘의 마법공식 매수 근거 — 최신 거래일 buys를 카드형으로(모바일 가로스크롤 없음).
-export function MagicTodayPicks({ history }: { history: Rec }) {
+// 오늘의 마법공식 매수 근거 — 기본 접힘(details) + 세로 목록. 각 종목이 위→아래로 한 줄씩 쌓인다.
+// 가로 카드 나열을 없애 모바일에서도 세로 정렬로만 진행한다.
+export function MagicTodayPicks({ history, defaultOpen = false }: { history: Rec; defaultOpen?: boolean }) {
   const days = parseMagicOfficialTradeDays(history);
   const latest = days[0];
   const buys = latest?.buys ?? [];
   const hasEvidenceMeta = buys.some((b) => b.evMethod || b.financialStatementYear !== null || b.closePrice !== null);
 
   return (
-    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>오늘의 마법공식 매수 근거</div>
-        {latest ? <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</div> : null}
-      </div>
-      <p style={{ margin: "0 0 10px", fontSize: 12, color: "#64748b" }}>
-        싼 순위(EBIT/EV) + 잘버는 순위(EBIT/투입자본) = 종합점수. 종합점수가 낮을수록 우수합니다.
-      </p>
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: "4px 16px 8px", minWidth: 0 }}>
+      <details open={defaultOpen}>
+        <summary style={{ cursor: "pointer", listStyle: "revert", padding: "12px 2px 4px", display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "2px 10px" }}>
+          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>오늘의 마법공식 매수 근거</span>
+          {latest ? <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</span> : null}
+          <span style={{ fontSize: 11.5, color: ACCENT.primary, fontWeight: 700 }}>펼쳐서 종목별 근거 보기</span>
+        </summary>
 
-      {buys.length === 0 ? (
-        <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>오늘의 매수 예정 종목이 아직 없어요.</p>
-      ) : (
-        <>
-          {!hasEvidenceMeta ? (
-            <div style={{ fontSize: 11.5, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "7px 10px", marginBottom: 10, lineHeight: 1.5 }}>
-              공식 근거 상세(기준 실적연도·EV 산식 등)는 evidence 스키마 도입 이후 신규 lot부터 표시됩니다. 순위·점수·비율은 그대로 확인할 수 있어요.
-            </div>
-          ) : null}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 10 }}>
-            {buys.map((b) => (
-              <div key={b.tradeId || b.lotId} style={{ border: "1px solid #eef2f7", borderRadius: 12, padding: "11px 12px", background: "#fbfdfc", minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: 8 }}>
-                  <span style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", background: ACCENT.primary, borderRadius: 8, padding: "1px 7px", flexShrink: 0 }}>{b.finalRank !== null ? `${b.finalRank}위` : "-"}</span>
-                  <b style={{ fontSize: 14, fontWeight: 850, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.name}</b>
-                  <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0 }}>{b.code}</span>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 8 }}>
-                  <PickMini label="싼 순위" value={b.cheapRank !== null ? `${b.cheapRank}위` : "-"} />
-                  <PickMini label="잘버는 순위" value={b.qualityRank !== null ? `${b.qualityRank}위` : "-"} />
-                  <PickMini label="종합점수" value={b.magicScore !== null ? `${b.magicScore}` : "-"} color={ACCENT.primary} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, marginBottom: 8 }}>
-                  <PickMini label="EBIT/EV" value={ratioPct(b.earningsYield)} />
-                  <PickMini label="EBIT/투입자본" value={ratioPct(b.returnOnCapital)} />
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", fontSize: 11, color: "#64748b", fontWeight: 700, borderTop: "1px dashed #e2e8f0", paddingTop: 7 }}>
-                  <span>매수 {krw(b.executionPrice)}</span>
-                  <span>{qty(b.quantity)}</span>
-                  <span>총 {krw(b.amount)}</span>
-                </div>
-                {(b.priceAsOfDate || b.financialStatementYear !== null || b.dartFsDiv) ? (
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", fontSize: 10.5, color: "#94a3b8", fontWeight: 600, marginTop: 5 }}>
-                    {b.priceAsOfDate ? <span>기준주가 {fmtDate(b.priceAsOfDate)}</span> : null}
-                    {b.financialStatementYear !== null ? <span>실적 {b.financialStatementYear}년</span> : null}
-                    {b.dartFsDiv ? <span>{fsDivLabel(b.dartFsDiv)}</span> : null}
-                  </div>
-                ) : null}
+        <p style={{ margin: "6px 0 10px", fontSize: 12, color: "#64748b" }}>
+          싼 순위(EBIT/EV) + 잘버는 순위(EBIT/투입자본) = 종합점수. 종합점수가 낮을수록 우수합니다.
+        </p>
+
+        {buys.length === 0 ? (
+          <p style={{ margin: "0 0 8px", fontSize: 13, color: "#64748b" }}>오늘의 매수 예정 종목이 아직 없어요.</p>
+        ) : (
+          <>
+            {!hasEvidenceMeta ? (
+              <div style={{ fontSize: 11.5, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "7px 10px", marginBottom: 10, lineHeight: 1.5 }}>
+                공식 근거 상세(기준 실적연도·EV 산식 등)는 evidence 스키마 도입 이후 신규 lot부터 표시됩니다. 순위·점수·비율은 그대로 확인할 수 있어요.
               </div>
-            ))}
+            ) : null}
+            {/* 세로 목록: 각 종목 = 전체 폭 한 줄. 가로 grid 나열 제거. */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 8 }}>
+              {buys.map((b) => (
+                <div key={b.tradeId || b.lotId} style={{ border: "1px solid #eef2f7", borderRadius: 12, padding: "11px 12px", background: "#fbfdfc", minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginBottom: 8, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 12.5, fontWeight: 900, color: "#fff", background: ACCENT.primary, borderRadius: 8, padding: "1px 7px", flexShrink: 0 }}>{b.finalRank !== null ? `${b.finalRank}위` : "-"}</span>
+                    <b style={{ fontSize: 14, fontWeight: 850, color: "#0f172a" }}>{b.name}</b>
+                    <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0 }}>{b.code}</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(88px, 1fr))", gap: 6, marginBottom: 8 }}>
+                    <PickMini label="싼 순위" value={b.cheapRank !== null ? `${b.cheapRank}위` : "-"} />
+                    <PickMini label="잘버는 순위" value={b.qualityRank !== null ? `${b.qualityRank}위` : "-"} />
+                    <PickMini label="종합점수" value={b.magicScore !== null ? `${b.magicScore}` : "-"} color={ACCENT.primary} />
+                    <PickMini label="EBIT/EV" value={ratioPct(b.earningsYield)} />
+                    <PickMini label="EBIT/투입자본" value={ratioPct(b.returnOnCapital)} />
+                    <PickMini label="기준주가" value={krw(b.closePrice)} />
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", fontSize: 11, color: "#64748b", fontWeight: 700, borderTop: "1px dashed #e2e8f0", paddingTop: 7 }}>
+                    <span>매수 {krw(b.executionPrice)}</span>
+                    <span>{qty(b.quantity)}</span>
+                    <span>총 {krw(b.amount)}</span>
+                    {b.priceAsOfDate ? <span style={{ color: "#94a3b8" }}>기준주가일 {fmtDate(b.priceAsOfDate)}</span> : null}
+                    {b.financialStatementYear !== null ? <span style={{ color: "#94a3b8" }}>실적 {b.financialStatementYear}년</span> : null}
+                    {b.dartFsDiv ? <span style={{ color: "#94a3b8" }}>{fsDivLabel(b.dartFsDiv)}</span> : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </details>
+    </section>
+  );
+}
+
+// ===== 대시보드 요약 전용(Phase MF-UI-MASTER-REFINE) — 상태 스트립 / 한눈 수치표 / 추이 차트 =====
+
+function avgOf(buys: MagicOfficialBuyTrade[], key: keyof MagicOfficialBuyTrade): number | null {
+  const vs = buys.map((b) => b[key]).filter((v): v is number => typeof v === "number");
+  return vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null;
+}
+function rankAvg(v: number | null): string {
+  return v === null ? "-" : `${v.toFixed(1)}위`;
+}
+
+// 상단 상태 스트립 — 자산 현황 한눈 요약(펀드명·기준일·배치·실주문0 고지 포함).
+export function MagicStatusStrip({ history }: { history: Rec }) {
+  const summary = parseMagicOfficialSummary(history);
+  if (!summary) return null;
+  const days = parseMagicOfficialTradeDays(history);
+  const latest = days[0];
+  const holdings = parseMagicOfficialPortfolio(history).holdings;
+  const investRate = summary.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
+
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
+          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>공식 운용 현황</span>
+          <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
+            기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
+          </span>
+        </div>
+        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(146px, 1fr))", gap: 8 }}>
+        <OMetric label="총자산" value={krw(summary.totalAsset)} />
+        <OMetric label="누적수익률" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)} />
+        <OMetric label="총현금" value={krw(summary.totalCash)} />
+        <OMetric label="보유평가액" value={krw(summary.holdingsMarketValue)} sub={investRate !== null ? `투자비중 ${investRate.toFixed(1)}%` : undefined} />
+        <OMetric label="보유 종목" value={`${holdings.length}개`} sub={`lot ${summary.openItemLotCount}개`} />
+        <OMetric label="운용일" value={`${summary.officialSequence}일`} sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
+      </div>
+    </section>
+  );
+}
+
+// 한눈에 보는 마법공식 수치표 — 오늘 상위 10종목의 공식 산출 평균값 + 자산 비중.
+export function MagicNumberBoard({ history }: { history: Rec }) {
+  const summary = parseMagicOfficialSummary(history);
+  const days = parseMagicOfficialTradeDays(history);
+  const latest = days[0];
+  const buys = latest?.buys ?? [];
+  const cashRate = summary?.totalAsset && summary.totalCash !== null ? (summary.totalCash / summary.totalAsset) * 100 : null;
+  const investRate = summary?.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
+
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 3 }}>한눈에 보는 마법공식</div>
+      <p style={{ margin: "0 0 12px", fontSize: 12, color: "#94a3b8" }}>
+        {latest ? `${fmtDate(latest.date)} · ${latest.officialSequence}일차 상위 ${buys.length}종목 평균` : "오늘 산출 대기 중"}
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 8 }}>
+        <OMetric label="오늘 매수 종목" value={`${buys.length}개`} />
+        <OMetric label="평균 EBIT/EV" value={ratioPct(avgOf(buys, "earningsYield"))} color={ACCENT.primary} />
+        <OMetric label="평균 EBIT/투입자본" value={ratioPct(avgOf(buys, "returnOnCapital"))} color={ACCENT.primary} />
+        <OMetric label="평균 싼 순위" value={rankAvg(avgOf(buys, "cheapRank"))} />
+        <OMetric label="평균 잘버는 순위" value={rankAvg(avgOf(buys, "qualityRank"))} />
+        <OMetric label="평균 종합점수" value={avgOf(buys, "magicScore") !== null ? avgOf(buys, "magicScore")!.toFixed(1) : "-"} />
+        <OMetric label="현금 비중" value={cashRate !== null ? `${cashRate.toFixed(1)}%` : "-"} />
+        <OMetric label="투자 비중" value={investRate !== null ? `${investRate.toFixed(1)}%` : "-"} />
+        <OMetric label="이번 회차 매수금액" value={krw(latest?.totalBuyAmount ?? null)} />
+        <OMetric label="총 보유 lot" value={`${summary?.openItemLotCount ?? 0}개`} />
+      </div>
+    </section>
+  );
+}
+
+// ----- 인라인 SVG 추이 차트(외부 라이브러리 없음) -----
+type TrendPt = { i: number; label: string; v: number };
+
+function LineTrend({ pts, color, baseline, unit }: { pts: TrendPt[]; color: string; baseline: number | null; unit: "krw" | "pct" }) {
+  const W = 480, H = 150, padL = 46, padR = 12, padT = 12, padB = 26;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const vals = pts.map((p) => p.v).concat(baseline !== null ? [baseline] : []);
+  let minV = Math.min(...vals), maxV = Math.max(...vals);
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  const pad = (maxV - minV) * 0.12;
+  minV -= pad; maxV += pad;
+  const xp = (i: number) => padL + (pts.length <= 1 ? plotW / 2 : (i / (pts.length - 1)) * plotW);
+  const yp = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
+  const path = pts.map((p, i) => `${i === 0 ? "M" : "L"}${xp(i).toFixed(1)},${yp(p.v).toFixed(1)}`).join(" ");
+  const fmtY = (v: number) => unit === "pct" ? `${v.toFixed(1)}%` : `${new Intl.NumberFormat("ko-KR").format(Math.round(v / 10000))}만`;
+  const ticks = [maxV, (maxV + minV) / 2, minV];
+  const labelIdx = pts.length <= 4 ? pts.map((_, i) => i) : [0, Math.round((pts.length - 1) / 2), pts.length - 1];
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto" }} role="img" aria-label="추이 차트">
+      {ticks.map((t, i) => (
+        <g key={i}>
+          <line x1={padL} x2={W - padR} y1={yp(t)} y2={yp(t)} stroke="#eef2f7" strokeWidth="1" />
+          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="9.5">{fmtY(t)}</text>
+        </g>
+      ))}
+      {baseline !== null ? <line x1={padL} x2={W - padR} y1={yp(baseline)} y2={yp(baseline)} stroke="#cbd5e1" strokeWidth="1.1" strokeDasharray="4 3" /> : null}
+      {pts.length >= 2 ? <path d={path} fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /> : null}
+      {pts.map((p, i) => <circle key={i} cx={xp(i)} cy={yp(p.v)} r={i === pts.length - 1 ? 3.6 : 2.2} fill={color} />)}
+      {labelIdx.map((idx, k) => {
+        const anchor: "start" | "middle" | "end" = k === 0 ? "start" : k === labelIdx.length - 1 ? "end" : "middle";
+        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="9.5">{pts[idx].label}</text>;
+      })}
+    </svg>
+  );
+}
+
+// 총자산 추이 + 누적수익률 추이 + 현금/투자 비중 bar.
+export function MagicTrendCharts({ history }: { history: Rec }) {
+  const summary = parseMagicOfficialSummary(history);
+  const days = parseMagicOfficialTradeDays(history);
+  // 최신이 위인 배열 → 시간순(과거→현재)으로 뒤집어 시계열 차트에 사용.
+  const chrono = [...days].reverse();
+  const mdLabel = (d: string) => { const m = d.match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}/${m[2]}` : d; };
+  const assetPts: TrendPt[] = chrono.filter((d) => d.totalAsset !== null).map((d, i) => ({ i, label: mdLabel(d.date), v: d.totalAsset as number }));
+  const retPts: TrendPt[] = chrono.filter((d) => d.cumulativeReturn !== null).map((d, i) => ({ i, label: mdLabel(d.date), v: d.cumulativeReturn as number }));
+  const initial = 50000000;
+  const cashRate = summary?.totalAsset && summary.totalCash !== null ? Math.max(0, Math.min(100, (summary.totalCash / summary.totalAsset) * 100)) : null;
+  const investRate = cashRate !== null ? 100 - cashRate : null;
+
+  if (assetPts.length === 0) {
+    return (
+      <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>운용 추이</div>
+        <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>추이 차트는 운용일이 쌓이면 표시됩니다.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
+      <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 12 }}>운용 추이</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 4 }}>총자산 추이</div>
+          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>점선 = 초기자본 {krw(initial)}</div>
+          <LineTrend pts={assetPts} color={ACCENT.primary} baseline={initial} unit="krw" />
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 4 }}>누적수익률 추이</div>
+          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>점선 = 0%(초기자본 기준)</div>
+          <LineTrend pts={retPts} color="#2563eb" baseline={0} unit="pct" />
+        </div>
+      </div>
+      {cashRate !== null && investRate !== null ? (
+        <div style={{ marginTop: 14 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 6 }}>현금 / 투자 비중</div>
+          <div style={{ display: "flex", height: 22, borderRadius: 8, overflow: "hidden", border: "1px solid #e2e8f0" }}>
+            <div style={{ width: `${investRate}%`, background: ACCENT.primary, minWidth: investRate > 0 ? 2 : 0 }} />
+            <div style={{ width: `${cashRate}%`, background: "#f97316", minWidth: cashRate > 0 ? 2 : 0 }} />
           </div>
-        </>
-      )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 16px", marginTop: 6, fontSize: 12, fontWeight: 700, color: "#475569" }}>
+            <span><span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 2, background: ACCENT.primary, marginRight: 5 }} />투자 {investRate.toFixed(1)}% · {krw(summary!.holdingsMarketValue)}</span>
+            <span><span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 2, background: "#f97316", marginRight: 5 }} />현금 {cashRate.toFixed(1)}% · {krw(summary!.totalCash)}</span>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
