@@ -65,6 +65,9 @@ type RankingItem = {
 };
 type OfficialRankings = {
   dataDate: string; cheapTop100: RankingItem[]; qualityTop100: RankingItem[];
+  // rankingScope: "global-eligible-universe"면 전체 유효 universe 기준 1~100 연속(subset 고지 불필요).
+  // 없거나 다른 값이면 구형 subset 데이터로 간주해 subset 고지를 표시한다.
+  isGlobal: boolean;
 };
 function parseRankings(history: Rec): OfficialRankings | null {
   const r = history.magicOfficialRankings;
@@ -82,6 +85,7 @@ function parseRankings(history: Rec): OfficialRankings | null {
     dataDate: str(ro.dataDate),
     cheapTop100: arr(ro.cheapTop100).map(mapItem),
     qualityTop100: arr(ro.qualityTop100).map(mapItem),
+    isGlobal: str(ro.rankingScope) === "global-eligible-universe",
   };
 }
 
@@ -224,6 +228,17 @@ function SubsetNotice({ kind }: { kind: "cheap" | "quality" }) {
   );
 }
 
+// global 원천(rankingScope=global-eligible-universe)일 때: 전체 유효 universe 기준 1~100 연속표임을 안내.
+function GlobalNotice({ kind }: { kind: "cheap" | "quality" }) {
+  const label = kind === "cheap" ? "싼 순위(EBIT/EV 높은 순)" : "잘버는 순위(EBIT/투입자본 높은 순)";
+  return (
+    <p style={{ margin: "0 0 10px", fontSize: 12, color: ACCENT.text, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 9, padding: "9px 11px", lineHeight: 1.55 }}>
+      전체 유효 상장사(금융·지주 등 제외)를 대상으로 {label}만 독립 계산해 1위부터 100위까지 매긴 순위입니다.
+      종합 후보와 무관하게 각 기준으로 가장 우수한 100개를 보여줍니다.
+    </p>
+  );
+}
+
 export default function MagicRankingPage() {
   const history = readRecommendationHistory();
   const days = parseMagicOfficialTradeDays(history);
@@ -263,7 +278,7 @@ export default function MagicRankingPage() {
         <SectionCard title="EBIT/EV 높은 순 · 기업가치 대비 영업이익">
           {rankings && rankings.cheapTop100.length > 0 ? (
             <>
-              <SubsetNotice kind="cheap" />
+              {rankings.isGlobal ? <GlobalNotice kind="cheap" /> : <SubsetNotice kind="cheap" />}
               <Top100Table items={rankings.cheapTop100} kind="cheap" />
             </>
           ) : (
@@ -277,7 +292,7 @@ export default function MagicRankingPage() {
         <SectionCard title="EBIT/투입자본 높은 순 · 순운전자본 + 유형자산 대비 영업이익">
           {rankings && rankings.qualityTop100.length > 0 ? (
             <>
-              <SubsetNotice kind="quality" />
+              {rankings.isGlobal ? <GlobalNotice kind="quality" /> : <SubsetNotice kind="quality" />}
               <Top100Table items={rankings.qualityTop100} kind="quality" />
             </>
           ) : (
