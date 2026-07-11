@@ -1,0 +1,1413 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-07-10",
+  "annualFinancialYear": 2025,
+  "ttmAsOfQuarter": "2026Q1",
+  "formulaVersionAnnual": "book-faithful-v1 (canonical, 연간 결산 기준)",
+  "codeSetHash": "2e09bc01e6af6f92",
+  "summary": {
+    "includedExperiment": 1213,
+    "excludedWarning": 101,
+    "excludedBlocked": 2,
+    "excludedIncomplete": 0,
+    "experimentalRanked": 1162,
+    "officialEligible": 1324
+  },
+  "stats": {
+    "includedExperiment": 1213,
+    "experimentalRanked": 1162,
+    "annualTop100_vs_expTop100_overlap": 63,
+    "expTop100_newEntrants": 37,
+    "expTop100_dropouts": 37,
+    "avgCombinedRankChange_subset": 0.0,
+    "medianCombinedRankChange_subset": 6,
+    "bigMovers_over50": 957,
+    "byStatus": {
+      "PASS_OFFICIAL_IR_CONFIRMED": 2,
+      "PASS": 934,
+      "PASS_WITH_TRANSITION_NOTE": 277
+    },
+    "selectionBias": "WARNING 101 + BLOCKED 2 + 미완성 0 제외 → 실험 모집단이 공식 eligible(1324)보다 작음. 순위변화는 동일 실험집합 내 재순위 기준(subset)으로 계산해 편향 최소화. 공식 top100 중 실험 제외로 빠진 종목은 별도 확인 필요.",
+    "note": "수익률 개선 주장 아님. 백테스트 없음. 데이터 신선도·순위 민감도만."
+  },
+  "disclaimer": "조회 전용 PoC. 공식 연간 마법공식 미반영. 투자 추천 아님. 백테스트 없음(순위 민감도만 표시).",
+  "rows": [
+    {
+      "stockCode": "046940",
+      "companyName": "우원개발",
+      "industry": "건설",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 67188905596.0,
+        "netIncome": null,
+        "currentAssets": 152359643570.0,
+        "currentLiabilities": 87709133245.0,
+        "ppe": 14903234432.0,
+        "cash": 34039074348.0,
+        "totalDebt": 107405281394.0,
+        "ebitEv": 0.483456,
+        "returnOnCapital": 0.844573,
+        "valueRank": 1,
+        "profitabilityRank": 11,
+        "combinedRank": 12,
+        "officialRankInEligible": 1,
+        "annualCombinedRankInSubset": 11
+      },
+      "ttmExperiment": {
+        "revenue": 348130543922.0,
+        "operatingIncome": 67809813530.0,
+        "netIncome": 48861233655.0,
+        "latestCurrentAssets": 136964134461.0,
+        "latestCurrentLiabilities": 84882979422.0,
+        "latestPpe": 12720980786.0,
+        "latestCash": 15836385273.0,
+        "latestTotalDebt": 101367525167.0,
+        "experimentalEbitEv": 0.448652,
+        "experimentalReturnOnCapital": 1.046413,
+        "experimentalValueRank": 5,
+        "experimentalProfitabilityRank": 9,
+        "experimentalCombinedRank": 14,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 1566030780.0,
+          "2025Q4": 27425616411.0,
+          "2025Q3": 26630975663.0,
+          "2025Q2": 12187190676.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 60861269861.0,
+          "2025Q4": 93045716842.0,
+          "2025Q3": 93815738989.0,
+          "2025Q2": 100407818230.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 0.92,
+        "valueRankChange": 4,
+        "profitabilityRankChange": -1,
+        "combinedRankChange": 3
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "124500",
+      "companyName": "아이티센글로벌",
+      "industry": "IT 서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 279925759631.0,
+        "netIncome": null,
+        "currentAssets": 1247956668330.0,
+        "currentLiabilities": 1022376406029.0,
+        "ppe": 154736169286.0,
+        "cash": 397224405642.0,
+        "totalDebt": 1599392088824.0,
+        "ebitEv": 0.165122,
+        "returnOnCapital": 0.736034,
+        "valueRank": 19,
+        "profitabilityRank": 13,
+        "combinedRank": 32,
+        "officialRankInEligible": 4,
+        "annualCombinedRankInSubset": 31
+      },
+      "ttmExperiment": {
+        "revenue": 10522496064910.0,
+        "operatingIncome": 345255593598.0,
+        "netIncome": 244828638251.0,
+        "latestCurrentAssets": 1304671716448.0,
+        "latestCurrentLiabilities": 1031215101096.0,
+        "latestPpe": 152086853237.0,
+        "latestCash": 273981776062.0,
+        "latestTotalDebt": 1078845719597.0,
+        "experimentalEbitEv": 0.265999,
+        "experimentalReturnOnCapital": 0.811329,
+        "experimentalValueRank": 16,
+        "experimentalProfitabilityRank": 13,
+        "experimentalCombinedRank": 29,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 99167251600.0,
+          "2025Q4": 160054364121.0,
+          "2025Q3": 64466896331.0,
+          "2025Q2": 21567081546.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 3288221636118.0,
+          "2025Q4": 4240280524145.0,
+          "2025Q3": 1727252178995.0,
+          "2025Q2": 1266741725652.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 23.34,
+        "valueRankChange": -3,
+        "profitabilityRankChange": 1,
+        "combinedRankChange": -2
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "037350",
+      "companyName": "성도이엔지",
+      "industry": "일반서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 57697884783.0,
+        "netIncome": null,
+        "currentAssets": 300755808565.0,
+        "currentLiabilities": 291834227747.0,
+        "ppe": 101027883051.0,
+        "cash": 104442516258.0,
+        "totalDebt": 601886642163.0,
+        "ebitEv": 0.091839,
+        "returnOnCapital": 0.524767,
+        "valueRank": 104,
+        "profitabilityRank": 29,
+        "combinedRank": 133,
+        "officialRankInEligible": 19,
+        "annualCombinedRankInSubset": 130
+      },
+      "ttmExperiment": {
+        "revenue": 687672369461.0,
+        "operatingIncome": 57480432507.0,
+        "netIncome": 31458511733.0,
+        "latestCurrentAssets": 353054905543.0,
+        "latestCurrentLiabilities": 344491998446.0,
+        "latestPpe": 101619131010.0,
+        "latestCash": 122916094032.0,
+        "latestTotalDebt": 380707543566.0,
+        "experimentalEbitEv": 0.147918,
+        "experimentalReturnOnCapital": 0.521686,
+        "experimentalValueRank": 98,
+        "experimentalProfitabilityRank": 33,
+        "experimentalCombinedRank": 131,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 7797967023.0,
+          "2025Q4": 9479418008.0,
+          "2025Q3": 14713034790.0,
+          "2025Q2": 25490012686.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 144597436290.0,
+          "2025Q4": 165692301759.0,
+          "2025Q3": 176137559748.0,
+          "2025Q2": 201245071664.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -0.38,
+        "valueRankChange": -4,
+        "profitabilityRankChange": 5,
+        "combinedRankChange": 1
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "284740",
+      "companyName": "쿠쿠홈시스",
+      "industry": "일반서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 169362970577.0,
+        "netIncome": null,
+        "currentAssets": 654971924684.0,
+        "currentLiabilities": 277167058143.0,
+        "ppe": 79082926821.0,
+        "cash": 162643604187.0,
+        "totalDebt": 1580152868881.0,
+        "ebitEv": 0.089248,
+        "returnOnCapital": 0.370688,
+        "valueRank": 110,
+        "profitabilityRank": 69,
+        "combinedRank": 179,
+        "officialRankInEligible": 30,
+        "annualCombinedRankInSubset": 172
+      },
+      "ttmExperiment": {
+        "revenue": 1123274197963.0,
+        "operatingIncome": 168067192296.0,
+        "netIncome": 140640832874.0,
+        "latestCurrentAssets": 660681476438.0,
+        "latestCurrentLiabilities": 302888307859.0,
+        "latestPpe": 78636189335.0,
+        "latestCash": 173987988349.0,
+        "latestTotalDebt": 332309372628.0,
+        "experimentalEbitEv": 0.26323,
+        "experimentalReturnOnCapital": 0.385096,
+        "experimentalValueRank": 17,
+        "experimentalProfitabilityRank": 67,
+        "experimentalCombinedRank": 84,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 41252475061.0,
+          "2025Q4": 44311421094.0,
+          "2025Q3": 40799006184.0,
+          "2025Q2": 41704289957.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 273041051425.0,
+          "2025Q4": 264551770058.0,
+          "2025Q3": 291641674131.0,
+          "2025Q2": 294039702349.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -0.77,
+        "valueRankChange": -90,
+        "profitabilityRankChange": 2,
+        "combinedRankChange": -88
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "408920",
+      "companyName": "메쎄이상",
+      "industry": "일반서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 18997461570.0,
+        "netIncome": null,
+        "currentAssets": 70197662144.0,
+        "currentLiabilities": 11529442538.0,
+        "ppe": 3530465308.0,
+        "cash": 25174332938.0,
+        "totalDebt": 96568824302.0,
+        "ebitEv": 0.093566,
+        "returnOnCapital": 0.305432,
+        "valueRank": 97,
+        "profitabilityRank": 94,
+        "combinedRank": 191,
+        "officialRankInEligible": 36,
+        "annualCombinedRankInSubset": 185
+      },
+      "ttmExperiment": {
+        "revenue": 76215204317.0,
+        "operatingIncome": 20665700407.0,
+        "netIncome": 17238008068.0,
+        "latestCurrentAssets": 80158477303.0,
+        "latestCurrentLiabilities": 23548829480.0,
+        "latestPpe": 3390492288.0,
+        "latestCash": 68362601369.0,
+        "latestTotalDebt": 29482154050.0,
+        "experimentalEbitEv": 0.222781,
+        "experimentalReturnOnCapital": 0.344428,
+        "experimentalValueRank": 29,
+        "experimentalProfitabilityRank": 82,
+        "experimentalCombinedRank": 111,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 4958940096.0,
+          "2025Q4": 2897685232.0,
+          "2025Q3": 6340335934.0,
+          "2025Q2": 6468739145.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 16566438921.0,
+          "2025Q4": 20266505622.0,
+          "2025Q3": 21946303892.0,
+          "2025Q2": 17435955882.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 8.78,
+        "valueRankChange": -67,
+        "profitabilityRankChange": -7,
+        "combinedRankChange": -74
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "263720",
+      "companyName": "디앤씨미디어",
+      "industry": "오락·문화",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 17336284379.0,
+        "netIncome": null,
+        "currentAssets": 75138477923.0,
+        "currentLiabilities": 19954868197.0,
+        "ppe": 4603566689.0,
+        "cash": 14320638191.0,
+        "totalDebt": 117432951843.0,
+        "ebitEv": 0.092574,
+        "returnOnCapital": 0.289967,
+        "valueRank": 99,
+        "profitabilityRank": 104,
+        "combinedRank": 203,
+        "officialRankInEligible": 41,
+        "annualCombinedRankInSubset": 196
+      },
+      "ttmExperiment": {
+        "revenue": 84722487598.0,
+        "operatingIncome": 19418869612.0,
+        "netIncome": 8296382688.0,
+        "latestCurrentAssets": 71618872458.0,
+        "latestCurrentLiabilities": 17292546386.0,
+        "latestPpe": 4398902744.0,
+        "latestCash": 11690699247.0,
+        "latestTotalDebt": 19050182968.0,
+        "experimentalEbitEv": 0.21219,
+        "experimentalReturnOnCapital": 0.330673,
+        "experimentalValueRank": 34,
+        "experimentalProfitabilityRank": 87,
+        "experimentalCombinedRank": 121,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 3490379087.0,
+          "2025Q4": 4106412199.0,
+          "2025Q3": 6503720164.0,
+          "2025Q2": 5318358162.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 17358785833.0,
+          "2025Q4": 15367115916.0,
+          "2025Q3": 27669778053.0,
+          "2025Q2": 24326807796.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 12.01,
+        "valueRankChange": -63,
+        "profitabilityRankChange": -12,
+        "combinedRankChange": -75
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "053580",
+      "companyName": "웹케시",
+      "industry": "IT 서비스",
+      "fsDiv": "OFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 13473558612.0,
+        "netIncome": null,
+        "currentAssets": 33860356717.0,
+        "currentLiabilities": 12293890698.0,
+        "ppe": 5439329479.0,
+        "cash": 16067391874.0,
+        "totalDebt": 20229235584.0,
+        "ebitEv": 0.157796,
+        "returnOnCapital": 0.498914,
+        "valueRank": 24,
+        "profitabilityRank": 34,
+        "combinedRank": 58,
+        "officialRankInEligible": 7,
+        "annualCombinedRankInSubset": 56
+      },
+      "ttmExperiment": {
+        "revenue": 72785735947.0,
+        "operatingIncome": 12561331273.0,
+        "netIncome": 12288010989.0,
+        "latestCurrentAssets": 38941992277.0,
+        "latestCurrentLiabilities": 13539528730.0,
+        "latestPpe": 5321199212.0,
+        "latestCash": 9031142080.0,
+        "latestTotalDebt": 21774905427.0,
+        "experimentalEbitEv": 0.133677,
+        "experimentalReturnOnCapital": 0.408849,
+        "experimentalValueRank": 138,
+        "experimentalProfitabilityRank": 58,
+        "experimentalCombinedRank": 196,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 2653782966.0,
+          "2025Q4": 3024164343.0,
+          "2025Q3": 3612429092.0,
+          "2025Q2": 3270954872.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 17806593356.0,
+          "2025Q4": 18523450914.0,
+          "2025Q3": 18004845185.0,
+          "2025Q2": 18450846492.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -6.77,
+        "valueRankChange": 114,
+        "profitabilityRankChange": 26,
+        "combinedRankChange": 140
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "018290",
+      "companyName": "브이티",
+      "industry": "화학",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 82869214759.0,
+        "netIncome": null,
+        "currentAssets": 212805210318.0,
+        "currentLiabilities": 94101475147.0,
+        "ppe": 43769347465.0,
+        "cash": 84220398087.0,
+        "totalDebt": 353501351205.0,
+        "ebitEv": 0.118959,
+        "returnOnCapital": 0.510049,
+        "valueRank": 50,
+        "profitabilityRank": 31,
+        "combinedRank": 81,
+        "officialRankInEligible": 8,
+        "annualCombinedRankInSubset": 80
+      },
+      "ttmExperiment": {
+        "revenue": 451024929072.0,
+        "operatingIncome": 71185384394.0,
+        "netIncome": 59271030090.0,
+        "latestCurrentAssets": 225937675556.0,
+        "latestCurrentLiabilities": 90153182562.0,
+        "latestPpe": 44498294211.0,
+        "latestCash": 77370231887.0,
+        "latestTotalDebt": 96363933011.0,
+        "experimentalEbitEv": 0.15949,
+        "experimentalReturnOnCapital": 0.394854,
+        "experimentalValueRank": 77,
+        "experimentalProfitabilityRank": 62,
+        "experimentalCombinedRank": 139,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 17333482678.0,
+          "2025Q4": 12661114191.0,
+          "2025Q3": 12123907082.0,
+          "2025Q2": 29066880443.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 114290932582.0,
+          "2025Q4": 114994014199.0,
+          "2025Q3": 110219156432.0,
+          "2025Q2": 111520825859.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -14.1,
+        "valueRankChange": 27,
+        "profitabilityRankChange": 32,
+        "combinedRankChange": 59
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "052400",
+      "companyName": "코나아이",
+      "industry": "IT 서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 88899374736.0,
+        "netIncome": null,
+        "currentAssets": 397507488995.0,
+        "currentLiabilities": 294884992075.0,
+        "ppe": 92081217014.0,
+        "cash": 241128404564.0,
+        "totalDebt": 301181795964.0,
+        "ebitEv": 0.124518,
+        "returnOnCapital": 0.456588,
+        "valueRank": 43,
+        "profitabilityRank": 39,
+        "combinedRank": 82,
+        "officialRankInEligible": 9,
+        "annualCombinedRankInSubset": 80
+      },
+      "ttmExperiment": {
+        "revenue": 327809074249.0,
+        "operatingIncome": 100996643471.0,
+        "netIncome": 88954078052.0,
+        "latestCurrentAssets": 372395762804.0,
+        "latestCurrentLiabilities": 264748903371.0,
+        "latestPpe": 92053659136.0,
+        "latestCash": 223224827731.0,
+        "latestTotalDebt": 270504352798.0,
+        "experimentalEbitEv": 0.14404,
+        "experimentalReturnOnCapital": 0.505741,
+        "experimentalValueRank": 107,
+        "experimentalProfitabilityRank": 36,
+        "experimentalCombinedRank": 143,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 24779966851.0,
+          "2025Q4": 28832195455.0,
+          "2025Q3": 30177163796.0,
+          "2025Q2": 17207317369.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 76960478043.0,
+          "2025Q4": 90383997109.0,
+          "2025Q3": 93250286743.0,
+          "2025Q2": 67214312354.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 13.61,
+        "valueRankChange": 64,
+        "profitabilityRankChange": -1,
+        "combinedRankChange": 63
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "088130",
+      "companyName": "동아엘텍",
+      "industry": "기계·장비",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS_WITH_TRANSITION_NOTE",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 113231146332.0,
+        "netIncome": null,
+        "currentAssets": 344348601679.0,
+        "currentLiabilities": 228872608785.0,
+        "ppe": 82446603451.0,
+        "cash": 173659388894.0,
+        "totalDebt": 502592778507.0,
+        "ebitEv": 0.269578,
+        "returnOnCapital": 0.572098,
+        "valueRank": 6,
+        "profitabilityRank": 22,
+        "combinedRank": 28,
+        "officialRankInEligible": 3,
+        "annualCombinedRankInSubset": 27
+      },
+      "ttmExperiment": {
+        "revenue": 596801062881.0,
+        "operatingIncome": 120378635137.0,
+        "netIncome": 83891875654.0,
+        "latestCurrentAssets": 439376933126.0,
+        "latestCurrentLiabilities": 287891465900.0,
+        "latestPpe": 90819904573.0,
+        "latestCash": 179947836400.0,
+        "latestTotalDebt": 329323190853.0,
+        "experimentalEbitEv": 0.50059,
+        "experimentalReturnOnCapital": 0.496805,
+        "experimentalValueRank": 4,
+        "experimentalProfitabilityRank": 37,
+        "experimentalCombinedRank": 41,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 4016310516.0,
+          "2025Q4": 54853168205.0,
+          "2025Q3": 21050875741.0,
+          "2025Q2": 40458280675.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 40874310652.0,
+          "2025Q4": 239044069182.0,
+          "2025Q3": 106402726081.0,
+          "2025Q2": 210479956966.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 6.31,
+        "valueRankChange": -2,
+        "profitabilityRankChange": 16,
+        "combinedRankChange": 14
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS_WITH_TRANSITION_NOTE"
+      ]
+    },
+    {
+      "stockCode": "184230",
+      "companyName": "SGA솔루션즈",
+      "industry": "IT 서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS_WITH_TRANSITION_NOTE",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 14823977696.0,
+        "netIncome": null,
+        "currentAssets": 39805610950.0,
+        "currentLiabilities": 47723233948.0,
+        "ppe": 16924263565.0,
+        "cash": 22311276480.0,
+        "totalDebt": 99019662120.0,
+        "ebitEv": 0.133109,
+        "returnOnCapital": 1.645894,
+        "valueRank": 36,
+        "profitabilityRank": 3,
+        "combinedRank": 39,
+        "officialRankInEligible": 5,
+        "annualCombinedRankInSubset": 39
+      },
+      "ttmExperiment": {
+        "revenue": 79554111982.0,
+        "operatingIncome": 17872382061.0,
+        "netIncome": 19408361045.0,
+        "latestCurrentAssets": 39608803002.0,
+        "latestCurrentLiabilities": 43553200087.0,
+        "latestPpe": 17282844256.0,
+        "latestCash": 18854318244.0,
+        "latestTotalDebt": 94609783604.0,
+        "experimentalEbitEv": 0.161866,
+        "experimentalReturnOnCapital": 1.339915,
+        "experimentalValueRank": 73,
+        "experimentalProfitabilityRank": 6,
+        "experimentalCombinedRank": 79,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 761225265.0,
+          "2025Q4": 8674646665.0,
+          "2025Q3": 9009774763.0,
+          "2025Q2": -573264632.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 25956217998.0,
+          "2025Q4": 23287474063.0,
+          "2025Q3": 20002816172.0,
+          "2025Q2": 10307603749.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 20.56,
+        "valueRankChange": 37,
+        "profitabilityRankChange": 3,
+        "combinedRankChange": 40
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS_WITH_TRANSITION_NOTE"
+      ]
+    },
+    {
+      "stockCode": "171090",
+      "companyName": "선익시스템",
+      "industry": "기계·장비",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS_WITH_TRANSITION_NOTE",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 111525548096.0,
+        "netIncome": null,
+        "currentAssets": 263683060075.0,
+        "currentLiabilities": 190223903315.0,
+        "ppe": 63166014404.0,
+        "cash": 149747229475.0,
+        "totalDebt": 365622084365.0,
+        "ebitEv": 0.144933,
+        "returnOnCapital": 0.816288,
+        "valueRank": 30,
+        "profitabilityRank": 12,
+        "combinedRank": 42,
+        "officialRankInEligible": 6,
+        "annualCombinedRankInSubset": 41
+      },
+      "ttmExperiment": {
+        "revenue": 515965726033.0,
+        "operatingIncome": 114794969302.0,
+        "netIncome": 80319215704.0,
+        "latestCurrentAssets": 344071965181.0,
+        "latestCurrentLiabilities": 240876385216.0,
+        "latestPpe": 73210307218.0,
+        "latestCash": 151846441224.0,
+        "latestTotalDebt": 281208474942.0,
+        "experimentalEbitEv": 0.168078,
+        "experimentalReturnOnCapital": 0.650743,
+        "experimentalValueRank": 68,
+        "experimentalProfitabilityRank": 17,
+        "experimentalCombinedRank": 85,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 1474918893.0,
+          "2025Q4": 53561228179.0,
+          "2025Q3": 19797084035.0,
+          "2025Q2": 39961738195.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 16098564434.0,
+          "2025Q4": 221048965214.0,
+          "2025Q3": 88763491261.0,
+          "2025Q2": 190054705124.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 2.93,
+        "valueRankChange": 38,
+        "profitabilityRankChange": 6,
+        "combinedRankChange": 44
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS_WITH_TRANSITION_NOTE"
+      ]
+    },
+    {
+      "stockCode": "000660",
+      "companyName": "SK하이닉스",
+      "industry": "전기·전자",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS_OFFICIAL_IR_CONFIRMED",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 47206319000000.0,
+        "netIncome": null,
+        "currentAssets": 69458073000000.0,
+        "currentLiabilities": 37378999000000.0,
+        "ppe": 77502704000000.0,
+        "cash": 14923766000000.0,
+        "totalDebt": 55440908000000.0,
+        "ebitEv": 0.029611,
+        "returnOnCapital": 0.430786,
+        "valueRank": 743,
+        "profitabilityRank": 49,
+        "combinedRank": 792,
+        "officialRankInEligible": 347,
+        "annualCombinedRankInSubset": 741
+      },
+      "ttmExperiment": {
+        "revenue": 132083821000000.0,
+        "operatingIncome": 77376098000000.0,
+        "netIncome": 75185616000000.0,
+        "latestCurrentAssets": 106506116000000.0,
+        "latestCurrentLiabilities": 40700530000000.0,
+        "latestPpe": 82051924000000.0,
+        "latestCash": 21166904000000.0,
+        "latestTotalDebt": 58448945000000.0,
+        "experimentalEbitEv": 0.048634,
+        "experimentalReturnOnCapital": 0.523315,
+        "experimentalValueRank": 650,
+        "experimentalProfitabilityRank": 32,
+        "experimentalCombinedRank": 682,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 37610283000000.0,
+          "2025Q4": 19169574000000.0,
+          "2025Q3": 11383390000000.0,
+          "2025Q2": 9212851000000.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 52576287000000.0,
+          "2025Q4": 32826653000000.0,
+          "2025Q3": 24448929000000.0,
+          "2025Q2": 22231952000000.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 63.91,
+        "valueRankChange": -45,
+        "profitabilityRankChange": -14,
+        "combinedRankChange": -59
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS_OFFICIAL_IR_CONFIRMED"
+      ]
+    },
+    {
+      "stockCode": "005930",
+      "companyName": "삼성전자",
+      "industry": "전기·전자",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS_OFFICIAL_IR_CONFIRMED",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 43601051000000.0,
+        "netIncome": null,
+        "currentAssets": 247684612000000.0,
+        "currentLiabilities": 106411348000000.0,
+        "ppe": 215304784000000.0,
+        "cash": 57856378000000.0,
+        "totalDebt": 130621773000000.0,
+        "ebitEv": 0.025073,
+        "returnOnCapital": 0.122276,
+        "valueRank": 827,
+        "profitabilityRank": 501,
+        "combinedRank": 1328,
+        "officialRankInEligible": 693,
+        "annualCombinedRankInSubset": 1230
+      },
+      "ttmExperiment": {
+        "revenue": 388338879000000.0,
+        "operatingIncome": 94148576000000.0,
+        "netIncome": 84209199000000.0,
+        "latestCurrentAssets": 306220075000000.0,
+        "latestCurrentLiabilities": 120603778000000.0,
+        "latestPpe": 217814922000000.0,
+        "latestCash": 73306751000000.0,
+        "latestTotalDebt": 146703628000000.0,
+        "experimentalEbitEv": 0.054121,
+        "experimentalReturnOnCapital": 0.23337,
+        "experimentalValueRank": 608,
+        "experimentalProfitabilityRank": 171,
+        "experimentalCombinedRank": 779,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 57232797000000.0,
+          "2025Q4": 20073660000000.0,
+          "2025Q3": 12166062000000.0,
+          "2025Q2": 4676057000000.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 133873444000000.0,
+          "2025Q4": 93837371000000.0,
+          "2025Q3": 86061747000000.0,
+          "2025Q2": 74566317000000.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 115.93,
+        "valueRankChange": -161,
+        "profitabilityRankChange": -290,
+        "combinedRankChange": -451
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS_OFFICIAL_IR_CONFIRMED"
+      ]
+    },
+    {
+      "stockCode": "461300",
+      "companyName": "아이스크림미디어",
+      "industry": "IT 서비스",
+      "fsDiv": "OFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 61763104721.0,
+        "netIncome": null,
+        "currentAssets": 161230479518.0,
+        "currentLiabilities": 62119409917.0,
+        "ppe": 2593279258.0,
+        "cash": 95402281148.0,
+        "totalDebt": 62380567227.0,
+        "ebitEv": 0.346407,
+        "returnOnCapital": 0.607281,
+        "valueRank": 5,
+        "profitabilityRank": 18,
+        "combinedRank": 23,
+        "officialRankInEligible": 2,
+        "annualCombinedRankInSubset": 22
+      },
+      "ttmExperiment": {
+        "revenue": 197859386461.0,
+        "operatingIncome": 62859625057.0,
+        "netIncome": 49245546506.0,
+        "latestCurrentAssets": 177459753375.0,
+        "latestCurrentLiabilities": 57181231672.0,
+        "latestPpe": 2708544149.0,
+        "latestCash": 86313285744.0,
+        "latestTotalDebt": 58010339250.0,
+        "experimentalEbitEv": 0.343467,
+        "experimentalReturnOnCapital": 0.511108,
+        "experimentalValueRank": 10,
+        "experimentalProfitabilityRank": 35,
+        "experimentalCombinedRank": 45,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": -8427446956.0,
+          "2025Q4": 55295578888.0,
+          "2025Q3": -8066110338.0,
+          "2025Q2": 24057603463.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 15296522137.0,
+          "2025Q4": 102004573403.0,
+          "2025Q3": 15869060983.0,
+          "2025Q2": 64689229938.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 1.78,
+        "valueRankChange": 5,
+        "profitabilityRankChange": 18,
+        "combinedRankChange": 23
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "484870",
+      "companyName": "엠앤씨솔루션",
+      "industry": "기계·장비",
+      "fsDiv": "OFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 56064984646.0,
+        "netIncome": null,
+        "currentAssets": 286657215104.0,
+        "currentLiabilities": 206936291579.0,
+        "ppe": 41598437862.0,
+        "cash": 86234078886.0,
+        "totalDebt": 402948622235.0,
+        "ebitEv": 0.09585,
+        "returnOnCapital": 0.462127,
+        "valueRank": 88,
+        "profitabilityRank": 37,
+        "combinedRank": 125,
+        "officialRankInEligible": 17,
+        "annualCombinedRankInSubset": 123
+      },
+      "ttmExperiment": {
+        "revenue": 394319101229.0,
+        "operatingIncome": 54523842846.0,
+        "netIncome": 43810549908.0,
+        "latestCurrentAssets": 278494222386.0,
+        "latestCurrentLiabilities": 216061985149.0,
+        "latestPpe": 42531837654.0,
+        "latestCash": 86037070153.0,
+        "latestTotalDebt": 217246878489.0,
+        "experimentalEbitEv": 0.136508,
+        "experimentalReturnOnCapital": 0.519452,
+        "experimentalValueRank": 127,
+        "experimentalProfitabilityRank": 34,
+        "experimentalCombinedRank": 161,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 7967176801.0,
+          "2025Q4": 21622025683.0,
+          "2025Q3": 11485417263.0,
+          "2025Q2": 13449223099.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 66076383939.0,
+          "2025Q4": 143225319806.0,
+          "2025Q3": 87590766231.0,
+          "2025Q2": 97426631253.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -2.75,
+        "valueRankChange": 39,
+        "profitabilityRankChange": -1,
+        "combinedRankChange": 38
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "215200",
+      "companyName": "메가스터디교육",
+      "industry": "일반서비스",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 121019655273.0,
+        "netIncome": null,
+        "currentAssets": 252519900261.0,
+        "currentLiabilities": 327572380432.0,
+        "ppe": 274424058994.0,
+        "cash": 66298633028.0,
+        "totalDebt": 896212661192.0,
+        "ebitEv": 0.097608,
+        "returnOnCapital": 0.607006,
+        "valueRank": 85,
+        "profitabilityRank": 19,
+        "combinedRank": 104,
+        "officialRankInEligible": 10,
+        "annualCombinedRankInSubset": 103
+      },
+      "ttmExperiment": {
+        "revenue": 883805030898.0,
+        "operatingIncome": 120802568060.0,
+        "netIncome": 94621944925.0,
+        "latestCurrentAssets": 315706601863.0,
+        "latestCurrentLiabilities": 411259613765.0,
+        "latestPpe": 273924375570.0,
+        "latestCash": 111763012983.0,
+        "latestTotalDebt": 460856680664.0,
+        "experimentalEbitEv": 0.159152,
+        "experimentalReturnOnCapital": 0.677253,
+        "experimentalValueRank": 78,
+        "experimentalProfitabilityRank": 16,
+        "experimentalCombinedRank": 94,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 25983557585.0,
+          "2025Q4": 8976659137.0,
+          "2025Q3": 53184575404.0,
+          "2025Q2": 32657775934.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 236530815386.0,
+          "2025Q4": 196574964423.0,
+          "2025Q3": 249706270448.0,
+          "2025Q2": 200992980641.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -0.18,
+        "valueRankChange": -7,
+        "profitabilityRankChange": -2,
+        "combinedRankChange": -9
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "136490",
+      "companyName": "선진",
+      "industry": "음식료·담배",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 179191482600.0,
+        "netIncome": null,
+        "currentAssets": 703496115858.0,
+        "currentLiabilities": 699938253300.0,
+        "ppe": 460439618768.0,
+        "cash": 144789238320.0,
+        "totalDebt": 1361716299332.0,
+        "ebitEv": 0.123685,
+        "returnOnCapital": 0.386191,
+        "valueRank": 45,
+        "profitabilityRank": 60,
+        "combinedRank": 105,
+        "officialRankInEligible": 11,
+        "annualCombinedRankInSubset": 101
+      },
+      "ttmExperiment": {
+        "revenue": 1972520576633.0,
+        "operatingIncome": 184393205171.0,
+        "netIncome": 120500158988.0,
+        "latestCurrentAssets": 807984771974.0,
+        "latestCurrentLiabilities": 757331491079.0,
+        "latestPpe": 467466695683.0,
+        "latestCash": 210024269315.0,
+        "latestTotalDebt": 857378301204.0,
+        "experimentalEbitEv": 0.209727,
+        "experimentalReturnOnCapital": 0.355889,
+        "experimentalValueRank": 38,
+        "experimentalProfitabilityRank": 76,
+        "experimentalCombinedRank": 114,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 61354366959.0,
+          "2025Q4": 40448373581.0,
+          "2025Q3": 38276773835.0,
+          "2025Q2": 44313690796.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 532971315164.0,
+          "2025Q4": 503297687374.0,
+          "2025Q3": 473244893350.0,
+          "2025Q2": 463006680745.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 2.9,
+        "valueRankChange": -7,
+        "profitabilityRankChange": 20,
+        "combinedRankChange": 13
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "383220",
+      "companyName": "F&F",
+      "industry": "섬유·의류",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 468574150329.0,
+        "netIncome": null,
+        "currentAssets": 942218950011.0,
+        "currentLiabilities": 582824265878.0,
+        "ppe": 421671785628.0,
+        "cash": 325383761882.0,
+        "totalDebt": 2651445897849.0,
+        "ebitEv": 0.088432,
+        "returnOnCapital": 0.599916,
+        "valueRank": 115,
+        "profitabilityRank": 20,
+        "combinedRank": 135,
+        "officialRankInEligible": 20,
+        "annualCombinedRankInSubset": 131
+      },
+      "ttmExperiment": {
+        "revenue": 1989277934399.0,
+        "operatingIncome": 498439762003.0,
+        "netIncome": 515673561882.0,
+        "latestCurrentAssets": 1173650880821.0,
+        "latestCurrentLiabilities": 678079701668.0,
+        "latestPpe": 418325730004.0,
+        "latestCash": 570000265784.0,
+        "latestTotalDebt": 851397734727.0,
+        "experimentalEbitEv": 0.153176,
+        "experimentalReturnOnCapital": 0.5454,
+        "experimentalValueRank": 89,
+        "experimentalProfitabilityRank": 25,
+        "experimentalCombinedRank": 114,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 153481999734.0,
+          "2025Q4": 132908182321.0,
+          "2025Q3": 128019678069.0,
+          "2025Q2": 84029901879.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 560898180961.0,
+          "2025Q4": 575251747519.0,
+          "2025Q3": 474257191766.0,
+          "2025Q2": 378870814153.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": 6.37,
+        "valueRankChange": -23,
+        "profitabilityRankChange": 6,
+        "combinedRankChange": -17
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    },
+    {
+      "stockCode": "052420",
+      "companyName": "오성첨단소재",
+      "industry": "화학",
+      "fsDiv": "CFS",
+      "qualityStatus": "PASS",
+      "annual": {
+        "revenue": null,
+        "operatingIncome": 30123323165.0,
+        "netIncome": null,
+        "currentAssets": 163794869947.0,
+        "currentLiabilities": 30160352424.0,
+        "ppe": 30896507870.0,
+        "cash": 119386860817.0,
+        "totalDebt": 342395987539.0,
+        "ebitEv": 0.097232,
+        "returnOnCapital": 0.183086,
+        "valueRank": 87,
+        "profitabilityRank": 274,
+        "combinedRank": 361,
+        "officialRankInEligible": 111,
+        "annualCombinedRankInSubset": 340
+      },
+      "ttmExperiment": {
+        "revenue": 135864073722.0,
+        "operatingIncome": 25089621455.0,
+        "netIncome": 47236240288.0,
+        "latestCurrentAssets": 92815209189.0,
+        "latestCurrentLiabilities": 26442148823.0,
+        "latestPpe": 17926587897.0,
+        "latestCash": 68454656317.0,
+        "latestTotalDebt": 79683713016.0,
+        "experimentalEbitEv": 0.255938,
+        "experimentalReturnOnCapital": 0.297624,
+        "experimentalValueRank": 21,
+        "experimentalProfitabilityRank": 99,
+        "experimentalCombinedRank": 120,
+        "excludeReason": null,
+        "quarterlyOperatingIncome": {
+          "2026Q1": 3409067442.0,
+          "2025Q4": 7493341985.0,
+          "2025Q3": 7961810053.0,
+          "2025Q2": 6225401975.0
+        },
+        "quarterlyRevenue": {
+          "2026Q1": 11492630182.0,
+          "2025Q4": 42764389880.0,
+          "2025Q3": 41910061450.0,
+          "2025Q2": 39696992210.0
+        }
+      },
+      "comparison": {
+        "operatingIncomeChangePct": -16.71,
+        "valueRankChange": -66,
+        "profitabilityRankChange": -154,
+        "combinedRankChange": -220
+      },
+      "sourceTrace": {
+        "ttmWindow": "2026-07-09",
+        "annualFinancialYear": 2025,
+        "ttmAsOfQuarter": "2026Q1",
+        "latestBsQuarter": "2026Q1(or 2025FY fallback)"
+      },
+      "warningNotes": [
+        "PASS"
+      ]
+    }
+  ],
+  "excludedExamples": [
+    {
+      "stockCode": "439260",
+      "companyName": "대한조선",
+      "qualityStatus": "WARNING_EXTERNAL_CONFIRMATION",
+      "excludeReason": "WARNING_EXTERNAL_CONFIRMATION",
+      "officialCombinedRank": 221
+    },
+    {
+      "stockCode": "259960",
+      "companyName": "크래프톤",
+      "qualityStatus": "WARNING_EXTERNAL_CONFIRMATION",
+      "excludeReason": "WARNING_EXTERNAL_CONFIRMATION",
+      "officialCombinedRank": 260
+    },
+    {
+      "stockCode": "462870",
+      "companyName": "시프트업",
+      "qualityStatus": "WARNING_EXTERNAL_CONFIRMATION",
+      "excludeReason": "WARNING_EXTERNAL_CONFIRMATION",
+      "officialCombinedRank": 264
+    },
+    {
+      "stockCode": "020180",
+      "companyName": "대신정보통신",
+      "qualityStatus": "BLOCKED_DATA_INCONSISTENCY",
+      "excludeReason": "BLOCKED_DATA_INCONSISTENCY",
+      "officialCombinedRank": 839
+    },
+    {
+      "stockCode": "178780",
+      "companyName": "일월지엠엘",
+      "qualityStatus": "BLOCKED_DATA_INCONSISTENCY",
+      "excludeReason": "BLOCKED_DATA_INCONSISTENCY",
+      "officialCombinedRank": 1815
+    }
+  ]
+}
