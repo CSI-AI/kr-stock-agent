@@ -399,13 +399,24 @@ export function MagicTodayPicks({ history, defaultOpen = false }: { history: Rec
   const latest = days[0];
   const buys = latest?.buys ?? [];
   const hasEvidenceMeta = buys.some((b) => b.evMethod || b.financialStatementYear !== null || b.closePrice !== null);
+  // 공식 장부는 사람 승인 후에만 반영된다. 최신 공식 거래일이 데이터 기준일(오늘)보다 과거면
+  // "오늘의 근거"가 아니라 "최근(마지막) 승인 반영 근거"이므로 문구를 구분한다. 날짜/데이터는 그대로 사용.
+  const todayBase = str(history.baseDate);
+  const noNewToday = Boolean(latest?.date && todayBase && latest.date < todayBase);
 
   return (
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: "4px 16px 8px", minWidth: 0 }}>
       <details open={defaultOpen}>
         <summary style={{ cursor: "pointer", listStyle: "revert", padding: "12px 2px 4px", display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "2px 10px" }}>
-          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>오늘의 마법공식 매수 근거</span>
+          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>
+            {noNewToday ? "최근 공식 매수 근거" : "오늘의 마법공식 매수 근거"}
+          </span>
           {latest ? <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</span> : null}
+          {noNewToday ? (
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
+              오늘({fmtDate(todayBase)}) 신규 공식 매수 없음
+            </span>
+          ) : null}
           <span style={{ fontSize: 11.5, color: ACCENT.primary, fontWeight: 700 }}>펼쳐서 종목별 근거 보기</span>
         </summary>
 
@@ -483,8 +494,13 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>공식 운용 현황</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
-            기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
+            공식 반영 기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
+          {str(history.baseDate) && summary.dataDate && summary.dataDate < str(history.baseDate) ? (
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
+              데이터 {fmtDate(str(history.baseDate))} 기준 · 공식 장부는 승인 후 반영
+            </span>
+          ) : null}
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
