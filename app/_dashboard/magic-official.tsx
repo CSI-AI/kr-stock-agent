@@ -59,6 +59,19 @@ function fmtDate(v: unknown): string {
   const m = str(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? `${m[1]}.${m[2]}.${m[3]}` : str(v) || "-";
 }
+// 장부가 실제로 밀렸는지 판정하는 기준일 = 시세 스냅샷이 실제로 쓴 거래일(priceAsOf).
+// baseDate 는 "실행일"이라 주말·휴장일에도 앞서간다. 그걸 기준으로 삼으면 장부가 최신인데도
+// 미반영으로 오탐한다(2026-07-26 일요일: 장부 07-24(금) = 최신인데 baseDate 07-26 이라 오탐).
+// priceAsOf 가 없는 과거 payload 는 baseDate 로 되돌린다.
+function latestTradingDate(history: Rec): string {
+  return str(history.priceAsOf) || str(history.baseDate);
+}
+// 공식 장부 기준일이 최신 거래일보다 과거면 true(= 미반영 거래일 존재).
+function isLedgerBehind(history: Rec, ledgerDate: string): boolean {
+  const latest = latestTradingDate(history);
+  return Boolean(ledgerDate && latest && ledgerDate < latest);
+}
+
 // 내부 sellReason → 사용자 문구.
 function humanizeSellReason(reason: string): string {
   if (/FIFTY_BATCH_FIFO_ROLLOVER|FIFO/i.test(reason)) return "50거래일 보유 후 교체";
@@ -399,10 +412,11 @@ export function MagicTodayPicks({ history, defaultOpen = false }: { history: Rec
   const latest = days[0];
   const buys = latest?.buys ?? [];
   const hasEvidenceMeta = buys.some((b) => b.evMethod || b.financialStatementYear !== null || b.closePrice !== null);
-  // 공식 장부는 사람 승인 후에만 반영된다. 최신 공식 거래일이 데이터 기준일(오늘)보다 과거면
-  // "오늘의 근거"가 아니라 "최근(마지막) 승인 반영 근거"이므로 문구를 구분한다. 날짜/데이터는 그대로 사용.
-  const todayBase = str(history.baseDate);
-  const noNewToday = Boolean(latest?.date && todayBase && latest.date < todayBase);
+  // 최신 공식 거래일이 "최신 거래일(priceAsOf)"보다 과거면 아직 그 거래일이 장부에 안 들어온 것이므로
+  // "오늘의 근거"가 아니라 "최근 반영 근거"로 문구를 구분한다. 주말·휴장일에는 실행일(baseDate)이
+  // 앞서가도 장부는 최신이므로 baseDate 대신 priceAsOf 기준으로 판정한다. 날짜/데이터는 그대로 사용.
+  const latestTrading = latestTradingDate(history);
+  const noNewToday = Boolean(latest?.date && isLedgerBehind(history, latest.date));
 
   return (
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: "4px 16px 8px", minWidth: 0 }}>
@@ -414,7 +428,7 @@ export function MagicTodayPicks({ history, defaultOpen = false }: { history: Rec
           {latest ? <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</span> : null}
           {noNewToday ? (
             <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
-              오늘({fmtDate(todayBase)}) 신규 공식 매수 없음
+              최신 거래일({fmtDate(latestTrading)}) 신규 공식 매수 없음
             </span>
           ) : null}
           <span style={{ fontSize: 11.5, color: ACCENT.primary, fontWeight: 700 }}>펼쳐서 종목별 근거 보기</span>
@@ -486,6 +500,9 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
   const investRate = summary.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
+  // 장부 기준일과 평가가격 기준일은 의미가 달라 분리 표기한다(같은 날이어도 각각 명시).
+  const priceBasis = latestTradingDate(history);
+  const ledgerBehind = isLedgerBehind(history, summary.dataDate);
 
   return (
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
@@ -494,13 +511,22 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>공식 운용 현황</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
-            공식 반영 기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
+            장부 기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
-          {str(history.baseDate) && summary.dataDate && summary.dataDate < str(history.baseDate) ? (
-            <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
-              데이터 {fmtDate(str(history.baseDate))} 기준 · 공식 장부는 승인 후 반영
+          {priceBasis ? (
+            <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
+              평가가격 기준일 {fmtDate(priceBasis)}
             </span>
           ) : null}
+          {ledgerBehind ? (
+            <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
+              최신 거래일 {fmtDate(priceBasis)} 장부 미반영
+            </span>
+          ) : (
+            <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.text, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>
+              최신 장부 반영 완료
+            </span>
+          )}
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
