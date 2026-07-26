@@ -1,4 +1,4 @@
-<#
+﻿<#
   Wababa Auto Publish - 공개 데이터(public/data/recommendation-history.json)만
   안전하게 commit/push 한다. (Phase 41-C)
 
@@ -38,7 +38,14 @@ $LogsDir   = Join-Path $Repo "logs"
 $LogPath   = Join-Path $LogsDir "wababa-auto-publish.log"
 $ErrPath   = Join-Path $LogsDir "wababa-auto-publish-error.log"
 
-if (-not (Test-Path $LogsDir)) { New-Item -ItemType Directory -Path $LogsDir | Out-Null }
+# 내구성 상태 산출물(08:40 Founder 종합보고가 읽는 원천).
+# reports/ 는 REPO1 .gitignore 대상 -> 이 스크립트의 dirty 가드를 건드리지 않고 stage 되지도 않는다.
+$StatusDir  = Join-Path $Repo "reports\wababa"
+$StatusJson = Join-Path $StatusDir "wababa-auto-publish-status-latest.json"
+$StatusMd   = Join-Path $StatusDir "wababa-auto-publish-status-latest.md"
+
+if (-not (Test-Path $LogsDir))   { New-Item -ItemType Directory -Path $LogsDir   | Out-Null }
+if (-not (Test-Path $StatusDir)) { New-Item -ItemType Directory -Path $StatusDir -Force | Out-Null }
 
 function Write-Log([string]$msg) {
   $line = "[{0}] {1}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'), $msg
@@ -46,11 +53,85 @@ function Write-Log([string]$msg) {
   Add-Content -Path $LogPath -Value $line -Encoding utf8
 }
 
+# 매 종료 경로에서 홈페이지 반영 결과를 기록한다(성공·no-change·BLOCKED 모두).
+# 실패해도 본 작업 exit code 를 바꾸지 않는다(보고용 부가 산출물).
+function Write-PublishStatus {
+  param(
+    [string]$Status,                 # PUBLISHED / NO_CHANGE / BLOCKED_<code>
+    [string]$Verdict,                # PASS / BLOCKED
+    [string]$Reason = "",
+    [string]$CommitHash = "",
+    [bool]$Pushed = $false,
+    [bool]$PublicChanged = $false,
+    [string]$FounderAction = "없음"
+  )
+  try {
+    $sum = $null
+    $extractor = Join-Path $PSScriptRoot "extract_public_publish_summary.py"
+    if ($script:pyExe -and (Test-Path -LiteralPath $extractor)) {
+      # PowerShell 5.1 ConvertFrom-Json 은 ROE/roe 중복키에서 실패하므로 Python 으로 평탄 요약을 받는다.
+      $raw = & $script:pyExe @script:pyPre $extractor (Join-Path $Repo $PublicRel) 2>$null
+      if ($LASTEXITCODE -eq 0 -and $raw) { $sum = ($raw | Out-String).Trim() | ConvertFrom-Json }
+    }
+    $o = [ordered]@{
+      verdict                = $Verdict
+      project                = "wababa"
+      stage                  = "AUTO_PUBLISH"
+      status                 = $Status
+      runAt                  = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+      ledgerBasisDate        = if ($sum) { $sum.ledgerBasisDate } else { $null }
+      priceBasisDate         = if ($sum) { $sum.priceBasisDate } else { $null }
+      priceFreshnessStatus   = if ($sum) { $sum.priceFreshnessStatus } else { $null }
+      officialSequence       = if ($sum) { $sum.officialSequence } else { $null }
+      uniqueHoldings         = if ($sum) { $sum.uniqueHoldings } else { $null }
+      totalLots              = if ($sum) { $sum.totalLots } else { $null }
+      totalBuyCount          = if ($sum) { $sum.totalBuyCount } else { $null }
+      totalSellCount         = if ($sum) { $sum.totalSellCount } else { $null }
+      totalAsset             = if ($sum) { $sum.totalAsset } else { $null }
+      availableCash          = if ($sum) { $sum.availableCash } else { $null }
+      latestTradeDate        = if ($sum) { $sum.latestTradeDate } else { $null }
+      latestBuyCount         = if ($sum) { $sum.latestBuyCount } else { $null }
+      latestSellCount        = if ($sum) { $sum.latestSellCount } else { $null }
+      publicChanged          = $PublicChanged
+      commit                 = $CommitHash
+      pushed                 = $Pushed
+      deployTrigger          = if ($Pushed) { "vercel-auto-on-push" } else { "none" }
+      realOrderCount         = 0
+      brokerApiCallCount     = 0
+      smtpCallCount          = 0
+      reason                 = $Reason
+      founderAction          = $FounderAction
+    }
+    $o | ConvertTo-Json -Depth 5 | Out-File -FilePath $StatusJson -Encoding utf8
+    # .md 첫 줄은 반드시 판정 헤더(Report Bridge 가 UNKNOWN 대신 판정을 파싱).
+    $md = @()
+    $md += "전체 판정: $Verdict"
+    $md += ""
+    $md += "[프로젝트] 와바바"
+    $md += "[제목] 홈페이지 공개 데이터 자동반영 (Wababa Auto Publish)"
+    $md += "[실행 시각] $($o.runAt) KST"
+    $md += "[홈페이지 반영] $Status"
+    $md += "[장부 기준일] $($o.ledgerBasisDate)"
+    $md += "[평가가격 기준일] $($o.priceBasisDate)"
+    $md += "[seq] $($o.officialSequence) · 고유 보유종목 $($o.uniqueHoldings) · 누적 lot $($o.totalLots)"
+    $md += "[commit] $(if($CommitHash){$CommitHash}else{'없음'}) · push $(if($Pushed){'완료'}else{'없음'})"
+    $md += "[실주문] 0"
+    $md += "[브로커 호출] 0"
+    if ($Reason) { $md += "[사유] $Reason" }
+    $md += "[대장이 할 일] $FounderAction"
+    $md -join "`r`n" | Out-File -FilePath $StatusMd -Encoding utf8
+  } catch {
+    Write-Host ("[WARN] publish status 기록 실패(본 작업 영향 없음): {0}" -f $_.Exception.Message)
+  }
+}
+
 function Stop-Fail([string]$msg) {
   $line = "[{0}] FAIL: {1}" -f (Get-Date).ToString('yyyy-MM-dd HH:mm:ss'), $msg
   Write-Host $line
   Add-Content -Path $LogPath -Value $line -Encoding utf8
   Add-Content -Path $ErrPath -Value $line -Encoding utf8
+  $code = if ($msg -match '^(BLOCKED_[A-Z_]+)') { $Matches[1] } else { "BLOCKED_PUBLISH" }
+  Write-PublishStatus -Status $code -Verdict "BLOCKED" -Reason $msg -FounderAction "원인 확인 후 Wababa Auto Publish 재실행"
   exit 1
 }
 
@@ -105,8 +186,12 @@ foreach ($bad in @('C:\', 'tradeHistoryPath', 'kr-stock-agent-data-new')) {
   if ($publicText.Contains($bad)) { Stop-Fail "공개 JSON에 금지 문자열 노출: '$bad'" }
 }
 
-# 5) public JSON 변경 없으면 정상 종료
-if (-not $publicChanged) { Write-Log "public JSON 변경 없음 - 작업 종료(정상)"; exit 0 }
+# 5) public JSON 변경 없으면 정상 종료 (거래일이 아니거나 canonical 이 이미 반영된 상태)
+if (-not $publicChanged) {
+  Write-Log "public JSON 변경 없음 - 작업 종료(정상)"
+  Write-PublishStatus -Status "NO_CHANGE" -Verdict "PASS" -Reason "public JSON 변경 없음(이미 최신)"
+  exit 0
+}
 Write-Log "public JSON 변경 감지"
 
 # 6) origin/master 동기화 상태 - diverged/behind 차단
@@ -118,7 +203,12 @@ $ahead  = [int]$counts[1]
 if ($behind -gt 0) { Stop-Fail "로컬이 origin/master보다 $behind 커밋 뒤처짐(diverged) - 수동 동기화 필요" }
 Write-Log "origin 동기화 상태 OK (behind=$behind ahead=$ahead)"
 
-if (-not $Commit) { Write-Log "검사 통과 (Commit 미지정) - stage/commit 생략, 종료"; exit 0 }
+if (-not $Commit) {
+  Write-Log "검사 통과 (Commit 미지정) - stage/commit 생략, 종료"
+  Write-PublishStatus -Status "NO_CHANGE" -Verdict "PASS" -PublicChanged $true `
+    -Reason "검사 전용 실행(-Commit 미지정) - 변경 감지했으나 commit 생략"
+  exit 0
+}
 
 # 7) 단일 파일 stage + 검증 (git 기준 slash 상대경로 사용)
 & git add -- $PublicRel
@@ -134,6 +224,8 @@ if ($staged.Count -eq 0) {
   $eol  = (& git ls-files --eol -- $PublicRel) -join ' | '
   Write-Log "stage 결과 비어 있음 - 실제 내용 변경 없음(EOL/stat 차이로 추정). 커밋 없이 정상 종료."
   Write-Log "진단: status=[$diag] eol=[$eol]"
+  Write-PublishStatus -Status "NO_CHANGE" -Verdict "PASS" `
+    -Reason "실제 내용 변경 없음(EOL/stat 차이) - 커밋 없이 정상 종료"
   exit 0
 }
 
@@ -151,13 +243,20 @@ if ($LASTEXITCODE -ne 0) { Stop-Fail "git commit 실패" }
 $hash = (& git rev-parse --short HEAD).Trim()
 Write-Log "commit 완료: $hash ($commitMsg)"
 
-if (-not $Push) { Write-Log "Push 미지정 - push 생략, 종료"; exit 0 }
+if (-not $Push) {
+  Write-Log "Push 미지정 - push 생략, 종료"
+  Write-PublishStatus -Status "NO_CHANGE" -Verdict "PASS" -PublicChanged $true -CommitHash $hash `
+    -Reason "commit 완료·push 미지정(배포 없음)"
+  exit 0
+}
 
-# 9) push (재시도 없음)
+# 9) push (재시도 없음). push 성공 시에만 Vercel Git 연동 자동배포가 걸린다.
 & git push origin master
 if ($LASTEXITCODE -ne 0) {
-  Stop-Fail "git push 실패 - Git Credential Manager 로그인 필요할 수 있음. 재시도 안 함(commit은 로컬에 남음: $hash)."
+  Stop-Fail "BLOCKED_PUSH_FAILED - git push 실패. Git Credential Manager 로그인 필요할 수 있음. 재시도 안 함(commit은 로컬에 남음: $hash)."
 }
 Write-Log "push 완료: origin/master <- $hash"
+Write-PublishStatus -Status "PUBLISHED" -Verdict "PASS" -PublicChanged $true -CommitHash $hash -Pushed $true `
+  -Reason "public 데이터 commit·push 완료 - Vercel 자동배포 트리거"
 Write-Log "=== Wababa Auto Publish 정상 종료 ==="
 exit 0

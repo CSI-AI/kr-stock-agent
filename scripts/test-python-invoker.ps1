@@ -1,4 +1,4 @@
-# test-python-invoker.ps1  (READ-ONLY regression for the exit-9009 fix)
+﻿# test-python-invoker.ps1  (READ-ONLY regression for the exit-9009 fix)
 # Verifies run-wababa-auto-daily.ps1 resolves a real Python interpreter and does
 # NOT depend on the broken WindowsApps 'python' alias. Uses -ResolveOnly, so the
 # build pipeline (build_recommendation_history.py) and any data write are NOT run.
