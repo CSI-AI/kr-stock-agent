@@ -21,10 +21,16 @@
 [CmdletBinding()]
 param(
   [switch]$Commit,
-  [switch]$Push
+  [switch]$Push,
+  [switch]$ResolveOnly
 )
 
 $ErrorActionPreference = "Stop"
+
+# Resolve-PythonInvoker (exit-9009 fix) — 공용 helper 1개만 dot-source 한다.
+# bare 'python' 은 이 호스트에서 0바이트 WindowsApps 앱실행 별칭 스텁으로만 해결돼
+# 비대화형 스케줄러에서 미해결(exit 9009) 되므로 절대 직접 호출하지 않는다.
+. (Join-Path (Split-Path -Parent $PSScriptRoot) "resolve-python-invoker.ps1")
 
 $Repo      = "C:\work\kr-stock-agent"
 $PublicRel = "public/data/recommendation-history.json"
@@ -50,14 +56,31 @@ function Stop-Fail([string]$msg) {
 
 Set-Location $Repo
 $env:PYTHONIOENCODING = "utf-8"
+
+# 0) Python 인터프리터 견고 해결. 못 찾으면 명확한 BLOCKED + non-zero exit(숨기지 않음).
+#    -ResolveOnly: 해결만 확인하고 종료(gate/stage/commit/push 없음, write 0).
+try {
+  $pyInvoker = Resolve-PythonInvoker
+  $pyExe = $pyInvoker.Exe
+  $pyPre = $pyInvoker.Pre
+} catch {
+  if ($ResolveOnly) { Write-Host ("PYTHON_INVOKER_FAIL: {0}" -f $_.Exception.Message); exit 1 }
+  Stop-Fail ("BLOCKED_PYTHON_INTERPRETER - {0}" -f $_.Exception.Message)
+}
+if ($ResolveOnly) {
+  Write-Host ("PYTHON_INVOKER_OK: {0} {1}" -f $pyExe, ($pyPre -join ' '))
+  exit 0
+}
+
 Write-Log "=== Wababa Auto Publish 시작 (Commit=$Commit Push=$Push) ==="
+Write-Log "python interpreter: $pyExe $($pyPre -join ' ')"
 
 # 1) 브랜치 확인
 $branch = (& git rev-parse --abbrev-ref HEAD 2>$null).Trim()
 if ($branch -ne "master") { Stop-Fail "현재 브랜치가 master가 아님: '$branch'" }
 
 # 2) freshness gate (미반영은 publish 대상이므로 --allow-unpublished)
-& python scripts\qa\check_public_data_freshness.py --allow-unpublished
+& $pyExe @pyPre scripts\qa\check_public_data_freshness.py --allow-unpublished
 if ($LASTEXITCODE -ne 0) { Stop-Fail "freshness gate FAIL (exit $LASTEXITCODE) - 누출/sanitize/원본불일치 의심" }
 Write-Log "freshness gate PASS"
 
@@ -121,7 +144,7 @@ if ($staged.Count -ne 1 -or $staged[0] -ne $PublicRel) {
 Write-Log "staged 확인: $PublicRel (1개)"
 
 # 8) baseDate 기반 commit 메시지
-$baseDate = (& python -c "import json,io;print(json.load(io.open(r'public/data/recommendation-history.json',encoding='utf-8')).get('baseDate',''))").Trim()
+$baseDate = (& $pyExe @pyPre -c "import json,io;print(json.load(io.open(r'public/data/recommendation-history.json',encoding='utf-8')).get('baseDate',''))").Trim()
 $commitMsg = "chore(data): refresh public recommendation history $baseDate".Trim()
 & git commit -m $commitMsg
 if ($LASTEXITCODE -ne 0) { Stop-Fail "git commit 실패" }
