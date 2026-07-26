@@ -1,7 +1,16 @@
-<#
+﻿<#
   "Wababa Auto Publish" 작업 스케줄러 등록 스크립트 (Phase 41-C)
 
-  평일 08:55에 publish-public-data.ps1 -Commit -Push 를 실행하도록 등록한다.
+  평일 17:00에 publish-public-data.ps1 -Commit -Push 를 실행하도록 등록한다.
+  (WABABA-AUTO-PUBLISH-SAME-DAY-SCHEDULE-ALIGNMENT — 구 08:55 계약 폐기)
+
+  왜 17:00 인가: 16:25 Auto Apply 로 canonical 에 그 거래일 장부가 들어간 *직후*,
+  같은 실제 거래일 저녁에 홈페이지 반영을 끝내야 다음 날 08:40 Founder 종합보고가
+  전날 전체 결과(장부+홈페이지+commit/push+배포+라이브검증)를 완결해 담을 수 있다.
+  08:55 는 08:40 보고보다 15분 늦어 항상 미완결이었다.
+
+  "평일" 은 트리거 조건일 뿐이고, 실제 publish 여부는 스크립트 내부 gate 가
+  한국 증시 실제 거래일 + 당일 Auto Apply 선행 완료로 판정한다(휴장일 self-skip).
   기존 "Wababa Auto Daily"(08:45 데이터 생성)는 건드리지 않는다.
 
   안전: 기본은 PREVIEW(등록 내용만 출력, 실제 등록 안 함).
@@ -26,7 +35,7 @@ $ErrorActionPreference = "Stop"
 $TaskName    = "Wababa Auto Publish"
 $Repo        = "C:\work\kr-stock-agent"
 $Script      = Join-Path $Repo "scripts\ops\publish-public-data.ps1"
-$RunAt       = "08:55"
+$RunAt       = "17:00"
 $Days        = @("Monday","Tuesday","Wednesday","Thursday","Friday")
 $Argument    = "-NoProfile -ExecutionPolicy Bypass -File `"$Script`" -Commit -Push"
 
@@ -54,7 +63,9 @@ if ($Unregister) {
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $Argument -WorkingDirectory $Repo
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek $Days -At $RunAt
 $principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
-$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 10)
+# 중복 실행 방지 + 실패 시 당일 내 30분 간격 최대 2회 재시도(§8). 다음 날로 넘기지 않는다 —
+# 넘어가더라도 스크립트 gate 가 "당일 Auto Apply 선행 완료" 를 요구해 자동 publish 되지 않는다.
+$settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 15) -MultipleInstances IgnoreNew -RestartInterval (New-TimeSpan -Minutes 30) -RestartCount 2
 
 if (-not $Apply) {
   Write-Host "[PREVIEW] 실제 등록하지 않았습니다. 등록하려면 -Apply 를 붙여 다시 실행하세요."
@@ -64,7 +75,7 @@ if (-not $Apply) {
 
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger `
   -Principal $principal -Settings $settings `
-  -Description "와바바 공개 데이터 자동 publish (Phase 41-C). 평일 08:55, freshness gate 통과 시 public JSON commit/push." `
+  -Description "와바바 공개 데이터 자동 publish. 평일 17:00(16:25 Auto Apply 이후 같은 거래일). 실제 거래일·Auto Apply 선행 gate 통과 시에만 public JSON commit/push -> Vercel 자동배포 -> 운영 URL 라이브 검증." `
   -Force | Out-Null
 
 Write-Host "'$TaskName' 등록 완료. (평일 $RunAt)"
