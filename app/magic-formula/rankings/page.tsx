@@ -119,7 +119,7 @@ function CombinedTop10({ buys, date, seq }: { buys: MagicOfficialBuyTrade[]; dat
   return (
     <>
       <div style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700, marginBottom: 8 }}>
-        {fmtDate(date)} · {seq}일차 기준 · 종합점수(싼 순위 + 잘버는 순위)가 낮은 순
+        {fmtDate(date)} · {seq}회차 기준 · 종합점수(싼 순위 + 잘버는 순위)가 낮은 순
       </div>
       <div style={{ overflowX: "auto", maxWidth: "100%" }}>
         <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 760 }}>

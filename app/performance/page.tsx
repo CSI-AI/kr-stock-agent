@@ -30,7 +30,7 @@ export default function PerformancePage() {
 
       <section className="dashSection">
         <h2 className="dashSectionTitle">
-          공식 운용 성과 · 보유 {holdings.length} · 운용일 {magicDays.length}
+          공식 운용 성과 · 고유 보유종목 {holdings.length} · 자동반영 {magicDays.length}회차
         </h2>
         <MagicOfficialCard history={history} />
       </section>

@@ -85,7 +85,9 @@ export function toFundView(history: Rec, key: FundKey): FundView {
         totalAsset,
         totalProfit: totalAsset !== null && initial !== null ? totalAsset - initial : null,
         totalProfitRate: num(off.cumulativeReturn),
-        holdingCount: num(off.openItemLotCount) ?? 0,
+        // '보유종목 수' 는 고유 종목 수여야 한다. openItemLotCount 는 날짜별 누적 lot(예: 190)이라
+        // 그대로 쓰면 고유 14종목을 190종목으로 오표시한다. 고유 종목은 portfolio.holdings 길이.
+        holdingCount: arr(obj(history.magicOfficialPortfolio).holdings).length,
         cash,
         cashRate: cash !== null && totalAsset ? (cash / totalAsset) * 100 : null,
       };

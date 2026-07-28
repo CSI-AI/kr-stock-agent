@@ -302,7 +302,7 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>와바바 마법공식 펀드 · 공식 운용</div>
-            <div style={{ fontSize: 12, color: "#94a3b8" }}>공식 시작일 {fmtDate(summary.officialStartDate)} · 공식 {summary.officialSequence}일차</div>
+            <div style={{ fontSize: 12, color: "#94a3b8" }}>공식 시작일 {fmtDate(summary.officialStartDate)} · 자동반영 {summary.officialSequence}회차</div>
           </div>
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: ACCENT.primary, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>운용 중</span>
@@ -357,7 +357,7 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
             <details key={d.date} open={i === 0} style={{ border: "1px solid #e2e8f0", borderRadius: 12, background: "#fff", padding: "0 12px" }}>
               <summary style={{ cursor: "pointer", listStyle: "revert", padding: "11px 2px", display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 10px" }}>
                 <span style={{ fontWeight: 900, color: "#0f172a", fontSize: 14 }}>{fmtDate(d.date)}</span>
-                <span style={{ fontWeight: 800, color: ACCENT.primary, fontSize: 12 }}>{d.officialSequence}일차</span>
+                <span style={{ fontWeight: 800, color: ACCENT.primary, fontSize: 12 }}>{d.officialSequence}회차</span>
                 <span style={{ fontSize: 12.5, color: "#334155", fontWeight: 700 }}>매수 {d.buyCount}건 · 매도 {d.sellCount}건</span>
                 <span style={{ fontSize: 12.5, color: d.sellCount > 0 ? tone(d.realizedProfit) : "#64748b", fontWeight: 700 }}>
                   {d.sellCount > 0 ? `실현손익 ${krwSigned(d.realizedProfit)}` : `매수 ${krw(d.totalBuyAmount)}`}
@@ -425,7 +425,7 @@ export function MagicTodayPicks({ history, defaultOpen = false }: { history: Rec
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>
             {noNewToday ? "최근 공식 매수 근거" : "오늘의 마법공식 매수 근거"}
           </span>
-          {latest ? <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}일차 · 매수 {buys.length}건</span> : null}
+          {latest ? <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>{fmtDate(latest.date)} · {latest.officialSequence}회차 · 매수 {buys.length}건</span> : null}
           {noNewToday ? (
             <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
               최신 거래일({fmtDate(latestTrading)}) 신규 공식 매수 없음
@@ -500,8 +500,16 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
   const investRate = summary.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
-  // 장부 기준일과 평가가격 기준일은 의미가 달라 분리 표기한다(같은 날이어도 각각 명시).
-  const priceBasis = latestTradingDate(history);
+  // 공식 펀드의 평가가격 기준일 = 장부 기준일(= 그 거래일 종가).
+  //   canonical 불변식: 최신 evaluationSnapshot(evalPriceSource=official_close) 의 자산값이
+  //   최신 dailyLedger 와 일치해야만 통과하므로(validate_canonical), 이 카드의 평가액·총자산은
+  //   항상 dataDate 종가 기준이다.
+  //   페이지 최상위 priceAsOf 는 08:45 와바바 일일 파이프라인이 채우는 값이라 당일 종가가 없어
+  //   한 거래일 뒤처진다. 그걸 이 카드의 평가가격 기준일로 쓰면 실제보다 하루 과거로 오표시된다
+  //   (2026-07-28 실사례: 장부·평가는 07-28 종가인데 07-27 로 표시).
+  const evalPriceBasis = summary.dataDate;
+  // 장부 밀림 판정은 계속 priceAsOf(실제 거래일) 기준 — 이건 "새 거래일이 왔는가"를 보는 값이라 맞다.
+  const latestMarketDate = latestTradingDate(history);
   const ledgerBehind = isLedgerBehind(history, summary.dataDate);
 
   return (
@@ -511,16 +519,16 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>공식 운용 현황</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
-            장부 기준일 {fmtDate(summary.dataDate)} · 공식 {summary.officialSequence}일차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
+            장부 기준일 {fmtDate(summary.dataDate)} · 자동반영 {summary.officialSequence}회차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
-          {priceBasis ? (
+          {evalPriceBasis ? (
             <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
-              평가가격 기준일 {fmtDate(priceBasis)}
+              평가가격 기준일 {fmtDate(evalPriceBasis)} 종가
             </span>
           ) : null}
           {ledgerBehind ? (
             <span style={{ fontSize: 11, fontWeight: 800, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 99, padding: "2px 8px" }}>
-              최신 거래일 {fmtDate(priceBasis)} 장부 미반영
+              최신 거래일 {fmtDate(latestMarketDate)} 장부 미반영
             </span>
           ) : (
             <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.text, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>
@@ -536,7 +544,7 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         <OMetric label="총현금" value={krw(summary.totalCash)} />
         <OMetric label="보유평가액" value={krw(summary.holdingsMarketValue)} sub={investRate !== null ? `투자비중 ${investRate.toFixed(1)}%` : undefined} />
         <OMetric label="보유 종목" value={`${holdings.length}개`} sub={`lot ${summary.openItemLotCount}개`} />
-        <OMetric label="운용일" value={`${summary.officialSequence}일`} sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
+        <OMetric label="자동반영 회차" value={`${summary.officialSequence}회`} sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
       </div>
     </section>
   );
@@ -555,7 +563,7 @@ export function MagicNumberBoard({ history }: { history: Rec }) {
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
       <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 3 }}>한눈에 보는 마법공식</div>
       <p style={{ margin: "0 0 12px", fontSize: 12, color: "#94a3b8" }}>
-        {latest ? `${fmtDate(latest.date)} · ${latest.officialSequence}일차 상위 ${buys.length}종목 평균` : "오늘 산출 대기 중"}
+        {latest ? `${fmtDate(latest.date)} · ${latest.officialSequence}회차 상위 ${buys.length}종목 평균` : "오늘 산출 대기 중"}
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(112px, 1fr))", gap: 8 }}>
         <OMetric label="오늘 매수 종목" value={`${buys.length}개`} />

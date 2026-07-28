@@ -49,7 +49,7 @@ export default function StrategyLabPage() {
         <summary className="perfSummary">
           <span className="perfSummaryTitle">마법공식 최근 운용기록</span>
           <span className="perfSummaryMeta">
-            {magicDays.length > 0 ? `최근 ${recentMagic.length}일 · 총 ${magicDays.length}운용일` : "기록 준비 중"}
+            {magicDays.length > 0 ? `최근 ${recentMagic.length}거래일 · 총 ${magicDays.length}회차` : "기록 준비 중"}
           </span>
         </summary>
         <div className="perfBody">
