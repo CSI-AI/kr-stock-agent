@@ -165,6 +165,15 @@ function Stop-Fail {
 
 Set-Location $Repo
 $env:PYTHONIOENCODING = "utf-8"
+# PS 5.1 은 자식 프로세스 stdout 을 [Console]::OutputEncoding 으로 디코딩한다. 바로 위에서
+# Python 에 UTF-8 출력을 시켰으므로 여기도 UTF-8 로 맞추지 않으면 비대화형 스케줄러 기본값
+# (CP949)으로 읽혀 **캡처 순간** 한글이 깨진다. 2026-08-12 실측 피해 두 가지:
+#   ① gate reason 이 "Auto Apply 媛 ?꾩쭅 lock ..." 로 상태 JSON 에 저장돼 08:40 Founder 보고의
+#      "대장이 할 일" 한 줄이 판독 불가가 됐다.
+#   ② CP949 lead byte 가 뒤따르는 '"' 를 삼켜 gate JSON 파싱까지 실패 → 진짜 decision
+#      (BLOCKED_CANONICAL_LEDGER_BEHIND)·founderAction 이 사라지고 일반 fallback 으로 기록됐다.
+# 파일 write 는 전부 -Encoding utf8 을 명시하므로 이 설정의 영향 범위는 자식 stdout 디코딩뿐이다.
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
 # 0) Python 인터프리터 견고 해결. 못 찾으면 명확한 BLOCKED + non-zero exit(숨기지 않음).
 #    -ResolveOnly: 해결만 확인하고 종료(gate/stage/commit/push 없음, write 0).
