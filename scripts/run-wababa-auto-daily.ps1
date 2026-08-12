@@ -1,4 +1,4 @@
-param([switch]$ResolveOnly)
+﻿param([switch]$ResolveOnly)
 
 $ErrorActionPreference = "Stop"
 
@@ -60,6 +60,10 @@ if ($startedAt.TimeOfDay -lt $runTime) {
 try {
   Set-Location $dataDir
   $env:PYTHONIOENCODING = "utf-8"
+  # publish-public-data.ps1 과 같은 이유: PS 5.1 은 자식 stdout 을 [Console]::OutputEncoding 으로
+  # 디코딩한다. 맞추지 않으면 아래 extract_auto_daily_summary.py 캡처에서 한글 종목명·상태가
+  # 깨진 채 wababa-auto-daily-task-last-result.json 에 저장된다(2026-08-12 동일 결함 계열).
+  try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 
   # 인터프리터 견고 해결(bare 'python' -> WindowsApps 스텁 미해결/exit 9009 방지).
   $pyInvoker = Resolve-PythonInvoker
