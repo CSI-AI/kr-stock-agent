@@ -383,14 +383,16 @@ export function MagicHero() {
   return (
     <section style={{ background: `linear-gradient(135deg, ${ACCENT.soft} 0%, #ffffff 100%)`, border: `1px solid ${ACCENT.border}`, borderRadius: 16, padding: "18px 18px 15px", minWidth: 0 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-        <h1 style={{ margin: 0, fontSize: 21, fontWeight: 900, color: ACCENT.text, letterSpacing: "-0.01em" }}>와바바 마법공식펀드</h1>
-        <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.primary, background: "#fff", border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>공개 모의장부</span>
+        <h1 style={{ margin: 0, fontSize: 21, fontWeight: 900, color: ACCENT.text, letterSpacing: "-0.01em" }}>와바바 마법공식 실험실</h1>
+        <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.primary, background: "#fff", border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>공개 모의운용 실험</span>
       </div>
       <p style={{ margin: "0 0 9px", fontSize: 13.5, color: "#334155", lineHeight: 1.6 }}>
-        매일 정해진 공식으로 한국 주식을 고르고, 50실거래일 보유 규칙에 따라 모의 운용하는 공개 장부입니다.
+        좋은 기업을 합리적인 가격에 고르는 <b>하나의 마법공식</b>을, 매수 빈도와 시작 시점만 달리하며
+        장기간 모의운용하고 그 결과를 공개 검증하는 프로젝트입니다.
       </p>
-      <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT.primary, background: "#fff", border: `1px dashed ${ACCENT.border}`, borderRadius: 10, padding: "7px 10px" }}>
-        실주문 아님 · 투자 참고용 · 모든 수익률은 장마감 종가 기준
+      <div style={{ fontSize: 12, fontWeight: 700, color: ACCENT.primary, background: "#fff", border: `1px dashed ${ACCENT.border}`, borderRadius: 10, padding: "7px 10px", lineHeight: 1.55 }}>
+        모의운용 실험입니다 · 투자 권유가 아닙니다 · 실제 주문은 일어나지 않습니다 ·
+        과거·모의 성과는 미래 성과를 보장하지 않습니다
       </div>
     </section>
   );
@@ -496,6 +498,9 @@ function rankAvg(v: number | null): string {
 export function MagicStatusStrip({ history }: { history: Rec }) {
   const summary = parseMagicOfficialSummary(history);
   if (!summary) return null;
+  const bench = parseMagicOfficialBenchmark(history);
+  const benchOk = benchmarkUsable(bench) && bench!.latest !== null;
+  const benchName = bench?.benchmark ?? "KOSPI";
   const days = parseMagicOfficialTradeDays(history);
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
@@ -517,7 +522,8 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
-          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>공식 운용 현황</span>
+          <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>MAGIC FORMULA CORE</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.text, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>운용 중</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
             장부 기준일 {fmtDate(summary.dataDate)} · 자동반영 {summary.officialSequence}회차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
@@ -538,9 +544,19 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
+      {/* 대표 3수치 — 펀드 / 같은 기간 벤치마크 / 초과(%p). source of truth 는 public payload 다. */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginBottom: 8 }}>
+        <OMetric label="누적수익률 (마법공식)" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)}
+                 sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
+        <OMetric label={`같은 기간 ${benchName}`} value={benchOk ? pct(bench!.latest!.benchmarkReturnPct) : "준비 중"}
+                 color={benchOk ? tone(bench!.latest!.benchmarkReturnPct) : undefined}
+                 sub={benchOk ? `${fmtDate(bench!.baseDate)} = 0%` : `${benchName} 비교 데이터 준비 중`} />
+        <OMetric label="초과수익률" value={benchOk ? `${bench!.latest!.excessReturnPctPoint >= 0 ? "+" : ""}${bench!.latest!.excessReturnPctPoint.toFixed(2)}%p` : "준비 중"}
+                 color={benchOk ? tone(bench!.latest!.excessReturnPctPoint) : undefined}
+                 sub={benchOk ? "펀드 − 벤치마크" : undefined} />
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(146px, 1fr))", gap: 8 }}>
         <OMetric label="총자산" value={krw(summary.totalAsset)} />
-        <OMetric label="누적수익률" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)} />
         <OMetric label="총현금" value={krw(summary.totalCash)} />
         <OMetric label="보유평가액" value={krw(summary.holdingsMarketValue)} sub={investRate !== null ? `투자비중 ${investRate.toFixed(1)}%` : undefined} />
         <OMetric label="보유 종목" value={`${holdings.length}개`} sub={`lot ${summary.openItemLotCount}개`} />
@@ -582,6 +598,108 @@ export function MagicNumberBoard({ history }: { history: Rec }) {
 }
 
 // ----- 인라인 SVG 추이 차트(외부 라이브러리 없음) -----
+// ── KOSPI 벤치마크(WABABA-PUBLIC-BENCHMARK-UI-R1) ─────────────────────────────
+// public 의 magicOfficialBenchmark(파생 4번째 키)만 읽는다. 계산은 데이터 계층이 끝냈다.
+// status !== "OK" 면 KOSPI 선을 그리지 않는다 — 0%나 직전값으로 위장하지 않는다.
+export type MagicBenchmarkPoint = { date: string; fundReturnPct: number; benchmarkReturnPct: number; excessReturnPctPoint: number };
+export type MagicOfficialBenchmark = {
+  status: string;
+  benchmark: string | null;
+  baseDate: string | null;
+  series: MagicBenchmarkPoint[];
+  latest: MagicBenchmarkPoint | null;
+  missingBenchmarkDateCount: number;
+};
+
+export function parseMagicOfficialBenchmark(history: Rec): MagicOfficialBenchmark | null {
+  const raw = history?.["magicOfficialBenchmark"];
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Rec;
+  const rows = Array.isArray(o.series) ? (o.series as Rec[]) : [];
+  const series: MagicBenchmarkPoint[] = [];
+  for (const r of rows) {
+    const d = typeof r?.date === "string" ? r.date : null;
+    const f = typeof r?.fundReturnPct === "number" ? r.fundReturnPct : null;
+    const b = typeof r?.benchmarkReturnPct === "number" ? r.benchmarkReturnPct : null;
+    const e = typeof r?.excessReturnPctPoint === "number" ? r.excessReturnPctPoint : null;
+    if (d !== null && f !== null && b !== null && e !== null) {
+      series.push({ date: d, fundReturnPct: f, benchmarkReturnPct: b, excessReturnPctPoint: e });
+    }
+  }
+  const lr = o.latest && typeof o.latest === "object" ? (o.latest as Rec) : null;
+  const latest =
+    lr && typeof lr.date === "string" && typeof lr.fundReturnPct === "number" &&
+    typeof lr.benchmarkReturnPct === "number" && typeof lr.excessReturnPctPoint === "number"
+      ? { date: lr.date, fundReturnPct: lr.fundReturnPct, benchmarkReturnPct: lr.benchmarkReturnPct, excessReturnPctPoint: lr.excessReturnPctPoint }
+      : null;
+  return {
+    status: typeof o.status === "string" ? o.status : "UNKNOWN",
+    benchmark: typeof o.benchmark === "string" ? o.benchmark : null,
+    baseDate: typeof o.baseDate === "string" ? o.baseDate : null,
+    series,
+    latest,
+    missingBenchmarkDateCount: typeof o.missingBenchmarkDateCount === "number" ? o.missingBenchmarkDateCount : 0,
+  };
+}
+
+/** 벤치마크를 실제로 그릴 수 있는 상태인가. status OK + 최소 2점. */
+export function benchmarkUsable(b: MagicOfficialBenchmark | null): boolean {
+  return !!b && b.status === "OK" && b.series.length >= 2;
+}
+
+const FUND_COLOR = "#059669";
+const KOSPI_COLOR = "#64748b";
+
+// 펀드 누적수익률 vs 같은 기간 KOSPI 누적수익률 — **한 그래프 / 같은 %축 / 같은 날짜축**.
+// 두 series 모두 펀드 시작일(D0)=0% 로 정규화된 값을 데이터 계층에서 그대로 받는다.
+function FundVsBenchmarkChart({ series, benchmarkName }: { series: MagicBenchmarkPoint[]; benchmarkName: string }) {
+  const W = 640, H = 210, padL = 46, padR = 12, padT = 12, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const vals = series.flatMap((p) => [p.fundReturnPct, p.benchmarkReturnPct]).concat([0]);
+  let minV = Math.min(...vals), maxV = Math.max(...vals);
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  const pad = (maxV - minV) * 0.12;
+  minV -= pad; maxV += pad;
+  const xp = (i: number) => padL + (series.length <= 1 ? plotW / 2 : (i / (series.length - 1)) * plotW);
+  const yp = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
+  const line = (key: "fundReturnPct" | "benchmarkReturnPct") =>
+    series.map((p, i) => `${i === 0 ? "M" : "L"}${xp(i).toFixed(1)},${yp(p[key]).toFixed(1)}`).join(" ");
+  const mdLabel = (d: string) => { const m = d.match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}/${m[2]}` : d; };
+  const ticks = [maxV, (maxV + minV) / 2, minV];
+  const labelIdx = series.length <= 4 ? series.map((_, i) => i) : [0, Math.round((series.length - 1) / 2), series.length - 1];
+  const sign = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto" }} role="img"
+         aria-label={`마법공식 CORE 누적수익률과 같은 기간 ${benchmarkName} 누적수익률 비교 차트`}>
+      {ticks.map((t, i) => (
+        <g key={i}>
+          <line x1={padL} x2={W - padR} y1={yp(t)} y2={yp(t)} stroke="#eef2f7" strokeWidth="1" />
+          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="9.5">{`${t.toFixed(1)}%`}</text>
+        </g>
+      ))}
+      {/* 0% 기준선 = 두 series 공통 출발점 */}
+      <line x1={padL} x2={W - padR} y1={yp(0)} y2={yp(0)} stroke="#cbd5e1" strokeWidth="1.1" strokeDasharray="4 3" />
+      <path d={line("benchmarkReturnPct")} fill="none" stroke={KOSPI_COLOR} strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={line("fundReturnPct")} fill="none" stroke={FUND_COLOR} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* hover tooltip — date / Fund% / KOSPI% / Excess%p */}
+      {series.map((p, i) => (
+        <g key={p.date}>
+          <circle cx={xp(i)} cy={yp(p.fundReturnPct)} r={i === series.length - 1 ? 3.6 : 1.8} fill={FUND_COLOR} />
+          <circle cx={xp(i)} cy={yp(p.benchmarkReturnPct)} r={i === series.length - 1 ? 3.2 : 1.5} fill={KOSPI_COLOR} />
+          <rect x={xp(i) - (plotW / Math.max(1, series.length)) / 2} y={padT} width={Math.max(4, plotW / Math.max(1, series.length))} height={plotH} fill="transparent">
+            <title>{`${p.date}\n마법공식 ${sign(p.fundReturnPct)}%\n${benchmarkName} ${sign(p.benchmarkReturnPct)}%\n초과 ${sign(p.excessReturnPctPoint)}%p`}</title>
+          </rect>
+        </g>
+      ))}
+      {labelIdx.map((idx, k) => {
+        const anchor: "start" | "middle" | "end" = k === 0 ? "start" : k === labelIdx.length - 1 ? "end" : "middle";
+        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="9.5">{mdLabel(series[idx].date)}</text>;
+      })}
+    </svg>
+  );
+}
+
 type TrendPt = { i: number; label: string; v: number };
 
 function LineTrend({ pts, color, baseline, unit }: { pts: TrendPt[]; color: string; baseline: number | null; unit: "krw" | "pct" }) {
@@ -617,23 +735,28 @@ function LineTrend({ pts, color, baseline, unit }: { pts: TrendPt[]; color: stri
   );
 }
 
-// 총자산 추이 + 누적수익률 추이 + 현금/투자 비중 bar.
+// 성과 그래프는 **하나만** 둔다(WABABA-PUBLIC-BENCHMARK-UI-R1).
+//   이전: 총자산 추이 + 누적수익률 추이 = 같은 성과를 두 번 그리던 구조.
+//   현재: 마법공식 누적수익률 vs 같은 기간 KOSPI 누적수익률(한 그래프·같은 %축·같은 날짜축).
+//   현금/투자 비중 bar 는 성과 그래프가 아니라 자산 구성이라 그대로 둔다(중복 아님).
+//   벤치마크가 없으면 펀드 단일 수익률 선으로 자동 강등한다 — 0%로 위장하지 않는다.
 export function MagicTrendCharts({ history }: { history: Rec }) {
   const summary = parseMagicOfficialSummary(history);
   const days = parseMagicOfficialTradeDays(history);
+  const bench = parseMagicOfficialBenchmark(history);
+  const usable = benchmarkUsable(bench);
   // 최신이 위인 배열 → 시간순(과거→현재)으로 뒤집어 시계열 차트에 사용.
   const chrono = [...days].reverse();
   const mdLabel = (d: string) => { const m = d.match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}/${m[2]}` : d; };
-  const assetPts: TrendPt[] = chrono.filter((d) => d.totalAsset !== null).map((d, i) => ({ i, label: mdLabel(d.date), v: d.totalAsset as number }));
   const retPts: TrendPt[] = chrono.filter((d) => d.cumulativeReturn !== null).map((d, i) => ({ i, label: mdLabel(d.date), v: d.cumulativeReturn as number }));
-  const initial = 50000000;
   const cashRate = summary?.totalAsset && summary.totalCash !== null ? Math.max(0, Math.min(100, (summary.totalCash / summary.totalAsset) * 100)) : null;
   const investRate = cashRate !== null ? 100 - cashRate : null;
+  const benchName = bench?.benchmark ?? "KOSPI";
 
-  if (assetPts.length === 0) {
+  if (retPts.length === 0 && !usable) {
     return (
       <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
-        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>운용 추이</div>
+        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 6 }}>누적수익률 추이</div>
         <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>추이 차트는 운용일이 쌓이면 표시됩니다.</p>
       </section>
     );
@@ -641,19 +764,31 @@ export function MagicTrendCharts({ history }: { history: Rec }) {
 
   return (
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
-      <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", marginBottom: 12 }}>운용 추이</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 4 }}>총자산 추이</div>
-          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>점선 = 초기자본 {krw(initial)}</div>
-          <LineTrend pts={assetPts} color={ACCENT.primary} baseline={initial} unit="krw" />
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+        <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>
+          누적수익률 추이{usable ? ` · 마법공식 vs ${benchName}` : ""}
         </div>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 4 }}>누적수익률 추이</div>
-          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>점선 = 0%(초기자본 기준)</div>
-          <LineTrend pts={retPts} color="#2563eb" baseline={0} unit="pct" />
+        <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700 }}>
+          시작일 {fmtDate(bench?.baseDate ?? summary?.officialStartDate ?? null)} = 0% 기준
         </div>
       </div>
+      {usable ? (
+        <>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 16px", margin: "2px 0 6px", fontSize: 12, fontWeight: 700, color: "#475569" }}>
+            <span><span style={{ display: "inline-block", width: 14, height: 3, borderRadius: 2, background: FUND_COLOR, marginRight: 6, verticalAlign: "middle" }} />마법공식 CORE</span>
+            <span><span style={{ display: "inline-block", width: 14, height: 3, borderRadius: 2, background: KOSPI_COLOR, marginRight: 6, verticalAlign: "middle" }} />{benchName}(같은 기간)</span>
+          </div>
+          <FundVsBenchmarkChart series={bench!.series} benchmarkName={benchName} />
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: 11, color: "#94a3b8", marginBottom: 4 }}>점선 = 0%(초기자본 기준)</div>
+          <LineTrend pts={retPts} color={FUND_COLOR} baseline={0} unit="pct" />
+          <div style={{ marginTop: 6, fontSize: 11.5, fontWeight: 700, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, padding: "5px 9px" }}>
+            {benchName} 비교 데이터 준비 중 — 펀드 성과만 표시합니다.
+          </div>
+        </>
+      )}
       {cashRate !== null && investRate !== null ? (
         <div style={{ marginTop: 14 }}>
           <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", marginBottom: 6 }}>현금 / 투자 비중</div>
