@@ -5,7 +5,7 @@
 
 type Rec = Record<string, unknown>;
 
-const ACCENT = { primary: "#059669", soft: "#ecfdf5", text: "#065f46", border: "#a7f3d0" };
+export const ACCENT = { primary: "#059669", soft: "#ecfdf5", text: "#065f46", border: "#a7f3d0" };
 
 function obj(v: unknown): Rec {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : {};
@@ -31,7 +31,7 @@ function ratioPct(v: number | null): string {
 function fsDivLabel(v: string): string {
   return v === "CFS" ? "연결" : v === "OFS" ? "별도" : "-";
 }
-function krw(v: number | null): string {
+export function krw(v: number | null): string {
   return v === null ? "-" : `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.round(v))}원`;
 }
 // 손익 부호 포함 금액(0원은 "0원").
@@ -41,7 +41,7 @@ function krwSigned(v: number | null): string {
   const body = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 }).format(Math.abs(r));
   return r > 0 ? `+${body}원` : r < 0 ? `-${body}원` : "0원";
 }
-function pct(v: number | null, digits = 2): string {
+export function pct(v: number | null, digits = 2): string {
   if (v === null) return "-";
   const sign = v > 0 ? "+" : "";
   return `${sign}${new Intl.NumberFormat("ko-KR", { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(v)}%`;
@@ -50,12 +50,12 @@ function qty(v: number | null): string {
   return v === null ? "-" : `${new Intl.NumberFormat("ko-KR").format(v)}주`;
 }
 // 한국 시장 관례: 이익(+) 빨강 / 손실(-) 파랑 / 0·결측 회색.
-function tone(v: number | null): string {
+export function tone(v: number | null): string {
   if (v === null || v === 0) return "#0f172a";
   return v > 0 ? "#dc2626" : "#1d4ed8";
 }
 // "2026-06-17" → "2026.06.17" (로케일 무관·hydration 안전).
-function fmtDate(v: unknown): string {
+export function fmtDate(v: unknown): string {
   const m = str(v).match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? `${m[1]}.${m[2]}.${m[3]}` : str(v) || "-";
 }
@@ -195,7 +195,7 @@ export function parseMagicOfficialTradeDays(history: Rec): MagicOfficialTradeDay
 }
 
 // ----- 소형 컴포넌트 -----
-function OMetric({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
+export function OMetric({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
   return (
     <div style={{ background: "#f8fafc", border: "1px solid #eef2f7", borderRadius: 10, padding: "9px 11px", minWidth: 0 }}>
       <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700, whiteSpace: "nowrap" }}>{label}</div>
@@ -653,7 +653,7 @@ const KOSPI_COLOR = "#64748b";
 // 펀드 누적수익률 vs 같은 기간 KOSPI 누적수익률 — **한 그래프 / 같은 %축 / 같은 날짜축**.
 // 두 series 모두 펀드 시작일(D0)=0% 로 정규화된 값을 데이터 계층에서 그대로 받는다.
 function FundVsBenchmarkChart({ series, benchmarkName }: { series: MagicBenchmarkPoint[]; benchmarkName: string }) {
-  const W = 640, H = 210, padL = 46, padR = 12, padT = 12, padB = 28;
+  const W = 640, H = 268, padL = 48, padR = 12, padT = 14, padB = 32;
   const plotW = W - padL - padR, plotH = H - padT - padB;
   const vals = series.flatMap((p) => [p.fundReturnPct, p.benchmarkReturnPct]).concat([0]);
   let minV = Math.min(...vals), maxV = Math.max(...vals);
@@ -675,7 +675,7 @@ function FundVsBenchmarkChart({ series, benchmarkName }: { series: MagicBenchmar
       {ticks.map((t, i) => (
         <g key={i}>
           <line x1={padL} x2={W - padR} y1={yp(t)} y2={yp(t)} stroke="#eef2f7" strokeWidth="1" />
-          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="9.5">{`${t.toFixed(1)}%`}</text>
+          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="11.5">{`${t.toFixed(1)}%`}</text>
         </g>
       ))}
       {/* 0% 기준선 = 두 series 공통 출발점 */}
@@ -694,7 +694,7 @@ function FundVsBenchmarkChart({ series, benchmarkName }: { series: MagicBenchmar
       ))}
       {labelIdx.map((idx, k) => {
         const anchor: "start" | "middle" | "end" = k === 0 ? "start" : k === labelIdx.length - 1 ? "end" : "middle";
-        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="9.5">{mdLabel(series[idx].date)}</text>;
+        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="11.5">{mdLabel(series[idx].date)}</text>;
       })}
     </svg>
   );
@@ -721,7 +721,7 @@ function LineTrend({ pts, color, baseline, unit }: { pts: TrendPt[]; color: stri
       {ticks.map((t, i) => (
         <g key={i}>
           <line x1={padL} x2={W - padR} y1={yp(t)} y2={yp(t)} stroke="#eef2f7" strokeWidth="1" />
-          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="9.5">{fmtY(t)}</text>
+          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="11.5">{fmtY(t)}</text>
         </g>
       ))}
       {baseline !== null ? <line x1={padL} x2={W - padR} y1={yp(baseline)} y2={yp(baseline)} stroke="#cbd5e1" strokeWidth="1.1" strokeDasharray="4 3" /> : null}
@@ -729,7 +729,7 @@ function LineTrend({ pts, color, baseline, unit }: { pts: TrendPt[]; color: stri
       {pts.map((p, i) => <circle key={i} cx={xp(i)} cy={yp(p.v)} r={i === pts.length - 1 ? 3.6 : 2.2} fill={color} />)}
       {labelIdx.map((idx, k) => {
         const anchor: "start" | "middle" | "end" = k === 0 ? "start" : k === labelIdx.length - 1 ? "end" : "middle";
-        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="9.5">{pts[idx].label}</text>;
+        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="11.5">{pts[idx].label}</text>;
       })}
     </svg>
   );
