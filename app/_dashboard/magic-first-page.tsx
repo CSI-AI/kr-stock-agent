@@ -37,11 +37,13 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
   const benchOk = benchmarkUsable(bench) && bench!.latest !== null;
   const benchName = bench?.benchmark ?? "KOSPI";
   const cum = summary.cumulativeReturn;
-  // 보조 지수(KOSPI200)는 **카드를 늘리지 않고** 기존 카드의 보조줄에 얹는다.
-  // Hero 는 의도적으로 단순한 화면이라 카드 증설 없이 숫자만 더 보여준다.
+  // 메인 그래프에 그리는 지수와 **같은 목록**을 카드로도 보여준다. 그래프는
+  // Fund/KOSPI/KOSDAQ 인데 요약만 KOSPI 하나면 두 영역의 benchmark 구성이
+  // 어긋난다. 목록은 payload 의 displayKeys 가 정하므로 지수를 추가·교체해도
+  // 이 컴포넌트는 그대로다(값 하드코딩 0).
   const multi = parseMagicOfficialBenchmarkMulti(history);
   const multiOk = benchmarkMultiUsable(multi);
-  const secondary = multiOk ? multi!.benchmarks.find((b) => b.key !== "kospi") ?? null : null;
+  const shownBenchmarks = multiOk ? multi!.benchmarks : [];
   const signPct = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
 
   return (
@@ -78,24 +80,37 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
 
       {/* 벤치마크 / 초과 / 총자산 — 누적수익률 바로 아래 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
-        <OMetric
-          label={`같은 기간 ${benchName}`}
-          value={benchOk ? pct(bench!.latest!.benchmarkReturnPct) : "준비 중"}
-          color={benchOk ? tone(bench!.latest!.benchmarkReturnPct) : undefined}
-          sub={benchOk
-            ? (secondary ? `${secondary.name} ${signPct(secondary.latestReturnPct)}% · ${fmtDate(bench!.baseDate)} = 0%`
-                         : `${fmtDate(bench!.baseDate)} = 0%`)
-            : undefined}
-        />
-        <OMetric
-          label="초과성과"
-          value={benchOk ? `${bench!.latest!.excessReturnPctPoint >= 0 ? "+" : ""}${bench!.latest!.excessReturnPctPoint.toFixed(2)}%p` : "준비 중"}
-          color={benchOk ? tone(bench!.latest!.excessReturnPctPoint) : undefined}
-          sub={benchOk
-            ? (secondary ? `펀드 − ${benchName} · vs ${secondary.name} ${signPct(secondary.excessPctPoint)}%p`
-                         : `펀드 − ${benchName}`)
-            : undefined}
-        />
+        {shownBenchmarks.length > 0 ? (
+          <>
+            {/* 지수 누적수익률 — 그래프에 그리는 지수와 같은 목록·같은 순서 */}
+            {shownBenchmarks.map((b) => (
+              <OMetric key={b.key} label={`같은 기간 ${b.name}`}
+                       value={pct(b.latestReturnPct)} color={tone(b.latestReturnPct)}
+                       sub={`${fmtDate(multi!.baseDate)} = 0%`} />
+            ))}
+            {/* 초과성과 — 지수별로 하나씩. 어느 지수 대비인지 라벨에 명시한다 */}
+            {shownBenchmarks.map((b) => (
+              <OMetric key={`x-${b.key}`} label={`초과성과 (vs ${b.name})`}
+                       value={`${signPct(b.excessPctPoint)}%p`}
+                       color={tone(b.excessPctPoint)} sub={`펀드 − ${b.name}`} />
+            ))}
+          </>
+        ) : (
+          <>
+            <OMetric
+              label={`같은 기간 ${benchName}`}
+              value={benchOk ? pct(bench!.latest!.benchmarkReturnPct) : "준비 중"}
+              color={benchOk ? tone(bench!.latest!.benchmarkReturnPct) : undefined}
+              sub={benchOk ? `${fmtDate(bench!.baseDate)} = 0%` : undefined}
+            />
+            <OMetric
+              label="초과성과"
+              value={benchOk ? `${signPct(bench!.latest!.excessReturnPctPoint)}%p` : "준비 중"}
+              color={benchOk ? tone(bench!.latest!.excessReturnPctPoint) : undefined}
+              sub={benchOk ? `펀드 − ${benchName}` : undefined}
+            />
+          </>
+        )}
         <OMetric label="총자산" value={krw(summary.totalAsset)} sub="가상 운용자금" />
       </div>
     </section>
