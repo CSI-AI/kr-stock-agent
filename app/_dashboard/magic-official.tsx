@@ -501,6 +501,8 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
   const bench = parseMagicOfficialBenchmark(history);
   const benchOk = benchmarkUsable(bench) && bench!.latest !== null;
   const benchName = bench?.benchmark ?? "KOSPI";
+  const multi = parseMagicOfficialBenchmarkMulti(history);
+  const multiOk = benchmarkMultiUsable(multi);
   const days = parseMagicOfficialTradeDays(history);
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
@@ -548,12 +550,27 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginBottom: 8 }}>
         <OMetric label="누적수익률 (마법공식)" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)}
                  sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
-        <OMetric label={`같은 기간 ${benchName}`} value={benchOk ? pct(bench!.latest!.benchmarkReturnPct) : "준비 중"}
-                 color={benchOk ? tone(bench!.latest!.benchmarkReturnPct) : undefined}
-                 sub={benchOk ? `${fmtDate(bench!.baseDate)} = 0%` : `${benchName} 비교 데이터 준비 중`} />
-        <OMetric label="초과수익률" value={benchOk ? `${bench!.latest!.excessReturnPctPoint >= 0 ? "+" : ""}${bench!.latest!.excessReturnPctPoint.toFixed(2)}%p` : "준비 중"}
-                 color={benchOk ? tone(bench!.latest!.excessReturnPctPoint) : undefined}
-                 sub={benchOk ? "펀드 − 벤치마크" : undefined} />
+        {multiOk ? (
+          multi!.benchmarks.map((b) => (
+            <OMetric key={b.key} label={`같은 기간 ${b.name}`} value={pct(b.latestReturnPct)}
+                     color={tone(b.latestReturnPct)} sub={`${fmtDate(multi!.baseDate)} = 0%`} />
+          ))
+        ) : (
+          <OMetric label={`같은 기간 ${benchName}`} value={benchOk ? pct(bench!.latest!.benchmarkReturnPct) : "준비 중"}
+                   color={benchOk ? tone(bench!.latest!.benchmarkReturnPct) : undefined}
+                   sub={benchOk ? `${fmtDate(bench!.baseDate)} = 0%` : `${benchName} 비교 데이터 준비 중`} />
+        )}
+        {multiOk ? (
+          multi!.benchmarks.map((b) => (
+            <OMetric key={`x-${b.key}`} label={`초과수익률 (vs ${b.name})`}
+                     value={`${b.excessPctPoint >= 0 ? "+" : ""}${b.excessPctPoint.toFixed(2)}%p`}
+                     color={tone(b.excessPctPoint)} sub={`펀드 − ${b.name}`} />
+          ))
+        ) : (
+          <OMetric label="초과수익률" value={benchOk ? `${bench!.latest!.excessReturnPctPoint >= 0 ? "+" : ""}${bench!.latest!.excessReturnPctPoint.toFixed(2)}%p` : "준비 중"}
+                   color={benchOk ? tone(bench!.latest!.excessReturnPctPoint) : undefined}
+                   sub={benchOk ? "펀드 − 벤치마크" : undefined} />
+        )}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(146px, 1fr))", gap: 8 }}>
         <OMetric label="총자산" value={krw(summary.totalAsset)} />
@@ -647,8 +664,75 @@ export function benchmarkUsable(b: MagicOfficialBenchmark | null): boolean {
   return !!b && b.status === "OK" && b.series.length >= 2;
 }
 
+// ── 다중 벤치마크(WABABA-LEGACY50D-KOSPI200-BENCHMARK-ADD-R1) ────────────────
+// magicOfficialBenchmark.multi 는 **추가** 키다. 없으면 기존 2선 비교로 그대로 돌아간다
+// (구 payload 하위호환). 축·기준일은 데이터 계층이 inner join 으로 맞춰서 내려준다.
+export type MagicBenchmarkMultiPoint = { date: string; fundReturnPct: number; values: Record<string, number> };
+export type MagicBenchmarkMultiMeta = { key: string; name: string; latestReturnPct: number; excessPctPoint: number };
+export type MagicOfficialBenchmarkMulti = {
+  status: string;
+  baseDate: string | null;
+  keys: string[];
+  benchmarks: MagicBenchmarkMultiMeta[];
+  series: MagicBenchmarkMultiPoint[];
+  latest: MagicBenchmarkMultiPoint | null;
+};
+
+export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBenchmarkMulti | null {
+  const root = history?.["magicOfficialBenchmark"];
+  if (!root || typeof root !== "object") return null;
+  const raw = (root as Rec)["multi"];
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Rec;
+  const keys = Array.isArray(o.benchmarkKeys) ? (o.benchmarkKeys as unknown[]).filter((k): k is string => typeof k === "string") : [];
+  if (keys.length === 0) return null;
+
+  const metaRows = Array.isArray(o.benchmarks) ? (o.benchmarks as Rec[]) : [];
+  const benchmarks: MagicBenchmarkMultiMeta[] = [];
+  for (const m of metaRows) {
+    const k = typeof m?.key === "string" ? m.key : null;
+    const n = typeof m?.name === "string" ? m.name : null;
+    const lr = typeof m?.latestReturnPct === "number" ? m.latestReturnPct : null;
+    const ex = typeof m?.excessPctPoint === "number" ? m.excessPctPoint : null;
+    if (k !== null && n !== null && lr !== null && ex !== null) benchmarks.push({ key: k, name: n, latestReturnPct: lr, excessPctPoint: ex });
+  }
+
+  const rows = Array.isArray(o.series) ? (o.series as Rec[]) : [];
+  const series: MagicBenchmarkMultiPoint[] = [];
+  for (const r of rows) {
+    const d = typeof r?.date === "string" ? r.date : null;
+    const f = typeof r?.fundReturnPct === "number" ? r.fundReturnPct : null;
+    if (d === null || f === null) continue;
+    const values: Record<string, number> = {};
+    let complete = true;
+    for (const k of keys) {
+      const v = r[`${k}ReturnPct`];
+      if (typeof v === "number") values[k] = v; else complete = false;
+    }
+    // 한 지수라도 값이 없는 날짜는 **버린다**. 직전값·0 으로 채우면 비교가 왜곡된다.
+    if (complete) series.push({ date: d, fundReturnPct: f, values });
+  }
+  return {
+    status: typeof o.status === "string" ? o.status : "UNKNOWN",
+    baseDate: typeof o.baseDate === "string" ? o.baseDate : null,
+    keys, benchmarks, series,
+    latest: series.length > 0 ? series[series.length - 1] : null,
+  };
+}
+
+/** 3선 비교를 그릴 수 있는 상태인가. status OK + 지수 2개 이상 + 최소 2점. */
+export function benchmarkMultiUsable(m: MagicOfficialBenchmarkMulti | null): boolean {
+  return !!m && m.status === "OK" && m.keys.length >= 2 && m.series.length >= 2 && m.benchmarks.length >= 2;
+}
+
 const FUND_COLOR = "#059669";
 const KOSPI_COLOR = "#64748b";
+const KOSPI200_COLOR = "#b45309";
+/** 지수 key → 선 색. 정의되지 않은 key 는 보조색으로 떨어진다. */
+const BENCH_COLORS: Record<string, string> = { kospi: KOSPI_COLOR, kospi200: KOSPI200_COLOR };
+const benchColor = (k: string) => BENCH_COLORS[k] ?? "#94a3b8";
+const BENCH_DASH: Record<string, string> = { kospi: "5 3", kospi200: "2 3" };
+const benchDash = (k: string) => BENCH_DASH[k] ?? "3 3";
 
 // 펀드 누적수익률 vs 같은 기간 KOSPI 누적수익률 — **한 그래프 / 같은 %축 / 같은 날짜축**.
 // 두 series 모두 펀드 시작일(D0)=0% 로 정규화된 값을 데이터 계층에서 그대로 받는다.
@@ -689,6 +773,65 @@ function FundVsBenchmarkChart({ series, benchmarkName }: { series: MagicBenchmar
           <circle cx={xp(i)} cy={yp(p.benchmarkReturnPct)} r={i === series.length - 1 ? 3.2 : 1.5} fill={KOSPI_COLOR} />
           <rect x={xp(i) - (plotW / Math.max(1, series.length)) / 2} y={padT} width={Math.max(4, plotW / Math.max(1, series.length))} height={plotH} fill="transparent">
             <title>{`${p.date}\n마법공식 ${sign(p.fundReturnPct)}%\n${benchmarkName} ${sign(p.benchmarkReturnPct)}%\n초과 ${sign(p.excessReturnPctPoint)}%p`}</title>
+          </rect>
+        </g>
+      ))}
+      {labelIdx.map((idx, k) => {
+        const anchor: "start" | "middle" | "end" = k === 0 ? "start" : k === labelIdx.length - 1 ? "end" : "middle";
+        return <text key={idx} x={xp(idx)} y={H - 9} textAnchor={anchor} fill="#94a3b8" fontSize="11.5">{mdLabel(series[idx].date)}</text>;
+      })}
+    </svg>
+  );
+}
+
+// 펀드 vs 여러 지수 — **한 그래프 / 같은 %축 / 같은 날짜축**.
+// 모든 series 는 같은 기준일(D0)=0% 로 정규화된 값을 데이터 계층에서 그대로 받는다.
+// 펀드 선만 굵게 그리는 것은 가독성 목적이고, 축·기간·정규화는 완전히 동일하다.
+function FundVsBenchmarksChart({ series, benchmarks }: { series: MagicBenchmarkMultiPoint[]; benchmarks: MagicBenchmarkMultiMeta[] }) {
+  const W = 640, H = 268, padL = 48, padR = 12, padT = 14, padB = 32;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const vals = series.flatMap((p) => [p.fundReturnPct, ...benchmarks.map((b) => p.values[b.key])]).filter((v) => typeof v === "number").concat([0]);
+  let minV = Math.min(...vals), maxV = Math.max(...vals);
+  if (minV === maxV) { minV -= 1; maxV += 1; }
+  const pad = (maxV - minV) * 0.12;
+  minV -= pad; maxV += pad;
+  const xp = (i: number) => padL + (series.length <= 1 ? plotW / 2 : (i / (series.length - 1)) * plotW);
+  const yp = (v: number) => padT + ((maxV - v) / (maxV - minV || 1)) * plotH;
+  const fundLine = series.map((p, i) => `${i === 0 ? "M" : "L"}${xp(i).toFixed(1)},${yp(p.fundReturnPct).toFixed(1)}`).join(" ");
+  const benchLine = (key: string) => series.map((p, i) => `${i === 0 ? "M" : "L"}${xp(i).toFixed(1)},${yp(p.values[key]).toFixed(1)}`).join(" ");
+  const mdLabel = (d: string) => { const m = d.match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}/${m[2]}` : d; };
+  const ticks = [maxV, (maxV + minV) / 2, minV];
+  const labelIdx = series.length <= 4 ? series.map((_, i) => i) : [0, Math.round((series.length - 1) / 2), series.length - 1];
+  const sign = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}`;
+  const names = benchmarks.map((b) => b.name).join(", ");
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto" }} role="img"
+         aria-label={`마법공식 CORE 누적수익률과 같은 기간 ${names} 누적수익률 비교 차트`}>
+      {ticks.map((t, i) => (
+        <g key={i}>
+          <line x1={padL} x2={W - padR} y1={yp(t)} y2={yp(t)} stroke="#eef2f7" strokeWidth="1" />
+          <text x={padL - 5} y={yp(t) + 3} textAnchor="end" fill="#94a3b8" fontSize="11.5">{`${t.toFixed(1)}%`}</text>
+        </g>
+      ))}
+      {/* 0% 기준선 = 모든 series 공통 출발점 */}
+      <line x1={padL} x2={W - padR} y1={yp(0)} y2={yp(0)} stroke="#cbd5e1" strokeWidth="1.1" strokeDasharray="4 3" />
+      {benchmarks.map((b) => (
+        <path key={b.key} d={benchLine(b.key)} fill="none" stroke={benchColor(b.key)} strokeWidth="2"
+              strokeDasharray={benchDash(b.key)} strokeLinecap="round" strokeLinejoin="round" />
+      ))}
+      <path d={fundLine} fill="none" stroke={FUND_COLOR} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      {/* hover tooltip — date / Fund% / 각 지수% / 각 초과%p */}
+      {series.map((p, i) => (
+        <g key={p.date}>
+          <circle cx={xp(i)} cy={yp(p.fundReturnPct)} r={i === series.length - 1 ? 3.6 : 1.8} fill={FUND_COLOR} />
+          {benchmarks.map((b) => (
+            <circle key={b.key} cx={xp(i)} cy={yp(p.values[b.key])} r={i === series.length - 1 ? 3.2 : 1.5} fill={benchColor(b.key)} />
+          ))}
+          <rect x={xp(i) - (plotW / Math.max(1, series.length)) / 2} y={padT} width={Math.max(4, plotW / Math.max(1, series.length))} height={plotH} fill="transparent">
+            <title>{[`${p.date}`, `마법공식 ${sign(p.fundReturnPct)}%`,
+                     ...benchmarks.map((b) => `${b.name} ${sign(p.values[b.key])}%`),
+                     ...benchmarks.map((b) => `초과(vs ${b.name}) ${sign(p.fundReturnPct - p.values[b.key])}%p`)].join("\n")}</title>
           </rect>
         </g>
       ))}
@@ -745,6 +888,8 @@ export function MagicTrendCharts({ history }: { history: Rec }) {
   const days = parseMagicOfficialTradeDays(history);
   const bench = parseMagicOfficialBenchmark(history);
   const usable = benchmarkUsable(bench);
+  const multi = parseMagicOfficialBenchmarkMulti(history);
+  const multiOk = benchmarkMultiUsable(multi);
   // 최신이 위인 배열 → 시간순(과거→현재)으로 뒤집어 시계열 차트에 사용.
   const chrono = [...days].reverse();
   const mdLabel = (d: string) => { const m = d.match(/^\d{4}-(\d{2})-(\d{2})/); return m ? `${m[1]}/${m[2]}` : d; };
@@ -766,13 +911,23 @@ export function MagicTrendCharts({ history }: { history: Rec }) {
     <section style={{ background: "#fff", border: "1px solid #e2e8f0", borderTop: `3px solid ${ACCENT.primary}`, borderRadius: 14, padding: 16, minWidth: 0 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
         <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>
-          누적수익률 추이{usable ? ` · 마법공식 vs ${benchName}` : ""}
+          누적수익률 추이{multiOk ? ` · 마법공식 vs ${multi!.benchmarks.map((b) => b.name).join(" vs ")}` : usable ? ` · 마법공식 vs ${benchName}` : ""}
         </div>
         <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 700 }}>
-          시작일 {fmtDate(bench?.baseDate ?? summary?.officialStartDate ?? null)} = 0% 기준
+          시작일 {fmtDate(multi?.baseDate ?? bench?.baseDate ?? summary?.officialStartDate ?? null)} = 0% 기준 · 같은 거래일 축
         </div>
       </div>
-      {usable ? (
+      {multiOk ? (
+        <>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 16px", margin: "2px 0 6px", fontSize: 12, fontWeight: 700, color: "#475569" }}>
+            <span><span style={{ display: "inline-block", width: 14, height: 3, borderRadius: 2, background: FUND_COLOR, marginRight: 6, verticalAlign: "middle" }} />마법공식 CORE</span>
+            {multi!.benchmarks.map((b) => (
+              <span key={b.key}><span style={{ display: "inline-block", width: 14, height: 3, borderRadius: 2, background: benchColor(b.key), marginRight: 6, verticalAlign: "middle" }} />{b.name}(같은 기간)</span>
+            ))}
+          </div>
+          <FundVsBenchmarksChart series={multi!.series} benchmarks={multi!.benchmarks} />
+        </>
+      ) : usable ? (
         <>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 16px", margin: "2px 0 6px", fontSize: 12, fontWeight: 700, color: "#475569" }}>
             <span><span style={{ display: "inline-block", width: 14, height: 3, borderRadius: 2, background: FUND_COLOR, marginRight: 6, verticalAlign: "middle" }} />마법공식 CORE</span>

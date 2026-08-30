@@ -23707,6 +23707,274 @@
       "fundReturnPct": 6.84,
       "benchmarkReturnPct": -23.41,
       "excessReturnPctPoint": 30.25
+    },
+    "multi": {
+      "schemaVersion": "magic-official-benchmark-multi-public-v1",
+      "status": "OK",
+      "baseDate": "2026-06-17",
+      "baseDateShifted": false,
+      "alignment": "INNER_JOIN_FUND_AND_ALL_BENCHMARKS",
+      "benchmarkKeys": [
+        "kospi",
+        "kospi200"
+      ],
+      "droppedDateCount": 0,
+      "benchmarks": [
+        {
+          "key": "kospi",
+          "name": "KOSPI",
+          "code": "1001",
+          "latestReturnPct": -23.41,
+          "excessPctPoint": 30.25,
+          "missingDateCount": 0
+        },
+        {
+          "key": "kospi200",
+          "name": "KOSPI200",
+          "code": "1028",
+          "latestReturnPct": -24.79,
+          "excessPctPoint": 31.63,
+          "missingDateCount": 0
+        }
+      ],
+      "series": [
+        {
+          "date": "2026-06-17",
+          "fundReturnPct": 0.0,
+          "kospiReturnPct": 0.0,
+          "kospi200ReturnPct": 0.0
+        },
+        {
+          "date": "2026-06-19",
+          "fundReturnPct": -0.08,
+          "kospiReturnPct": 2.12,
+          "kospi200ReturnPct": 3.0
+        },
+        {
+          "date": "2026-06-23",
+          "fundReturnPct": -0.34,
+          "kospiReturnPct": -7.45,
+          "kospi200ReturnPct": -6.72
+        },
+        {
+          "date": "2026-06-25",
+          "fundReturnPct": -0.58,
+          "kospiReturnPct": 0.75,
+          "kospi200ReturnPct": 2.62
+        },
+        {
+          "date": "2026-06-26",
+          "fundReturnPct": -0.7,
+          "kospiReturnPct": -5.11,
+          "kospi200ReturnPct": -3.56
+        },
+        {
+          "date": "2026-06-29",
+          "fundReturnPct": -0.88,
+          "kospiReturnPct": -5.3,
+          "kospi200ReturnPct": -4.55
+        },
+        {
+          "date": "2026-06-30",
+          "fundReturnPct": -0.08,
+          "kospiReturnPct": -4.37,
+          "kospi200ReturnPct": -3.26
+        },
+        {
+          "date": "2026-07-01",
+          "fundReturnPct": -0.18,
+          "kospiReturnPct": -6.33,
+          "kospi200ReturnPct": -5.76
+        },
+        {
+          "date": "2026-07-02",
+          "fundReturnPct": 0.1,
+          "kospiReturnPct": -13.72,
+          "kospi200ReturnPct": -13.93
+        },
+        {
+          "date": "2026-07-03",
+          "fundReturnPct": 0.1,
+          "kospiReturnPct": -8.75,
+          "kospi200ReturnPct": -8.3
+        },
+        {
+          "date": "2026-07-07",
+          "fundReturnPct": 0.15,
+          "kospiReturnPct": -13.63,
+          "kospi200ReturnPct": -13.51
+        },
+        {
+          "date": "2026-07-08",
+          "fundReturnPct": -0.31,
+          "kospiReturnPct": -18.25,
+          "kospi200ReturnPct": -18.25
+        },
+        {
+          "date": "2026-07-09",
+          "fundReturnPct": -1.32,
+          "kospiReturnPct": -17.74,
+          "kospi200ReturnPct": -17.45
+        },
+        {
+          "date": "2026-07-21",
+          "fundReturnPct": -1.75,
+          "kospiReturnPct": -23.87,
+          "kospi200ReturnPct": -24.25
+        },
+        {
+          "date": "2026-07-22",
+          "fundReturnPct": -1.36,
+          "kospiReturnPct": -23.31,
+          "kospi200ReturnPct": -23.77
+        },
+        {
+          "date": "2026-07-23",
+          "fundReturnPct": -1.17,
+          "kospiReturnPct": -19.94,
+          "kospi200ReturnPct": -20.51
+        },
+        {
+          "date": "2026-07-24",
+          "fundReturnPct": -0.08,
+          "kospiReturnPct": -24.52,
+          "kospi200ReturnPct": -25.5
+        },
+        {
+          "date": "2026-07-27",
+          "fundReturnPct": -0.38,
+          "kospiReturnPct": -23.79,
+          "kospi200ReturnPct": -24.54
+        },
+        {
+          "date": "2026-07-28",
+          "fundReturnPct": -0.95,
+          "kospiReturnPct": -32.05,
+          "kospi200ReturnPct": -33.26
+        },
+        {
+          "date": "2026-07-29",
+          "fundReturnPct": -2.31,
+          "kospiReturnPct": -36.11,
+          "kospi200ReturnPct": -37.39
+        },
+        {
+          "date": "2026-07-30",
+          "fundReturnPct": -5.52,
+          "kospiReturnPct": -36.9,
+          "kospi200ReturnPct": -38.43
+        },
+        {
+          "date": "2026-07-31",
+          "fundReturnPct": -2.97,
+          "kospiReturnPct": -25.59,
+          "kospi200ReturnPct": -26.12
+        },
+        {
+          "date": "2026-08-03",
+          "fundReturnPct": -1.77,
+          "kospiReturnPct": -29.41,
+          "kospi200ReturnPct": -30.36
+        },
+        {
+          "date": "2026-08-04",
+          "fundReturnPct": -0.25,
+          "kospiReturnPct": -28.26,
+          "kospi200ReturnPct": -29.42
+        },
+        {
+          "date": "2026-08-05",
+          "fundReturnPct": 2.02,
+          "kospiReturnPct": -25.56,
+          "kospi200ReturnPct": -26.7
+        },
+        {
+          "date": "2026-08-06",
+          "fundReturnPct": 3.54,
+          "kospiReturnPct": -28.97,
+          "kospi200ReturnPct": -30.63
+        },
+        {
+          "date": "2026-08-07",
+          "fundReturnPct": 3.5,
+          "kospiReturnPct": -29.39,
+          "kospi200ReturnPct": -31.21
+        },
+        {
+          "date": "2026-08-10",
+          "fundReturnPct": 3.56,
+          "kospiReturnPct": -28.93,
+          "kospi200ReturnPct": -30.99
+        },
+        {
+          "date": "2026-08-11",
+          "fundReturnPct": 5.4,
+          "kospiReturnPct": -28.41,
+          "kospi200ReturnPct": -30.32
+        },
+        {
+          "date": "2026-08-12",
+          "fundReturnPct": 6.24,
+          "kospiReturnPct": -25.78,
+          "kospi200ReturnPct": -27.35
+        },
+        {
+          "date": "2026-08-13",
+          "fundReturnPct": 6.2,
+          "kospiReturnPct": -23.14,
+          "kospi200ReturnPct": -24.4
+        },
+        {
+          "date": "2026-08-14",
+          "fundReturnPct": 4.43,
+          "kospiReturnPct": -21.28,
+          "kospi200ReturnPct": -22.5
+        },
+        {
+          "date": "2026-08-18",
+          "fundReturnPct": 4.82,
+          "kospiReturnPct": -22.5,
+          "kospi200ReturnPct": -23.64
+        },
+        {
+          "date": "2026-08-19",
+          "fundReturnPct": 1.68,
+          "kospiReturnPct": -27.0,
+          "kospi200ReturnPct": -28.54
+        },
+        {
+          "date": "2026-08-25",
+          "fundReturnPct": 5.5,
+          "kospiReturnPct": -23.93,
+          "kospi200ReturnPct": -25.14
+        },
+        {
+          "date": "2026-08-26",
+          "fundReturnPct": 6.46,
+          "kospiReturnPct": -23.19,
+          "kospi200ReturnPct": -24.4
+        },
+        {
+          "date": "2026-08-27",
+          "fundReturnPct": 6.94,
+          "kospiReturnPct": -22.02,
+          "kospi200ReturnPct": -23.17
+        },
+        {
+          "date": "2026-08-28",
+          "fundReturnPct": 6.84,
+          "kospiReturnPct": -23.41,
+          "kospi200ReturnPct": -24.79
+        }
+      ],
+      "latest": {
+        "date": "2026-08-28",
+        "fundReturnPct": 6.84,
+        "kospiReturnPct": -23.41,
+        "kospi200ReturnPct": -24.79,
+        "excessVsKospiPctPoint": 30.25,
+        "excessVsKospi200PctPoint": 31.63
+      }
     }
   }
 }
