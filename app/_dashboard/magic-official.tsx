@@ -667,7 +667,7 @@ export function benchmarkUsable(b: MagicOfficialBenchmark | null): boolean {
 // ── 다중 벤치마크(WABABA-LEGACY50D-KOSPI200-BENCHMARK-ADD-R1) ────────────────
 // magicOfficialBenchmark.multi 는 **추가** 키다. 없으면 기존 2선 비교로 그대로 돌아간다
 // (구 payload 하위호환). 축·기준일은 데이터 계층이 inner join 으로 맞춰서 내려준다.
-export type MagicBenchmarkMultiPoint = { date: string; fundReturnPct: number; values: Record<string, number> };
+export type MagicBenchmarkMultiPoint = { date: string; fundReturnPct: number; values: Record<string, number>; excess: Record<string, number> };
 export type MagicBenchmarkMultiMeta = { key: string; name: string; latestReturnPct: number; excessPctPoint: number };
 export type MagicOfficialBenchmarkMulti = {
   status: string;
@@ -687,6 +687,10 @@ export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBen
   const keys = Array.isArray(o.benchmarkKeys) ? (o.benchmarkKeys as unknown[]).filter((k): k is string => typeof k === "string") : [];
   if (keys.length === 0) return null;
 
+  // displayKeys 가 없으면(구 payload) 전체를 표시한다 — 하위호환.
+  const displayKeys = Array.isArray(o.displayKeys)
+    ? (o.displayKeys as unknown[]).filter((k): k is string => typeof k === "string")
+    : keys;
   const metaRows = Array.isArray(o.benchmarks) ? (o.benchmarks as Rec[]) : [];
   const benchmarks: MagicBenchmarkMultiMeta[] = [];
   for (const m of metaRows) {
@@ -694,9 +698,14 @@ export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBen
     const n = typeof m?.name === "string" ? m.name : null;
     const lr = typeof m?.latestReturnPct === "number" ? m.latestReturnPct : null;
     const ex = typeof m?.excessPctPoint === "number" ? m.excessPctPoint : null;
-    if (k !== null && n !== null && lr !== null && ex !== null) benchmarks.push({ key: k, name: n, latestReturnPct: lr, excessPctPoint: ex });
+    if (k === null || n === null || lr === null || ex === null) continue;
+    // display 플래그가 명시돼 있으면 그것을, 없으면 displayKeys 포함 여부를 쓴다.
+    const shown = typeof m?.display === "boolean" ? m.display : displayKeys.includes(k);
+    if (!shown) continue;   // 값은 payload 에 남아 있고 **표시만** 끈다
+    benchmarks.push({ key: k, name: n, latestReturnPct: lr, excessPctPoint: ex });
   }
 
+  const shownKeys = new Set(benchmarks.map((b) => b.key));
   const rows = Array.isArray(o.series) ? (o.series as Rec[]) : [];
   const series: MagicBenchmarkMultiPoint[] = [];
   for (const r of rows) {
@@ -704,18 +713,26 @@ export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBen
     const f = typeof r?.fundReturnPct === "number" ? r.fundReturnPct : null;
     if (d === null || f === null) continue;
     const values: Record<string, number> = {};
+    const excess: Record<string, number> = {};
     let complete = true;
     for (const k of keys) {
       const v = r[`${k}ReturnPct`];
-      if (typeof v === "number") values[k] = v; else complete = false;
+      if (typeof v === "number") values[k] = v;
+      else if (shownKeys.has(k)) complete = false;   // 표시 안 하는 지수 결측은 무시
+      // 초과수익은 데이터 계층이 **반올림 전 값**으로 계산해 내려준 것을 그대로 쓴다.
+      // 여기서 다시 빼면 요약 카드와 0.01 이 어긋난다(실측: KOSDAQ 25.59 vs 25.60).
+      // 구 payload 에 없으면 계산으로 fallback 한다.
+      const ex = r[`excessVs${k.slice(0, 1).toUpperCase()}${k.slice(1)}PctPoint`];
+      if (typeof ex === "number") excess[k] = ex;
+      else if (typeof v === "number") excess[k] = f - v;
     }
     // 한 지수라도 값이 없는 날짜는 **버린다**. 직전값·0 으로 채우면 비교가 왜곡된다.
-    if (complete) series.push({ date: d, fundReturnPct: f, values });
+    if (complete) series.push({ date: d, fundReturnPct: f, values, excess });
   }
   return {
     status: typeof o.status === "string" ? o.status : "UNKNOWN",
     baseDate: typeof o.baseDate === "string" ? o.baseDate : null,
-    keys, benchmarks, series,
+    keys: keys.filter((k) => shownKeys.has(k)), benchmarks, series,
     latest: series.length > 0 ? series[series.length - 1] : null,
   };
 }
@@ -729,9 +746,10 @@ const FUND_COLOR = "#059669";
 const KOSPI_COLOR = "#64748b";
 const KOSPI200_COLOR = "#b45309";
 /** 지수 key → 선 색. 정의되지 않은 key 는 보조색으로 떨어진다. */
-const BENCH_COLORS: Record<string, string> = { kospi: KOSPI_COLOR, kospi200: KOSPI200_COLOR };
+const KOSDAQ_COLOR = "#7c3aed";
+const BENCH_COLORS: Record<string, string> = { kospi: KOSPI_COLOR, kospi200: KOSPI200_COLOR, kosdaq: KOSDAQ_COLOR };
 const benchColor = (k: string) => BENCH_COLORS[k] ?? "#94a3b8";
-const BENCH_DASH: Record<string, string> = { kospi: "5 3", kospi200: "2 3" };
+const BENCH_DASH: Record<string, string> = { kospi: "5 3", kospi200: "2 3", kosdaq: "1 4" };
 const benchDash = (k: string) => BENCH_DASH[k] ?? "3 3";
 
 // 펀드 누적수익률 vs 같은 기간 KOSPI 누적수익률 — **한 그래프 / 같은 %축 / 같은 날짜축**.
@@ -831,7 +849,7 @@ function FundVsBenchmarksChart({ series, benchmarks }: { series: MagicBenchmarkM
           <rect x={xp(i) - (plotW / Math.max(1, series.length)) / 2} y={padT} width={Math.max(4, plotW / Math.max(1, series.length))} height={plotH} fill="transparent">
             <title>{[`${p.date}`, `마법공식 ${sign(p.fundReturnPct)}%`,
                      ...benchmarks.map((b) => `${b.name} ${sign(p.values[b.key])}%`),
-                     ...benchmarks.map((b) => `초과(vs ${b.name}) ${sign(p.fundReturnPct - p.values[b.key])}%p`)].join("\n")}</title>
+                     ...benchmarks.map((b) => `초과(vs ${b.name}) ${sign(p.excess?.[b.key] ?? (p.fundReturnPct - p.values[b.key]))}%p`)].join("\n")}</title>
           </rect>
         </g>
       ))}

@@ -23716,7 +23716,12 @@
       "alignment": "INNER_JOIN_FUND_AND_ALL_BENCHMARKS",
       "benchmarkKeys": [
         "kospi",
+        "kosdaq",
         "kospi200"
+      ],
+      "displayKeys": [
+        "kospi",
+        "kosdaq"
       ],
       "droppedDateCount": 0,
       "benchmarks": [
@@ -23726,7 +23731,17 @@
           "code": "1001",
           "latestReturnPct": -23.41,
           "excessPctPoint": 30.25,
-          "missingDateCount": 0
+          "missingDateCount": 0,
+          "display": true
+        },
+        {
+          "key": "kosdaq",
+          "name": "KOSDAQ",
+          "code": "2001",
+          "latestReturnPct": -18.76,
+          "excessPctPoint": 25.59,
+          "missingDateCount": 0,
+          "display": true
         },
         {
           "key": "kospi200",
@@ -23734,7 +23749,8 @@
           "code": "1028",
           "latestReturnPct": -24.79,
           "excessPctPoint": 31.63,
-          "missingDateCount": 0
+          "missingDateCount": 0,
+          "display": false
         }
       ],
       "series": [
@@ -23742,237 +23758,391 @@
           "date": "2026-06-17",
           "fundReturnPct": 0.0,
           "kospiReturnPct": 0.0,
-          "kospi200ReturnPct": 0.0
+          "excessVsKospiPctPoint": 0.0,
+          "kosdaqReturnPct": 0.0,
+          "excessVsKosdaqPctPoint": 0.0,
+          "kospi200ReturnPct": 0.0,
+          "excessVsKospi200PctPoint": 0.0
         },
         {
           "date": "2026-06-19",
           "fundReturnPct": -0.08,
           "kospiReturnPct": 2.12,
-          "kospi200ReturnPct": 3.0
+          "excessVsKospiPctPoint": -2.2,
+          "kosdaqReturnPct": -6.33,
+          "excessVsKosdaqPctPoint": 6.26,
+          "kospi200ReturnPct": 3.0,
+          "excessVsKospi200PctPoint": -3.08
         },
         {
           "date": "2026-06-23",
           "fundReturnPct": -0.34,
           "kospiReturnPct": -7.45,
-          "kospi200ReturnPct": -6.72
+          "excessVsKospiPctPoint": 7.11,
+          "kosdaqReturnPct": -13.61,
+          "excessVsKosdaqPctPoint": 13.27,
+          "kospi200ReturnPct": -6.72,
+          "excessVsKospi200PctPoint": 6.39
         },
         {
           "date": "2026-06-25",
           "fundReturnPct": -0.58,
           "kospiReturnPct": 0.75,
-          "kospi200ReturnPct": 2.62
+          "excessVsKospiPctPoint": -1.32,
+          "kosdaqReturnPct": -13.97,
+          "excessVsKosdaqPctPoint": 13.39,
+          "kospi200ReturnPct": 2.62,
+          "excessVsKospi200PctPoint": -3.2
         },
         {
           "date": "2026-06-26",
           "fundReturnPct": -0.7,
           "kospiReturnPct": -5.11,
-          "kospi200ReturnPct": -3.56
+          "excessVsKospiPctPoint": 4.41,
+          "kosdaqReturnPct": -17.5,
+          "excessVsKosdaqPctPoint": 16.8,
+          "kospi200ReturnPct": -3.56,
+          "excessVsKospi200PctPoint": 2.86
         },
         {
           "date": "2026-06-29",
           "fundReturnPct": -0.88,
           "kospiReturnPct": -5.3,
-          "kospi200ReturnPct": -4.55
+          "excessVsKospiPctPoint": 4.42,
+          "kosdaqReturnPct": -10.79,
+          "excessVsKosdaqPctPoint": 9.91,
+          "kospi200ReturnPct": -4.55,
+          "excessVsKospi200PctPoint": 3.67
         },
         {
           "date": "2026-06-30",
           "fundReturnPct": -0.08,
           "kospiReturnPct": -4.37,
-          "kospi200ReturnPct": -3.26
+          "excessVsKospiPctPoint": 4.29,
+          "kosdaqReturnPct": -11.22,
+          "excessVsKosdaqPctPoint": 11.14,
+          "kospi200ReturnPct": -3.26,
+          "excessVsKospi200PctPoint": 3.18
         },
         {
           "date": "2026-07-01",
           "fundReturnPct": -0.18,
           "kospiReturnPct": -6.33,
-          "kospi200ReturnPct": -5.76
+          "excessVsKospiPctPoint": 6.14,
+          "kosdaqReturnPct": -9.94,
+          "excessVsKosdaqPctPoint": 9.76,
+          "kospi200ReturnPct": -5.76,
+          "excessVsKospi200PctPoint": 5.58
         },
         {
           "date": "2026-07-02",
           "fundReturnPct": 0.1,
           "kospiReturnPct": -13.72,
-          "kospi200ReturnPct": -13.93
+          "excessVsKospiPctPoint": 13.82,
+          "kosdaqReturnPct": -16.01,
+          "excessVsKosdaqPctPoint": 16.12,
+          "kospi200ReturnPct": -13.93,
+          "excessVsKospi200PctPoint": 14.03
         },
         {
           "date": "2026-07-03",
           "fundReturnPct": 0.1,
           "kospiReturnPct": -8.75,
-          "kospi200ReturnPct": -8.3
+          "excessVsKospiPctPoint": 8.85,
+          "kosdaqReturnPct": -15.85,
+          "excessVsKosdaqPctPoint": 15.95,
+          "kospi200ReturnPct": -8.3,
+          "excessVsKospi200PctPoint": 8.4
         },
         {
           "date": "2026-07-07",
           "fundReturnPct": 0.15,
           "kospiReturnPct": -13.63,
-          "kospi200ReturnPct": -13.51
+          "excessVsKospiPctPoint": 13.78,
+          "kosdaqReturnPct": -19.45,
+          "excessVsKosdaqPctPoint": 19.6,
+          "kospi200ReturnPct": -13.51,
+          "excessVsKospi200PctPoint": 13.66
         },
         {
           "date": "2026-07-08",
           "fundReturnPct": -0.31,
           "kospiReturnPct": -18.25,
-          "kospi200ReturnPct": -18.25
+          "excessVsKospiPctPoint": 17.94,
+          "kosdaqReturnPct": -23.93,
+          "excessVsKosdaqPctPoint": 23.63,
+          "kospi200ReturnPct": -18.25,
+          "excessVsKospi200PctPoint": 17.94
         },
         {
           "date": "2026-07-09",
           "fundReturnPct": -1.32,
           "kospiReturnPct": -17.74,
-          "kospi200ReturnPct": -17.45
+          "excessVsKospiPctPoint": 16.42,
+          "kosdaqReturnPct": -23.06,
+          "excessVsKosdaqPctPoint": 21.74,
+          "kospi200ReturnPct": -17.45,
+          "excessVsKospi200PctPoint": 16.13
         },
         {
           "date": "2026-07-21",
           "fundReturnPct": -1.75,
           "kospiReturnPct": -23.87,
-          "kospi200ReturnPct": -24.25
+          "excessVsKospiPctPoint": 22.13,
+          "kosdaqReturnPct": -27.0,
+          "excessVsKosdaqPctPoint": 25.25,
+          "kospi200ReturnPct": -24.25,
+          "excessVsKospi200PctPoint": 22.5
         },
         {
           "date": "2026-07-22",
           "fundReturnPct": -1.36,
           "kospiReturnPct": -23.31,
-          "kospi200ReturnPct": -23.77
+          "excessVsKospiPctPoint": 21.96,
+          "kosdaqReturnPct": -27.22,
+          "excessVsKosdaqPctPoint": 25.86,
+          "kospi200ReturnPct": -23.77,
+          "excessVsKospi200PctPoint": 22.41
         },
         {
           "date": "2026-07-23",
           "fundReturnPct": -1.17,
           "kospiReturnPct": -19.94,
-          "kospi200ReturnPct": -20.51
+          "excessVsKospiPctPoint": 18.77,
+          "kosdaqReturnPct": -23.42,
+          "excessVsKosdaqPctPoint": 22.25,
+          "kospi200ReturnPct": -20.51,
+          "excessVsKospi200PctPoint": 19.34
         },
         {
           "date": "2026-07-24",
           "fundReturnPct": -0.08,
           "kospiReturnPct": -24.52,
-          "kospi200ReturnPct": -25.5
+          "excessVsKospiPctPoint": 24.44,
+          "kosdaqReturnPct": -27.5,
+          "excessVsKosdaqPctPoint": 27.42,
+          "kospi200ReturnPct": -25.5,
+          "excessVsKospi200PctPoint": 25.43
         },
         {
           "date": "2026-07-27",
           "fundReturnPct": -0.38,
           "kospiReturnPct": -23.79,
-          "kospi200ReturnPct": -24.54
+          "excessVsKospiPctPoint": 23.4,
+          "kosdaqReturnPct": -25.88,
+          "excessVsKosdaqPctPoint": 25.5,
+          "kospi200ReturnPct": -24.54,
+          "excessVsKospi200PctPoint": 24.16
         },
         {
           "date": "2026-07-28",
           "fundReturnPct": -0.95,
           "kospiReturnPct": -32.05,
-          "kospi200ReturnPct": -33.26
+          "excessVsKospiPctPoint": 31.1,
+          "kosdaqReturnPct": -31.6,
+          "excessVsKosdaqPctPoint": 30.65,
+          "kospi200ReturnPct": -33.26,
+          "excessVsKospi200PctPoint": 32.31
         },
         {
           "date": "2026-07-29",
           "fundReturnPct": -2.31,
           "kospiReturnPct": -36.11,
-          "kospi200ReturnPct": -37.39
+          "excessVsKospiPctPoint": 33.81,
+          "kosdaqReturnPct": -35.78,
+          "excessVsKosdaqPctPoint": 33.48,
+          "kospi200ReturnPct": -37.39,
+          "excessVsKospi200PctPoint": 35.08
         },
         {
           "date": "2026-07-30",
           "fundReturnPct": -5.52,
           "kospiReturnPct": -36.9,
-          "kospi200ReturnPct": -38.43
+          "excessVsKospiPctPoint": 31.38,
+          "kosdaqReturnPct": -37.52,
+          "excessVsKosdaqPctPoint": 32.0,
+          "kospi200ReturnPct": -38.43,
+          "excessVsKospi200PctPoint": 32.91
         },
         {
           "date": "2026-07-31",
           "fundReturnPct": -2.97,
           "kospiReturnPct": -25.59,
-          "kospi200ReturnPct": -26.12
+          "excessVsKospiPctPoint": 22.62,
+          "kosdaqReturnPct": -30.25,
+          "excessVsKosdaqPctPoint": 27.28,
+          "kospi200ReturnPct": -26.12,
+          "excessVsKospi200PctPoint": 23.15
         },
         {
           "date": "2026-08-03",
           "fundReturnPct": -1.77,
           "kospiReturnPct": -29.41,
-          "kospi200ReturnPct": -30.36
+          "excessVsKospiPctPoint": 27.64,
+          "kosdaqReturnPct": -28.55,
+          "excessVsKosdaqPctPoint": 26.78,
+          "kospi200ReturnPct": -30.36,
+          "excessVsKospi200PctPoint": 28.6
         },
         {
           "date": "2026-08-04",
           "fundReturnPct": -0.25,
           "kospiReturnPct": -28.26,
-          "kospi200ReturnPct": -29.42
+          "excessVsKospiPctPoint": 28.01,
+          "kosdaqReturnPct": -24.35,
+          "excessVsKosdaqPctPoint": 24.1,
+          "kospi200ReturnPct": -29.42,
+          "excessVsKospi200PctPoint": 29.18
         },
         {
           "date": "2026-08-05",
           "fundReturnPct": 2.02,
           "kospiReturnPct": -25.56,
-          "kospi200ReturnPct": -26.7
+          "excessVsKospiPctPoint": 27.58,
+          "kosdaqReturnPct": -22.52,
+          "excessVsKosdaqPctPoint": 24.54,
+          "kospi200ReturnPct": -26.7,
+          "excessVsKospi200PctPoint": 28.73
         },
         {
           "date": "2026-08-06",
           "fundReturnPct": 3.54,
           "kospiReturnPct": -28.97,
-          "kospi200ReturnPct": -30.63
+          "excessVsKospiPctPoint": 32.51,
+          "kosdaqReturnPct": -22.32,
+          "excessVsKosdaqPctPoint": 25.86,
+          "kospi200ReturnPct": -30.63,
+          "excessVsKospi200PctPoint": 34.17
         },
         {
           "date": "2026-08-07",
           "fundReturnPct": 3.5,
           "kospiReturnPct": -29.39,
-          "kospi200ReturnPct": -31.21
+          "excessVsKospiPctPoint": 32.9,
+          "kosdaqReturnPct": -22.59,
+          "excessVsKosdaqPctPoint": 26.1,
+          "kospi200ReturnPct": -31.21,
+          "excessVsKospi200PctPoint": 34.71
         },
         {
           "date": "2026-08-10",
           "fundReturnPct": 3.56,
           "kospiReturnPct": -28.93,
-          "kospi200ReturnPct": -30.99
+          "excessVsKospiPctPoint": 32.49,
+          "kosdaqReturnPct": -17.2,
+          "excessVsKosdaqPctPoint": 20.76,
+          "kospi200ReturnPct": -30.99,
+          "excessVsKospi200PctPoint": 34.55
         },
         {
           "date": "2026-08-11",
           "fundReturnPct": 5.4,
           "kospiReturnPct": -28.41,
-          "kospi200ReturnPct": -30.32
+          "excessVsKospiPctPoint": 33.81,
+          "kosdaqReturnPct": -16.87,
+          "excessVsKosdaqPctPoint": 22.27,
+          "kospi200ReturnPct": -30.32,
+          "excessVsKospi200PctPoint": 35.72
         },
         {
           "date": "2026-08-12",
           "fundReturnPct": 6.24,
           "kospiReturnPct": -25.78,
-          "kospi200ReturnPct": -27.35
+          "excessVsKospiPctPoint": 32.02,
+          "kosdaqReturnPct": -16.77,
+          "excessVsKosdaqPctPoint": 23.01,
+          "kospi200ReturnPct": -27.35,
+          "excessVsKospi200PctPoint": 33.59
         },
         {
           "date": "2026-08-13",
           "fundReturnPct": 6.2,
           "kospiReturnPct": -23.14,
-          "kospi200ReturnPct": -24.4
+          "excessVsKospiPctPoint": 29.34,
+          "kosdaqReturnPct": -16.53,
+          "excessVsKosdaqPctPoint": 22.73,
+          "kospi200ReturnPct": -24.4,
+          "excessVsKospi200PctPoint": 30.6
         },
         {
           "date": "2026-08-14",
           "fundReturnPct": 4.43,
           "kospiReturnPct": -21.28,
-          "kospi200ReturnPct": -22.5
+          "excessVsKospiPctPoint": 25.71,
+          "kosdaqReturnPct": -16.21,
+          "excessVsKosdaqPctPoint": 20.64,
+          "kospi200ReturnPct": -22.5,
+          "excessVsKospi200PctPoint": 26.93
         },
         {
           "date": "2026-08-18",
           "fundReturnPct": 4.82,
           "kospiReturnPct": -22.5,
-          "kospi200ReturnPct": -23.64
+          "excessVsKospiPctPoint": 27.32,
+          "kosdaqReturnPct": -19.16,
+          "excessVsKosdaqPctPoint": 23.98,
+          "kospi200ReturnPct": -23.64,
+          "excessVsKospi200PctPoint": 28.46
         },
         {
           "date": "2026-08-19",
           "fundReturnPct": 1.68,
           "kospiReturnPct": -27.0,
-          "kospi200ReturnPct": -28.54
+          "excessVsKospiPctPoint": 28.68,
+          "kosdaqReturnPct": -20.11,
+          "excessVsKosdaqPctPoint": 21.79,
+          "kospi200ReturnPct": -28.54,
+          "excessVsKospi200PctPoint": 30.22
         },
         {
           "date": "2026-08-25",
           "fundReturnPct": 5.5,
           "kospiReturnPct": -23.93,
-          "kospi200ReturnPct": -25.14
+          "excessVsKospiPctPoint": 29.43,
+          "kosdaqReturnPct": -19.85,
+          "excessVsKosdaqPctPoint": 25.34,
+          "kospi200ReturnPct": -25.14,
+          "excessVsKospi200PctPoint": 30.64
         },
         {
           "date": "2026-08-26",
           "fundReturnPct": 6.46,
           "kospiReturnPct": -23.19,
-          "kospi200ReturnPct": -24.4
+          "excessVsKospiPctPoint": 29.65,
+          "kosdaqReturnPct": -19.87,
+          "excessVsKosdaqPctPoint": 26.33,
+          "kospi200ReturnPct": -24.4,
+          "excessVsKospi200PctPoint": 30.86
         },
         {
           "date": "2026-08-27",
           "fundReturnPct": 6.94,
           "kospiReturnPct": -22.02,
-          "kospi200ReturnPct": -23.17
+          "excessVsKospiPctPoint": 28.96,
+          "kosdaqReturnPct": -18.83,
+          "excessVsKosdaqPctPoint": 25.77,
+          "kospi200ReturnPct": -23.17,
+          "excessVsKospi200PctPoint": 30.12
         },
         {
           "date": "2026-08-28",
           "fundReturnPct": 6.84,
           "kospiReturnPct": -23.41,
-          "kospi200ReturnPct": -24.79
+          "excessVsKospiPctPoint": 30.25,
+          "kosdaqReturnPct": -18.76,
+          "excessVsKosdaqPctPoint": 25.59,
+          "kospi200ReturnPct": -24.79,
+          "excessVsKospi200PctPoint": 31.63
         }
       ],
       "latest": {
         "date": "2026-08-28",
         "fundReturnPct": 6.84,
         "kospiReturnPct": -23.41,
-        "kospi200ReturnPct": -24.79,
         "excessVsKospiPctPoint": 30.25,
+        "kosdaqReturnPct": -18.76,
+        "excessVsKosdaqPctPoint": 25.59,
+        "kospi200ReturnPct": -24.79,
         "excessVsKospi200PctPoint": 31.63
       }
     }
