@@ -34,7 +34,9 @@
 param(
   [switch]$Commit,
   [switch]$Push,
-  [switch]$ResolveOnly
+  [switch]$ResolveOnly,
+  [ValidatePattern('^\d{4}-\d{2}-\d{2}$')]
+  [string]$ManualTargetDate = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -201,7 +203,14 @@ Write-Log "python interpreter: $pyExe $($pyPre -join ' ')"
 $gateScript = "C:\work\kr-stock-agent-data-new\scripts\magic_publish_gate.py"
 $gateDecision = "UNKNOWN"; $publishTarget = ""
 if (Test-Path -LiteralPath $gateScript) {
-  $gateRaw = & $pyExe @pyPre $gateScript 2>&1
+  # 주말·휴장일에 직전 거래일 publish 를 수동 승인받아 복구할 때만 날짜를 명시한다.
+  # 기본 스케줄 경로는 인수 없이 기존처럼 오늘 KST 를 판정한다.
+  if ($ManualTargetDate) {
+    Write-Log "수동 publish 대상 거래일: $ManualTargetDate"
+    $gateRaw = & $pyExe @pyPre $gateScript --today $ManualTargetDate 2>&1
+  } else {
+    $gateRaw = & $pyExe @pyPre $gateScript 2>&1
+  }
   $gateExit = $LASTEXITCODE
   $gate = $null
   try { $gate = ($gateRaw | Out-String).Trim() | ConvertFrom-Json } catch {}
