@@ -3,9 +3,6 @@ import path from "path";
 
 import type { StockFinancialMetrics } from "@/types/financial";
 
-const GITHUB_REAL_DATA_URL =
-  "https://raw.githubusercontent.com/dunbar-link/kr-stock-agent-data/main/financial-universe-real.json";
-
 const LOCAL_REAL_DATA_FILE_PATHS = [
   path.resolve(
     process.cwd(),
@@ -65,7 +62,7 @@ export type RealUniverseResponse = {
 
 export type LoadedRealUniverse = {
   payload: RealUniverseResponse;
-  sourceType: "local-file" | "github-raw";
+  sourceType: "local-file";
   localFilePath: string;
 };
 
@@ -176,23 +173,6 @@ async function readLocalRealUniverse(): Promise<{
   return null;
 }
 
-async function readRemoteRealUniverse(): Promise<RealUniverseResponse> {
-  const response = await fetch(GITHUB_REAL_DATA_URL, {
-    cache: "no-store",
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `외부 데이터 fetch 실패: ${response.status} ${response.statusText}`
-    );
-  }
-
-  return (await response.json()) as RealUniverseResponse;
-}
-
 export async function loadStrategyLabRealUniverse(): Promise<LoadedRealUniverse> {
   const localLoaded = await readLocalRealUniverse();
 
@@ -204,13 +184,11 @@ export async function loadStrategyLabRealUniverse(): Promise<LoadedRealUniverse>
     };
   }
 
-  const remotePayload = await readRemoteRealUniverse();
-
-  return {
-    payload: remotePayload,
-    sourceType: "github-raw",
-    localFilePath: LOCAL_REAL_DATA_FILE_PATHS[0],
-  };
+  throw new Error(
+    `Strategy Lab 로컬 데이터 파일을 찾지 못했습니다: ${LOCAL_REAL_DATA_FILE_PATHS.join(
+      ", "
+    )}`
+  );
 }
 
 export async function loadStrategyLabRealItems(): Promise<LoadedStrategyLabRealItems> {
