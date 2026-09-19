@@ -14,6 +14,8 @@
 
   안전장치:
    - **Auto Apply 선행 gate**(magic_publish_gate.py): 실제 거래일 아님 -> 정상 self-skip.
+     Magic intentional HOLD 는 신선한 가격·일반 추천만 GENERAL_DATA_ONLY 로 분리 허용한다.
+     가격이 WAIT_EXTERNAL/2거래일 이상 stale이면 generatedAt만 바꿔 publish하지 않는다.
      당일 Auto Apply 미완료/실패/canonical 불일치 -> BLOCKED, public write·commit·push·deploy 0.
      선행 미완료를 NO_CHANGE 성공으로 위장하지 않는다(구분 가능한 non-success + exit 1 -> 재시도).
    - **거래 당일 public 재생성**(refresh_public_from_canonical.py): 08:45 산출물에는 그 거래일
@@ -57,6 +59,7 @@ $ErrPath   = Join-Path $LogsDir "wababa-auto-publish-error.log"
 $StatusDir  = Join-Path $Repo "reports\wababa"
 $StatusJson = Join-Path $StatusDir "wababa-auto-publish-status-latest.json"
 $StatusMd   = Join-Path $StatusDir "wababa-auto-publish-status-latest.md"
+$script:publishMode = "UNDECIDED"
 
 if (-not (Test-Path $LogsDir))   { New-Item -ItemType Directory -Path $LogsDir   | Out-Null }
 if (-not (Test-Path $StatusDir)) { New-Item -ItemType Directory -Path $StatusDir -Force | Out-Null }
@@ -67,12 +70,20 @@ function Write-Log([string]$msg) {
   Add-Content -Path $LogPath -Value $line -Encoding utf8
 }
 
+function Get-PublicSummary {
+  $extractor = Join-Path $PSScriptRoot "extract_public_publish_summary.py"
+  if (-not $script:pyExe -or -not (Test-Path -LiteralPath $extractor)) { return $null }
+  $raw = & $script:pyExe @script:pyPre $extractor (Join-Path $Repo $PublicRel) 2>$null
+  if ($LASTEXITCODE -ne 0 -or -not $raw) { return $null }
+  try { return (($raw | Out-String).Trim() | ConvertFrom-Json) } catch { return $null }
+}
+
 # 매 종료 경로에서 홈페이지 반영 결과를 기록한다(성공·no-change·BLOCKED 모두).
 # 실패해도 본 작업 exit code 를 바꾸지 않는다(보고용 부가 산출물).
 function Write-PublishStatus {
   param(
     [string]$Status,                 # PUBLISHED / NO_CHANGE / BLOCKED_<code>
-    [string]$Verdict,                # PASS / BLOCKED
+    [string]$Verdict,                # PASS / WARNING / WAIT / BLOCKED
     [string]$Reason = "",
     [string]$CommitHash = "",
     [bool]$Pushed = $false,
@@ -85,12 +96,8 @@ function Write-PublishStatus {
   )
   try {
     $sum = $null
-    $extractor = Join-Path $PSScriptRoot "extract_public_publish_summary.py"
-    if ($script:pyExe -and (Test-Path -LiteralPath $extractor)) {
-      # PowerShell 5.1 ConvertFrom-Json 은 ROE/roe 중복키에서 실패하므로 Python 으로 평탄 요약을 받는다.
-      $raw = & $script:pyExe @script:pyPre $extractor (Join-Path $Repo $PublicRel) 2>$null
-      if ($LASTEXITCODE -eq 0 -and $raw) { $sum = ($raw | Out-String).Trim() | ConvertFrom-Json }
-    }
+    # PowerShell 5.1 ConvertFrom-Json 은 ROE/roe 중복키에서 실패하므로 Python 으로 평탄 요약을 받는다.
+    $sum = Get-PublicSummary
     $o = [ordered]@{
       verdict                = $Verdict
       project                = "wababa"
@@ -100,6 +107,8 @@ function Write-PublishStatus {
       ledgerBasisDate        = if ($sum) { $sum.ledgerBasisDate } else { $null }
       priceBasisDate         = if ($sum) { $sum.priceBasisDate } else { $null }
       priceFreshnessStatus   = if ($sum) { $sum.priceFreshnessStatus } else { $null }
+      priceStaleTradingDays  = if ($sum) { $sum.priceStaleTradingDays } else { $null }
+      magicContentSha256     = if ($sum) { $sum.magicContentSha256 } else { $null }
       officialSequence       = if ($sum) { $sum.officialSequence } else { $null }
       uniqueHoldings         = if ($sum) { $sum.uniqueHoldings } else { $null }
       totalLots              = if ($sum) { $sum.totalLots } else { $null }
@@ -114,6 +123,7 @@ function Write-PublishStatus {
       latestSellCount        = if ($sum) { $sum.latestSellCount } else { $null }
       publishTargetDate      = $PublishTargetDate
       applyGateDecision      = $ApplyGateDecision
+      publishMode            = $script:publishMode
       publicChanged          = $PublicChanged
       commit                 = $CommitHash
       pushed                 = $Pushed
@@ -135,8 +145,10 @@ function Write-PublishStatus {
     $md += "[제목] 홈페이지 공개 데이터 자동반영 (Wababa Auto Publish)"
     $md += "[실행 시각] $($o.runAt) KST"
     $md += "[홈페이지 반영] $Status"
+    $md += "[publish 모드] $($o.publishMode)"
     $md += "[장부 기준일] $($o.ledgerBasisDate)"
     $md += "[평가가격 기준일] $($o.priceBasisDate)"
+    $md += "[가격 freshness] $($o.priceFreshnessStatus) · stale 거래일 $($o.priceStaleTradingDays)"
     $md += "[seq] $($o.officialSequence) · 고유 보유종목 $($o.uniqueHoldings) · 누적 lot $($o.totalLots)"
     $md += "[commit] $(if($CommitHash){$CommitHash}else{'없음'}) · push $(if($Pushed){'완료'}else{'없음'})"
     $md += "[운영 URL 라이브 검증] $LiveVerify"
@@ -222,19 +234,49 @@ if (Test-Path -LiteralPath $gateScript) {
     Write-Log "선행 gate 출력 파싱 실패(exit $gateExit): $(($gateRaw | Out-String).Trim())"
   }
 
-  if ($gateExit -eq 10) {
-    # 실제 거래일이 아님 — 토·일·공휴일·임시휴장. 정상 self-skip(성공, 재시도 불필요).
-    Write-Log "실제 거래일 아님 - publish self-skip(정상 종료)"
-    Write-PublishStatus -Status "SKIPPED_NON_TRADING_DAY" -Verdict "PASS" `
-      -ApplyGateDecision $gateDecision -LiveVerify "NOT_RUN" `
-      -Reason "$(if($gate){$gate.reason}else{'실제 거래일 아님'})"
+  # Magic lane과 일반 가격·추천 lane을 분리한다. intentional HOLD만 예외이며,
+  # HOLD 정책 손상이나 Auto Apply 실패를 일반 publish로 우회시키지는 않는다.
+  $preSummary = Get-PublicSummary
+  $priceStatus = if ($preSummary) { "$($preSummary.priceFreshnessStatus)" } else { "" }
+  $priceStaleDays = if ($preSummary -and $null -ne $preSummary.priceStaleTradingDays) { "$($preSummary.priceStaleTradingDays)" } else { "" }
+  $modeScript = Join-Path $PSScriptRoot "evaluate_public_publish_mode.py"
+  if (-not (Test-Path -LiteralPath $modeScript)) {
+    Stop-Fail "BLOCKED_PUBLISH_MODE_POLICY_MISSING - publish lane 분리 정책 스크립트 없음"
+  }
+  $modeArgs = @(
+    $modeScript,
+    "--gate-exit", "$gateExit",
+    "--gate-decision", "$gateDecision",
+    "--price-freshness-status", "$priceStatus"
+  )
+  if ($priceStaleDays) { $modeArgs += @("--price-stale-trading-days", "$priceStaleDays") }
+  $modeRaw = & $pyExe @pyPre @modeArgs 2>&1
+  $modeExit = $LASTEXITCODE
+  $mode = $null
+  try { $mode = ($modeRaw | Out-String).Trim() | ConvertFrom-Json } catch {}
+  if (-not $mode) {
+    Stop-Fail "BLOCKED_PUBLISH_MODE_UNPARSED - publish lane 판정 파싱 실패(exit $modeExit)"
+  }
+  $script:publishMode = "$($mode.publishMode)"
+  Write-Log "publish lane 판정: $($mode.decision) · mode=$($mode.publishMode) · $($mode.reason)"
+
+  if ($modeExit -eq 10) {
+    if ("$($mode.decision)" -eq "WAIT_STALE_GENERAL_DATA") {
+      Write-PublishStatus -Status "SKIPPED_GENERAL_DATA_STALE" -Verdict "WAIT" `
+        -ApplyGateDecision $gateDecision -LiveVerify "NOT_RUN" -Reason "$($mode.reason)" `
+        -FounderAction "KRX 가격 원천 복구 후 다음 자연 실행 확인"
+    } else {
+      Write-PublishStatus -Status "SKIPPED_NON_TRADING_DAY" -Verdict "PASS" `
+        -ApplyGateDecision $gateDecision -LiveVerify "NOT_RUN" `
+        -Reason "$(if($gate){$gate.reason}else{$mode.reason})"
+    }
     exit 0
   }
-  if ($gateExit -ne 0) {
+  if ($modeExit -ne 0) {
     # Auto Apply 선행 미완료/불일치 → public write 0 · commit 0 · push 0 · deploy 0
-    $code = if ($gateDecision -match '^(BLOCKED_[A-Z_]+)') { $Matches[1] } else { "BLOCKED_APPLY_GATE" }
+    $code = if ($gateDecision -match '^(BLOCKED_[A-Z_]+)') { $Matches[1] } else { "$($mode.decision)" }
     $act = if ($gate -and "$($gate.founderAction)".Trim()) { "$($gate.founderAction)" } else { "Auto Apply 선행 완료 여부 확인" }
-    Stop-Fail "$code - $(if($gate){$gate.reason}else{'Auto Apply 선행 gate 실패'})" -FounderAction $act -GateDecision $gateDecision
+    Stop-Fail "$code - $($mode.reason)" -FounderAction $act -GateDecision $gateDecision
   }
 } else {
   Stop-Fail "BLOCKED_APPLY_GATE - 선행 gate 스크립트 없음: $gateScript"
@@ -261,6 +303,50 @@ if (Test-Path -LiteralPath $refreshScript) {
   }
 } else {
   Stop-Fail "BLOCKED_PUBLIC_REFRESH_FAILED - 재생성 스크립트 없음: $refreshScript"
+}
+
+# 재생성 직후에도 freshness를 다시 판정한다. 실행 전 PASS였다는 이유로 실행 중
+# stale 전환이나 generatedAt-only 갱신을 통과시키지 않는다.
+$postSummary = Get-PublicSummary
+if (-not $postSummary) {
+  Stop-Fail "BLOCKED_PUBLIC_SUMMARY_UNREADABLE - 재생성 후 public 요약을 읽을 수 없음"
+}
+$postPriceStatus = "$($postSummary.priceFreshnessStatus)"
+$postPriceStaleDays = if ($null -ne $postSummary.priceStaleTradingDays) { "$($postSummary.priceStaleTradingDays)" } else { "" }
+$postModeArgs = @(
+  $modeScript,
+  "--gate-exit", "$gateExit",
+  "--gate-decision", "$gateDecision",
+  "--price-freshness-status", "$postPriceStatus"
+)
+if ($postPriceStaleDays) { $postModeArgs += @("--price-stale-trading-days", "$postPriceStaleDays") }
+$postModeRaw = & $pyExe @pyPre @postModeArgs 2>&1
+$postModeExit = $LASTEXITCODE
+$postMode = $null
+try { $postMode = ($postModeRaw | Out-String).Trim() | ConvertFrom-Json } catch {}
+if (-not $postMode) {
+  Stop-Fail "BLOCKED_PUBLISH_MODE_UNPARSED - 재생성 후 publish lane 판정 파싱 실패(exit $postModeExit)"
+}
+if ($postModeExit -eq 10 -and "$($postMode.decision)" -eq "WAIT_STALE_GENERAL_DATA") {
+  $script:publishMode = "NONE"
+  Write-PublishStatus -Status "SKIPPED_GENERAL_DATA_STALE" -Verdict "WAIT" `
+    -ApplyGateDecision $gateDecision -LiveVerify "NOT_RUN" -Reason "$($postMode.reason)" `
+    -FounderAction "KRX 가격 원천 복구 후 다음 자연 실행 확인"
+  exit 0
+}
+if ($postModeExit -ne 0 -or "$($postMode.decision)" -ne "$($mode.decision)") {
+  Stop-Fail "BLOCKED_PUBLISH_MODE_CHANGED - 재생성 전후 lane 판정 불일치($($mode.decision) -> $($postMode.decision))"
+}
+
+# GENERAL_DATA_ONLY에서는 refresh가 Magic 장부 표현을 단 한 바이트 의미도 바꾸지
+# 않았음을 canonical JSON hash로 확인한다. Magic HOLD/주문 상태는 그대로다.
+if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
+  $magicBefore = if ($preSummary) { "$($preSummary.magicContentSha256)" } else { "" }
+  $magicAfter = "$($postSummary.magicContentSha256)"
+  if (-not $magicBefore -or -not $magicAfter -or $magicBefore -ne $magicAfter) {
+    Stop-Fail "BLOCKED_MAGIC_CONTENT_CHANGED - GENERAL_DATA_ONLY refresh 중 Magic 공개 키 변경 감지"
+  }
+  Write-Log "GENERAL_DATA_ONLY 검증: Magic 공개 키 hash 불변 · 실주문/브로커 호출 0"
 }
 
 # 2) freshness gate (미반영은 publish 대상이므로 --allow-unpublished)

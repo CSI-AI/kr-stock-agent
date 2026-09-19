@@ -14,6 +14,7 @@ usage: extract_public_publish_summary.py <public recommendation-history.json>
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 from pathlib import Path
 
@@ -21,6 +22,8 @@ EMPTY = {
     "ledgerBasisDate": None,
     "priceBasisDate": None,
     "priceFreshnessStatus": None,
+    "priceStaleTradingDays": None,
+    "magicContentSha256": None,
     "generatedAt": None,
     "officialSequence": None,
     "uniqueHoldings": 0,
@@ -67,6 +70,16 @@ def main() -> int:
     summary["ledgerBasisDate"] = s.get("dataDate")
     summary["priceBasisDate"] = doc.get("priceAsOf")
     summary["priceFreshnessStatus"] = doc.get("priceFreshnessStatus")
+    summary["priceStaleTradingDays"] = doc.get("priceStaleTradingDays")
+    magic_only = {
+        key: value for key, value in doc.items()
+        if str(key).startswith("magic")
+    }
+    summary["magicContentSha256"] = hashlib.sha256(
+        json.dumps(
+            magic_only, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
     summary["generatedAt"] = doc.get("generatedAt")
     summary["officialSequence"] = s.get("officialSequence")
     summary["uniqueHoldings"] = len(holdings)          # 고유 보유종목 수
