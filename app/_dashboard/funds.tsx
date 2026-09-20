@@ -72,7 +72,9 @@ export function toFundView(history: Rec, key: FundKey): FundView {
   if (key === "magic") {
     // [45-E9] OFFICIAL(공식 운용) 우선. magicOfficialSummary가 있으면 그것을 기준으로,
     // 없으면 legacy PILOT(magicPortfolioSummary)로 fallback하며 "(파일럿)" 표시. PILOT/OFFICIAL 미혼합.
-    const off = obj(history.magicOfficialSummary);
+    const reconstructed = obj(history.magicReconstructedSummary);
+    const useReconstruction = obj(history.magicReconstructionMeta).actualExecution === false && Object.keys(reconstructed).length > 0;
+    const off = useReconstruction ? reconstructed : obj(history.magicOfficialSummary);
     const hasOfficial = str(off.officialStartDate) !== "" && (num(off.officialSequence) ?? 0) >= 1;
     if (hasOfficial) {
       const totalAsset = num(off.totalAsset);
@@ -80,14 +82,14 @@ export function toFundView(history: Rec, key: FundKey): FundView {
       const initial = num(off.totalAsset) !== null ? 50000000 : null;
       return {
         ...base,
-        statusLabel: "운용 중",
+        statusLabel: useReconstruction ? "별도 복구 가상장부" : "운용 중",
         statusTone: a.primary,
         totalAsset,
         totalProfit: totalAsset !== null && initial !== null ? totalAsset - initial : null,
         totalProfitRate: num(off.cumulativeReturn),
         // '보유종목 수' 는 고유 종목 수여야 한다. openItemLotCount 는 날짜별 누적 lot(예: 190)이라
         // 그대로 쓰면 고유 14종목을 190종목으로 오표시한다. 고유 종목은 portfolio.holdings 길이.
-        holdingCount: arr(obj(history.magicOfficialPortfolio).holdings).length,
+        holdingCount: arr(obj(useReconstruction ? history.magicReconstructedPortfolio : history.magicOfficialPortfolio).holdings).length,
         cash,
         cashRate: cash !== null && totalAsset ? (cash / totalAsset) * 100 : null,
       };

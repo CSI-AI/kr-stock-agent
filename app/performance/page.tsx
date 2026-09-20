@@ -6,6 +6,7 @@ import {
 } from "../_dashboard/kit";
 import {
   MagicOfficialCard,
+  isMagicReconstruction,
   parseMagicOfficialTradeDays,
   parseMagicOfficialPortfolio,
 } from "../_dashboard/magic-official";
@@ -18,6 +19,7 @@ export default function PerformancePage() {
   const history = readRecommendationHistory();
   const magicDays = parseMagicOfficialTradeDays(history);
   const holdings = parseMagicOfficialPortfolio(history).holdings;
+  const reconstructed = isMagicReconstruction(history);
   const reviewedCount = Array.isArray(history.reviewedCandidateCodes)
     ? history.reviewedCandidateCodes.length
     : 0;
@@ -30,7 +32,7 @@ export default function PerformancePage() {
 
       <section className="dashSection">
         <h2 className="dashSectionTitle">
-          공식 운용 성과 · 고유 보유종목 {holdings.length} · 자동반영 {magicDays.length}회차
+          {reconstructed ? "별도 복구 가상장부 성과" : "공식 운용 성과"} · 고유 보유종목 {holdings.length} · 기록 {magicDays.length}회차
         </h2>
         <MagicOfficialCard history={history} />
       </section>

@@ -6,6 +6,7 @@ import {
 } from "../../_dashboard/kit";
 import {
   parseMagicOfficialTradeDays,
+  isMagicReconstruction,
   MagicFormulaExplainer,
   type MagicOfficialBuyTrade,
 } from "../../_dashboard/magic-official";
@@ -70,7 +71,7 @@ type OfficialRankings = {
   isGlobal: boolean;
 };
 function parseRankings(history: Rec): OfficialRankings | null {
-  const r = history.magicOfficialRankings;
+  const r = isMagicReconstruction(history) ? history.magicReconstructedRankings : history.magicOfficialRankings;
   if (!r || typeof r !== "object" || Array.isArray(r)) return null;
   const ro = r as Rec;
   const mapItem = (x: Rec): RankingItem => ({
@@ -107,14 +108,14 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 // 섹션 2 — 합산 상위 10개(현재 public 노출분).
-function CombinedTop10({ buys, date, seq }: { buys: MagicOfficialBuyTrade[]; date: string; seq: number }) {
+function CombinedTop10({ buys, date, seq, reconstructed }: { buys: MagicOfficialBuyTrade[]; date: string; seq: number; reconstructed: boolean }) {
   if (buys.length === 0) {
     return <p style={{ margin: 0, fontSize: 13, color: "#64748b" }}>합산 상위 종목이 아직 없어요.</p>;
   }
   const cols: Array<[string, boolean]> = [
     ["최종순위", true], ["종목명", false], ["싼 순위", true], ["잘버는 순위", true], ["종합점수", true],
     ["EBIT/EV", true], ["EBIT/투입자본", true], ["기준주가", true], ["기준주가일", true],
-    ["실적연도", true], ["연결/별도", true], ["실제매수", true],
+    ["실적연도", true], ["연결/별도", true], [reconstructed ? "복구장부 반영" : "실제매수", true],
   ];
   return (
     <>
@@ -144,7 +145,7 @@ function CombinedTop10({ buys, date, seq }: { buys: MagicOfficialBuyTrade[]; dat
                   <td style={{ ...TD, color: "#64748b" }}>{fmtDate(b.priceAsOfDate)}</td>
                   <td style={{ ...TD, color: "#64748b" }}>{b.financialStatementYear !== null ? `${b.financialStatementYear}년` : "—"}</td>
                   <td style={{ ...TD, color: "#64748b" }}>{fsDivLabel(b.dartFsDiv)}</td>
-                  <td style={{ ...TD, color: ACCENT.text, fontWeight: 800 }}>예</td>
+                  <td style={{ ...TD, color: reconstructed ? "#92400e" : ACCENT.text, fontWeight: 800 }}>{reconstructed ? "가상" : "예"}</td>
                 </tr>
               );
             })}
@@ -242,14 +243,15 @@ function GlobalNotice({ kind }: { kind: "cheap" | "quality" }) {
 export default function MagicRankingPage() {
   const history = readRecommendationHistory();
   const days = parseMagicOfficialTradeDays(history);
-  const latest = days[0];
+  const reconstructed = isMagicReconstruction(history);
+  const latest = days.find((d) => d.buys.length > 0) ?? days[0];
   const buys = latest?.buys ?? [];
   const rankings = parseRankings(history);
 
   // 데이터 기준(원자료) — 최신 매수분의 실적연도·연결/별도·기준주가일에서 도출.
   const fsYear = buys.map((b) => b.financialStatementYear).find((v) => v !== null) ?? null;
   const fsDiv = buys.map((b) => b.dartFsDiv).find((v) => v) ?? "";
-  const priceDate = buys.map((b) => b.priceAsOfDate).find((v) => v) ?? latest?.date ?? "";
+  const priceDate = rankings?.dataDate || buys.map((b) => b.priceAsOfDate).find((v) => v) || latest?.date || "";
 
   return (
     <main className="dashboardRoot">
@@ -263,13 +265,16 @@ export default function MagicRankingPage() {
             마법공식은 싼 회사와 돈을 잘버는 회사를 각각 순위화한 뒤, 두 순위를 더해 종합점수가 낮은 종목을 선택합니다.
             이 페이지는 순위 원자료를 그대로 보여줍니다. 해석과 판단은 직접 하세요.
           </p>
+          {reconstructed ? <p style={{ margin: "10px 0 0", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
+            순위 검증은 별도 복구 가상장부와 연결됩니다. 09.07 매수는 보존 PIT 순위, 09.08~09.17 매수는 09.04 순위 고정 가정이며, 아래 09.18 전체 순위는 현재 평가용으로 과거 매수 결정에 사용하지 않았습니다.
+          </p> : null}
         </div>
       </section>
 
       <section className="dashSection">
         <h2 className="dashSectionTitle">합산 상위 10개</h2>
         <SectionCard title="종합점수 = 싼 순위 + 잘버는 순위 (낮을수록 우수)">
-          <CombinedTop10 buys={buys} date={latest?.date ?? ""} seq={latest?.officialSequence ?? 0} />
+          <CombinedTop10 buys={buys} date={latest?.date ?? ""} seq={latest?.officialSequence ?? 0} reconstructed={reconstructed} />
         </SectionCard>
       </section>
 

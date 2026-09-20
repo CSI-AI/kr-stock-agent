@@ -23,6 +23,13 @@ function str(v: unknown): string {
 function boolOrNull(v: unknown): boolean | null {
   return v === true ? true : v === false ? false : null;
 }
+export function isMagicReconstruction(history: Rec): boolean {
+  const meta = obj(history.magicReconstructionMeta);
+  return meta.actualExecution === false && Object.keys(obj(history.magicReconstructedSummary)).length > 0;
+}
+function magicSource(history: Rec, reconstructedKey: string, officialKey: string): unknown {
+  return isMagicReconstruction(history) ? history[reconstructedKey] : history[officialKey];
+}
 // 비율(EBIT/EV, EBIT/투입자본) → 백분율 표시. 0.4522 → "45.2%".
 function ratioPct(v: number | null): string {
   return v === null ? "-" : `${(v * 100).toFixed(1)}%`;
@@ -125,13 +132,14 @@ export type MagicOfficialTradeDay = {
   totalBuyAmount: number | null; totalSellAmount: number | null; realizedProfit: number | null;
   totalCash: number | null; holdingsMarketValue: number | null; totalAsset: number | null;
   cumulativeReturn: number | null; buyBatchId: string; sellBatchId: string;
+  reconstructionClass: string; notActualExecution: boolean; rankingBasisDate: string;
   buys: MagicOfficialBuyTrade[]; sells: MagicOfficialSellTrade[];
 };
 export type MagicOfficialPortfolio = { holdings: MagicOfficialHolding[] };
 
 // ----- 안전 파서 (canonical은 REPO2, 여기선 public 키만 읽음) -----
 export function parseMagicOfficialSummary(history: Rec): MagicOfficialSummary | null {
-  const s = obj(history.magicOfficialSummary);
+  const s = obj(magicSource(history, "magicReconstructedSummary", "magicOfficialSummary"));
   if (!s.officialStartDate || num(s.officialSequence) === null) return null;
   return {
     officialStartDate: str(s.officialStartDate),
@@ -154,7 +162,7 @@ export function parseMagicOfficialSummary(history: Rec): MagicOfficialSummary | 
 }
 export function parseMagicOfficialPortfolio(history: Rec): MagicOfficialPortfolio {
   return {
-    holdings: arr(obj(history.magicOfficialPortfolio).holdings).map((h) => ({
+    holdings: arr(obj(magicSource(history, "magicReconstructedPortfolio", "magicOfficialPortfolio")).holdings).map((h) => ({
       code: str(h.code), name: str(h.name) || str(h.code), openLotCount: num(h.openLotCount) ?? 0,
       totalQuantity: num(h.totalQuantity), totalInvested: num(h.totalInvested),
       averageBuyPrice: num(h.averageBuyPrice), currentPrice: num(h.currentPrice),
@@ -163,13 +171,15 @@ export function parseMagicOfficialPortfolio(history: Rec): MagicOfficialPortfoli
   };
 }
 export function parseMagicOfficialTradeDays(history: Rec): MagicOfficialTradeDay[] {
-  const days = arr(history.magicOfficialTradeDays).map((d) => ({
+  const days = arr(magicSource(history, "magicReconstructedTradeDays", "magicOfficialTradeDays")).map((d) => ({
     date: str(d.date), officialSequence: num(d.officialSequence) ?? 0, runStatus: str(d.runStatus),
     buyCount: num(d.buyCount) ?? 0, sellCount: num(d.sellCount) ?? 0,
     totalBuyAmount: num(d.totalBuyAmount), totalSellAmount: num(d.totalSellAmount),
     realizedProfit: num(d.realizedProfit), totalCash: num(d.totalCash),
     holdingsMarketValue: num(d.holdingsMarketValue), totalAsset: num(d.totalAsset),
     cumulativeReturn: num(d.cumulativeReturn), buyBatchId: str(d.buyBatchId), sellBatchId: str(d.sellBatchId),
+    reconstructionClass: str(d.reconstructionClass), notActualExecution: d.notActualExecution === true,
+    rankingBasisDate: str(d.rankingBasisDate),
     buys: arr(d.buys).map((b) => ({
       tradeId: str(b.tradeId), batchId: str(b.batchId), lotId: str(b.lotId), rank: num(b.rank),
       code: str(b.code), name: str(b.name) || str(b.code), executionPrice: num(b.executionPrice),
@@ -293,6 +303,7 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
   const portfolio = parseMagicOfficialPortfolio(history);
   const tradeDays = parseMagicOfficialTradeDays(history);
   const holdings = portfolio.holdings;
+  const reconstructed = isMagicReconstruction(history);
   const holdCols: Array<[string, "left" | "right"]> = [["종목명", "left"], ["lot", "right"], ["수량", "right"], ["평균매수가", "right"], ["현재가", "right"], ["투자금액", "right"], ["평가금액", "right"], ["평가손익", "right"], ["수익률", "right"]];
 
   return (
@@ -301,12 +312,16 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>와바바 마법공식 펀드 · 공식 운용</div>
+            <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>와바바 마법공식 펀드 · {reconstructed ? "별도 복구 가상장부" : "공식 운용"}</div>
             <div style={{ fontSize: 12, color: "#94a3b8" }}>공식 시작일 {fmtDate(summary.officialStartDate)} · 자동반영 {summary.officialSequence}회차</div>
           </div>
         </div>
-        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: ACCENT.primary, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>운용 중</span>
+        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: reconstructed ? "#92400e" : ACCENT.primary, background: reconstructed ? "#fffbeb" : ACCENT.soft, border: `1px solid ${reconstructed ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>{reconstructed ? "실거래와 분리" : "운용 중"}</span>
       </div>
+
+      {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
+        2026.09.05~09.18 누락분을 복원한 별도 가상장부입니다. 09.07은 보존 PIT 순위, 09.08~09.17은 09.04 순위 고정 가정이며 09.18은 종가 평가만 반영했습니다. 실제 주문·브로커 거래는 0건입니다.
+      </p> : null}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))", gap: 8, marginBottom: 12 }}>
         <OMetric label="총자산" value={krw(summary.totalAsset)} />
@@ -506,6 +521,7 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
   const days = parseMagicOfficialTradeDays(history);
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
+  const reconstructed = isMagicReconstruction(history);
   const investRate = summary.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
   // 공식 펀드의 평가가격 기준일 = 장부 기준일(= 그 거래일 종가).
   //   canonical 불변식: 최신 evaluationSnapshot(evalPriceSource=official_close) 의 자산값이
@@ -525,7 +541,7 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>MAGIC FORMULA CORE</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: ACCENT.text, background: ACCENT.soft, border: `1px solid ${ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>운용 중</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: reconstructed ? "#92400e" : ACCENT.text, background: reconstructed ? "#fffbeb" : ACCENT.soft, border: `1px solid ${reconstructed ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>{reconstructed ? "별도 복구 가상장부" : "운용 중"}</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
             장부 기준일 {fmtDate(summary.dataDate)} · 자동반영 {summary.officialSequence}회차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
@@ -546,6 +562,9 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
+      {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
+        누락된 정상 기능을 복원한 성과입니다. 09.07은 보존 PIT, 09.08~09.17은 09.04 순위 고정 가정, 09.18은 종가 평가 전용이며 실제 운용 성과와 혼합하지 않습니다.
+      </p> : null}
       {/* 대표 3수치 — 펀드 / 같은 기간 벤치마크 / 초과(%p). source of truth 는 public payload 다. */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginBottom: 8 }}>
         <OMetric label="누적수익률 (마법공식)" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)}
@@ -629,6 +648,7 @@ export type MagicOfficialBenchmark = {
 };
 
 export function parseMagicOfficialBenchmark(history: Rec): MagicOfficialBenchmark | null {
+  if (isMagicReconstruction(history)) return null;
   const raw = history?.["magicOfficialBenchmark"];
   if (!raw || typeof raw !== "object") return null;
   const o = raw as Rec;
@@ -679,6 +699,7 @@ export type MagicOfficialBenchmarkMulti = {
 };
 
 export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBenchmarkMulti | null {
+  if (isMagicReconstruction(history)) return null;
   const root = history?.["magicOfficialBenchmark"];
   if (!root || typeof root !== "object") return null;
   const raw = (root as Rec)["multi"];
