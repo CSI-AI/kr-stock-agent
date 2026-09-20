@@ -157,7 +157,17 @@ def run(*, timeout_sec: int = 180, interval_sec: int = 10, base_url: str = BASE_
         if path == "/" and c == 200 and b:
             txt = _strip_html(b.decode("utf-8", errors="replace"))
             page_checks["noStalePendingLabel"] = ("최근 갱신 대기 중" not in txt)
-            page_checks["syncCompleteLabel"] = ("최신 장부 반영 완료" in txt)
+            # 일반 가격/추천만 최신화되고 Magic 장부가 intentional HOLD인 경우에는
+            # '최신 장부 반영 완료'가 아니라 '장부 미반영'이 정확한 표시다.
+            # payload 기준으로 기대 문구를 선택해 HOLD를 정상 동기화로 가장하지 않는다.
+            ledger_behind = str(detail.get("ledgerBasisDate") or "") != str(
+                detail.get("priceBasisDate") or ""
+            )
+            page_checks["ledgerStatusLabel"] = (
+                "장부 미반영" in txt
+                if ledger_behind
+                else "최신 장부 반영 완료" in txt
+            )
             page_checks["ledgerBasisShown"] = bool(re.search(r"장부 기준일 [\d.]+", txt))
             page_checks["priceBasisShown"] = bool(re.search(r"평가가격 기준일 [\d.]+", txt))
     page_checks["httpOk"] = all(v == 200 for v in pages.values())
