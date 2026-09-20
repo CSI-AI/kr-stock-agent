@@ -360,8 +360,9 @@ if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
 if ($LASTEXITCODE -ne 0) { Stop-Fail "freshness gate FAIL (exit $LASTEXITCODE) - 누출/sanitize/원본불일치 의심" }
 Write-Log "freshness gate PASS"
 
-# 3) dirty/untracked 검사 - 허용: public JSON, next-env.d.ts
-$allowed = @($PublicRel, "next-env.d.ts")
+# 3) dirty/untracked 검사 - 허용: public JSON, Next 생성파일, 실행에 영향 없는 작업지침.
+# stage 검사는 아래에서 public JSON 1개만 다시 강제한다.
+$allowed = @($PublicRel, "next-env.d.ts", "AGENTS.md")
 $publicChanged = $false
 $unexpected = @()
 $porcelain = & git status --porcelain
