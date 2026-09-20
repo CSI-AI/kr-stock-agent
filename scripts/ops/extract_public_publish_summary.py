@@ -24,6 +24,7 @@ EMPTY = {
     "priceFreshnessStatus": None,
     "priceStaleTradingDays": None,
     "magicContentSha256": None,
+    "magicOfficialContentSha256": None,
     "generatedAt": None,
     "officialSequence": None,
     "uniqueHoldings": 0,
@@ -78,6 +79,22 @@ def main() -> int:
     summary["magicContentSha256"] = hashlib.sha256(
         json.dumps(
             magic_only, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
+    # Magic HOLD의 실행 상태와 화면용 평가 파생값을 분리한다. 일반 가격 갱신은
+    # legacy magicPortfolio 계열의 평가금액을 바꿀 수 있지만, 공식 장부/거래일을
+    # 바꾸면 안 된다. publish gate는 이 authoritative subset의 불변성을 검사한다.
+    magic_official = {
+        key: doc.get(key)
+        for key in (
+            "magicOfficialSummary",
+            "magicOfficialPortfolio",
+            "magicOfficialTradeDays",
+        )
+    }
+    summary["magicOfficialContentSha256"] = hashlib.sha256(
+        json.dumps(
+            magic_official, ensure_ascii=False, sort_keys=True, separators=(",", ":")
         ).encode("utf-8")
     ).hexdigest()
     summary["generatedAt"] = doc.get("generatedAt")

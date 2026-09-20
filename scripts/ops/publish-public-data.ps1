@@ -70,10 +70,11 @@ function Write-Log([string]$msg) {
   Add-Content -Path $LogPath -Value $line -Encoding utf8
 }
 
-function Get-PublicSummary {
+function Get-PublicSummary([string]$Path = "") {
   $extractor = Join-Path $PSScriptRoot "extract_public_publish_summary.py"
   if (-not $script:pyExe -or -not (Test-Path -LiteralPath $extractor)) { return $null }
-  $raw = & $script:pyExe @script:pyPre $extractor (Join-Path $Repo $PublicRel) 2>$null
+  if (-not $Path) { $Path = Join-Path $Repo $PublicRel }
+  $raw = & $script:pyExe @script:pyPre $extractor $Path 2>$null
   if ($LASTEXITCODE -ne 0 -or -not $raw) { return $null }
   try { return (($raw | Out-String).Trim() | ConvertFrom-Json) } catch { return $null }
 }
@@ -109,6 +110,7 @@ function Write-PublishStatus {
       priceFreshnessStatus   = if ($sum) { $sum.priceFreshnessStatus } else { $null }
       priceStaleTradingDays  = if ($sum) { $sum.priceStaleTradingDays } else { $null }
       magicContentSha256     = if ($sum) { $sum.magicContentSha256 } else { $null }
+      magicOfficialContentSha256 = if ($sum) { $sum.magicOfficialContentSha256 } else { $null }
       officialSequence       = if ($sum) { $sum.officialSequence } else { $null }
       uniqueHoldings         = if ($sum) { $sum.uniqueHoldings } else { $null }
       totalLots              = if ($sum) { $sum.totalLots } else { $null }
@@ -236,9 +238,13 @@ if (Test-Path -LiteralPath $gateScript) {
 
   # Magic lane과 일반 가격·추천 lane을 분리한다. intentional HOLD만 예외이며,
   # HOLD 정책 손상이나 Auto Apply 실패를 일반 publish로 우회시키지는 않는다.
-  $preSummary = Get-PublicSummary
-  $priceStatus = if ($preSummary) { "$($preSummary.priceFreshnessStatus)" } else { "" }
-  $priceStaleDays = if ($preSummary -and $null -ne $preSummary.priceStaleTradingDays) { "$($preSummary.priceStaleTradingDays)" } else { "" }
+  $prePublicSummary = Get-PublicSummary
+  # 현재 공개 파일이 오래된 것은 refresh가 필요한 이유이지, 새 canonical 원본까지
+  # 오래됐다는 뜻이 아니다. publish 여부는 read-only 내부 원본 freshness로 판정한다.
+  $internalHistory = "C:\work\kr-stock-agent-data-new\recommendation-history.json"
+  $sourceSummary = Get-PublicSummary $internalHistory
+  $priceStatus = if ($sourceSummary) { "$($sourceSummary.priceFreshnessStatus)" } else { "" }
+  $priceStaleDays = if ($sourceSummary -and $null -ne $sourceSummary.priceStaleTradingDays) { "$($sourceSummary.priceStaleTradingDays)" } else { "" }
   $modeScript = Join-Path $PSScriptRoot "evaluate_public_publish_mode.py"
   if (-not (Test-Path -LiteralPath $modeScript)) {
     Stop-Fail "BLOCKED_PUBLISH_MODE_POLICY_MISSING - publish lane 분리 정책 스크립트 없음"
@@ -341,8 +347,8 @@ if ($postModeExit -ne 0 -or "$($postMode.decision)" -ne "$($mode.decision)") {
 # GENERAL_DATA_ONLY에서는 refresh가 Magic 장부 표현을 단 한 바이트 의미도 바꾸지
 # 않았음을 canonical JSON hash로 확인한다. Magic HOLD/주문 상태는 그대로다.
 if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
-  $magicBefore = if ($preSummary) { "$($preSummary.magicContentSha256)" } else { "" }
-  $magicAfter = "$($postSummary.magicContentSha256)"
+  $magicBefore = if ($prePublicSummary) { "$($prePublicSummary.magicOfficialContentSha256)" } else { "" }
+  $magicAfter = "$($postSummary.magicOfficialContentSha256)"
   if (-not $magicBefore -or -not $magicAfter -or $magicBefore -ne $magicAfter) {
     Stop-Fail "BLOCKED_MAGIC_CONTENT_CHANGED - GENERAL_DATA_ONLY refresh 중 Magic 공개 키 변경 감지"
   }
