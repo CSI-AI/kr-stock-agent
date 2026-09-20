@@ -80,7 +80,7 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
         {fmtDate(summary.officialStartDate)} 시작 · 기준일 {fmtDate(summary.dataDate)} 종가
       </div>
       {reconstructed ? <p style={{ margin: "0 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-        별도 식별 복구 가상장부: 09.07은 보존 PIT 순위, 09.08~09.17은 09.04 순위 고정 가정, 09.18은 종가 평가만 사용했습니다. 실제 주문 0건이며 원본 운용장부와 분리됩니다.
+        별도 식별 복구 가상장부: 06.17~09.18 실제 66거래일을 반영했습니다. 기존 실행일 선택은 보존하고 누락일은 보존 재무입력과 전 거래일 공식 종가로 재계산했으며, 매수 후 51거래일째부터 교체합니다. 실제 주문 0건이며 원본 운용장부와 분리됩니다.
       </p> : null}
 
       {/* 벤치마크 / 초과 / 총자산 — 누적수익률 바로 아래 */}

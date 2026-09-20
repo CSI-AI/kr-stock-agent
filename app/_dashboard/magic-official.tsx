@@ -320,7 +320,7 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
       </div>
 
       {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-        2026.09.05~09.18 누락분을 복원한 별도 가상장부입니다. 09.07은 보존 PIT 순위, 09.08~09.17은 09.04 순위 고정 가정이며 09.18은 종가 평가만 반영했습니다. 실제 주문·브로커 거래는 0건입니다.
+        2026.06.17~09.18의 실제 66거래일을 다시 맞춘 별도 가상장부입니다. 기존 실행일의 선택은 보존하고, 누락일은 보존 재무입력과 전 거래일 공식 종가로 재계산했습니다. 매수일을 1일째로 세어 51거래일째 시가에 교체하며 실제 주문·브로커 거래는 0건입니다.
       </p> : null}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))", gap: 8, marginBottom: 12 }}>
@@ -563,7 +563,7 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
       {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-        누락된 정상 기능을 복원한 성과입니다. 09.07은 보존 PIT, 09.08~09.17은 09.04 순위 고정 가정, 09.18은 종가 평가 전용이며 실제 운용 성과와 혼합하지 않습니다.
+        누락된 정상 기능을 복원한 별도 가상 성과입니다. 6월 17일부터 실제 66거래일을 사용했고 첫 교체 매도는 51거래일째인 8월 28일입니다. 원본 운용 성과·실거래와 혼합하지 않습니다.
       </p> : null}
       {/* 대표 3수치 — 펀드 / 같은 기간 벤치마크 / 초과(%p). source of truth 는 public payload 다. */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginBottom: 8 }}>
@@ -648,8 +648,9 @@ export type MagicOfficialBenchmark = {
 };
 
 export function parseMagicOfficialBenchmark(history: Rec): MagicOfficialBenchmark | null {
-  if (isMagicReconstruction(history)) return null;
-  const raw = history?.["magicOfficialBenchmark"];
+  const raw = isMagicReconstruction(history)
+    ? history?.["magicReconstructedBenchmark"]
+    : history?.["magicOfficialBenchmark"];
   if (!raw || typeof raw !== "object") return null;
   const o = raw as Rec;
   const rows = Array.isArray(o.series) ? (o.series as Rec[]) : [];
@@ -699,8 +700,9 @@ export type MagicOfficialBenchmarkMulti = {
 };
 
 export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBenchmarkMulti | null {
-  if (isMagicReconstruction(history)) return null;
-  const root = history?.["magicOfficialBenchmark"];
+  const root = isMagicReconstruction(history)
+    ? history?.["magicReconstructedBenchmark"]
+    : history?.["magicOfficialBenchmark"];
   if (!root || typeof root !== "object") return null;
   const raw = (root as Rec)["multi"];
   if (!raw || typeof raw !== "object") return null;

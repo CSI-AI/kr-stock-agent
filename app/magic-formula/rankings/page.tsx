@@ -266,7 +266,7 @@ export default function MagicRankingPage() {
             이 페이지는 순위 원자료를 그대로 보여줍니다. 해석과 판단은 직접 하세요.
           </p>
           {reconstructed ? <p style={{ margin: "10px 0 0", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-            순위 검증은 별도 복구 가상장부와 연결됩니다. 09.07 매수는 보존 PIT 순위, 09.08~09.17 매수는 09.04 순위 고정 가정이며, 아래 09.18 전체 순위는 현재 평가용으로 과거 매수 결정에 사용하지 않았습니다.
+            순위 검증은 별도 복구 가상장부와 연결됩니다. 기존 실행일의 선택은 보존했고, 누락일은 보존 재무입력과 각 전 거래일 공식 종가로 다시 계산했습니다. 아래 09.18 전체 순위는 현재 평가용이며 과거 매수 결정에 소급 사용하지 않았습니다.
           </p> : null}
         </div>
       </section>
