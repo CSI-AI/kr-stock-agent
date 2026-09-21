@@ -6,7 +6,7 @@
 
 검증:
   1) 운영 public JSON 의 sha256 == 로컬 HEAD 커밋 blob 의 sha256 (전 필드 일치를 한 번에 보장)
-  2) canonical sequence == 서빙되는 public sequence
+  2) 공개 생성 경로의 활성 가상장부 sequence·source hash == 서빙되는 public 값
   3) 장부 기준일 / 평가가격 기준일 / 현금 / 총자산 / 고유 보유종목 / 누적 lot 일치
   4) 최신 거래일 신규 매수·만기 매도 거래기록 반영
   5) 성과 시계열 마지막 날짜 == 장부 기준일
@@ -34,7 +34,7 @@ from pathlib import Path
 REPO1 = Path("C:/work/kr-stock-agent")
 PUBLIC_REL = "public/data/recommendation-history.json"
 BASE_URL = "https://kr-stock-agent.vercel.app"
-CANONICAL = Path("C:/work/kr-stock-agent-data-new/magic-formula-official-state.json")
+DATA_ROOT = Path("C:/work/kr-stock-agent-data-new")
 
 
 def _committed_blob() -> bytes | None:
@@ -67,23 +67,88 @@ def _strip_html(h: str) -> str:
     return re.sub(r"\s+", " ", s)
 
 
-def _canonical_seq():
+def _active_ledger_evidence(*, active_path=None, source_path=None, original_path=None,
+                            expected_original_sha=None) -> dict:
+    """Use the same active-paper resolver as public generation; fail closed on drift."""
+    if any(value is None for value in
+           (active_path, source_path, original_path, expected_original_sha)):
+        sys.path.insert(0, str(DATA_ROOT / "scripts"))
+        import magic_active_paper as active_paper
+        active_path = active_path or active_paper.ACTIVE_PATH
+        source_path = source_path or active_paper.RECONSTRUCTION_SOURCE_PATH
+        original_path = original_path or active_paper.ORIGINAL_PATH
+        expected_original_sha = (expected_original_sha or
+                                 active_paper.ORIGINAL_PRESERVED_SHA256)
+    active_path, source_path, original_path = map(
+        Path, (active_path, source_path, original_path))
+    active_bytes = active_path.read_bytes()
+    active = json.loads(active_bytes)
+    source = json.loads(source_path.read_text(encoding="utf-8"))
+    original_sha = hashlib.sha256(original_path.read_bytes()).hexdigest()
+    if original_sha != expected_original_sha.lower():
+        raise ValueError("preserved original hash changed")
+    if not isinstance(active, dict) or not isinstance(source, dict):
+        raise ValueError("active or reconstruction source is not an object")
+    identity = active.get("ledgerIdentity")
+    if not isinstance(identity, str) or not identity or identity != source.get("ledgerIdentity"):
+        raise ValueError("active paper ledger identity mismatch")
+    sequence = active.get("officialSequence")
+    if type(sequence) is not int or sequence < 1:
+        raise ValueError("active paper sequence invalid")
+    completed = [str(row.get("date")) for row in active.get("dailyLedger", [])
+                 if isinstance(row, dict) and row.get("runStatus") == "COMPLETED"
+                 and row.get("date")]
+    if not completed:
+        raise ValueError("active paper completed ledger absent")
+    return {"officialSequence": sequence, "sourceStateSha256":
+            hashlib.sha256(active_bytes).hexdigest(), "ledgerIdentity": identity,
+            "lastCompletedDate": max(completed), "originalPreserved": True}
+
+
+def _hold_decision() -> str:
     try:
-        st = json.loads(CANONICAL.read_text(encoding="utf-8"))
-        return st.get("officialSequence")
-    except (OSError, ValueError):
-        return None
+        sys.path.insert(0, str(DATA_ROOT / "scripts"))
+        import magic_paper_lane_hold as hold
+        return str(hold.evaluate().get("decision") or "UNKNOWN")
+    except Exception:  # noqa: BLE001 — warning is retained, never presumed clear
+        return "UNKNOWN"
 
 
-def verify_payload(served: dict, canonical_seq) -> dict:
-    """서빙된 payload 자체의 내부 정합 + canonical 일치 검사."""
+def source_warnings(served: dict, hold_decision: str) -> list[str]:
+    warnings = []
+    if served.get("priceFreshnessStatus") != "PASS":
+        warnings.append("PRICE_FRESHNESS_NOT_PASS")
+    if hold_decision == "HOLD":
+        warnings.append("MAGIC_PAPER_HOLD")
+    elif hold_decision != "UNHELD":
+        warnings.append("MAGIC_PAPER_HOLD_STATE_UNVERIFIED")
+    return warnings
+
+
+def verify_payload(served: dict, active_evidence: dict | None) -> dict:
+    """서빙 payload와 공개 생성에 사용한 활성 장부의 동일성 검사."""
     s = served.get("magicOfficialSummary") or {}
+    active_evidence = active_evidence or {}
+    canonical_seq = active_evidence.get("officialSequence")
     holdings = (served.get("magicOfficialPortfolio") or {}).get("holdings") or []
     days = served.get("magicOfficialTradeDays") or []
     latest = max(days, key=lambda d: str(d.get("date") or "")) if days else {}
     ledger_date = s.get("dataDate")
     checks = {
-        "publicSeqMatchesCanonical": (canonical_seq is None or s.get("officialSequence") == canonical_seq),
+        "publicSeqMatchesCanonical": (
+            type(canonical_seq) is int and type(s.get("officialSequence")) is int
+            and s["officialSequence"] == canonical_seq
+        ),
+        "publicSourceMatchesActiveLedger": (
+            isinstance(active_evidence.get("sourceStateSha256"), str)
+            and isinstance(s.get("sourceStateSha256"), str)
+            and s["sourceStateSha256"] == active_evidence["sourceStateSha256"]
+        ),
+        "ledgerBasisMatchesActive": (
+            bool(active_evidence.get("lastCompletedDate"))
+            and s.get("dataDate") == active_evidence["lastCompletedDate"]
+        ),
+        "activeLedgerIdentityVerified": bool(active_evidence.get("ledgerIdentity")),
         "ledgerBasisDatePresent": bool(ledger_date),
         "priceBasisDatePresent": bool(served.get("priceAsOf")),
         "cashPresent": s.get("officialAvailableCash") is not None,
@@ -120,12 +185,16 @@ def verify_payload(served: dict, canonical_seq) -> dict:
 
 
 def run(*, timeout_sec: int = 180, interval_sec: int = 10, base_url: str = BASE_URL) -> dict:
+    try:
+        active_evidence = _active_ledger_evidence()
+    except (OSError, ValueError, TypeError, ImportError) as error:
+        return {"status": "BLOCKED_ACTIVE_LEDGER_EVIDENCE_INVALID",
+                "reason": f"활성 장부 증거 불가: {type(error).__name__}", "filesWritten": 0}
     blob = _committed_blob()
     if not blob:
         return {"status": "BLOCKED_NO_COMMITTED_BLOB", "reason": "HEAD 커밋에서 public 산출물을 읽을 수 없음",
                 "filesWritten": 0}
     want = hashlib.sha256(blob).hexdigest()
-    canonical_seq = _canonical_seq()
     deadline = time.time() + timeout_sec
     attempt = 0
     got = None
@@ -147,7 +216,9 @@ def run(*, timeout_sec: int = 180, interval_sec: int = 10, base_url: str = BASE_
         time.sleep(interval_sec)
 
     served = json.loads(body.decode("utf-8"))
-    detail = verify_payload(served, canonical_seq)
+    detail = verify_payload(served, active_evidence)
+    hold_decision = _hold_decision()
+    warnings = source_warnings(served, hold_decision)
 
     # 페이지 렌더 확인(SSR) — 상태 문구까지 본다.
     pages, page_checks = {}, {}
@@ -180,7 +251,11 @@ def run(*, timeout_sec: int = 180, interval_sec: int = 10, base_url: str = BASE_
         "reason": ("운영 URL 이 커밋된 public 산출물과 일치하고 표시 계약도 정상"
                    if not failed else f"운영 라이브 검증 실패 항목: {', '.join(failed)}"),
         "expectedSha256": want[:16], "servedSha256": got[:16],
-        "canonicalSequence": canonical_seq,
+        "canonicalSequence": active_evidence["officialSequence"],
+        "activeLedgerIdentity": active_evidence["ledgerIdentity"],
+        "priceFreshnessStatus": served.get("priceFreshnessStatus"),
+        "priceStaleTradingDays": served.get("priceStaleTradingDays"),
+        "magicPaperLaneDecision": hold_decision, "sourceWarnings": warnings,
         "httpStatus": pages, "attempts": attempt,
         "checks": checks, "failedChecks": failed,
         **{k: v for k, v in detail.items() if k != "checks"},
@@ -195,7 +270,8 @@ def main(argv=None) -> int:
     ap.add_argument("--base-url", default=BASE_URL)
     args = ap.parse_args(argv)
     r = run(timeout_sec=args.timeout, interval_sec=args.interval, base_url=args.base_url)
-    print(json.dumps(r, ensure_ascii=False), flush=True)
+    # Windows scheduled PowerShell may capture stdout with a legacy code page.
+    print(json.dumps(r, ensure_ascii=True), flush=True)
     return 0 if r["status"] == "LIVE_OK" else 2
 
 
