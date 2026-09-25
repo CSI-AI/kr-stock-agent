@@ -2,6 +2,8 @@
 """Network-free contract tests for the Auto Publish lane-separation policy."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from evaluate_public_publish_mode import evaluate
 
 
@@ -77,13 +79,70 @@ def main() -> int:
         held_stale_warning["decision"] == "WAIT_STALE_GENERAL_DATA",
     )
 
-    weekend = evaluate(
+    holiday_newer = evaluate(
+        gate_exit=10,
+        gate_decision="SKIPPED_NON_TRADING_DAY",
+        price_freshness_status="PASS",
+        price_stale_trading_days=0,
+        source_price_as_of="2026-09-23",
+        published_price_as_of="2026-09-22",
+    )
+    check(
+        "holiday publishes only newer validated general data",
+        holiday_newer["decision"] == "PROCEED_GENERAL_DATA_ONLY"
+        and holiday_newer["publishMode"] == "GENERAL_DATA_ONLY",
+    )
+
+    holiday_same = evaluate(
+        gate_exit=10,
+        gate_decision="SKIPPED_NON_TRADING_DAY",
+        price_freshness_status="PASS",
+        price_stale_trading_days=0,
+        source_price_as_of="2026-09-23",
+        published_price_as_of="2026-09-23",
+    )
+    check(
+        "holiday same price date is NO_CHANGE",
+        holiday_same["decision"] == "SKIP_NON_TRADING_DAY"
+        and holiday_same["publishMode"] == "NONE",
+    )
+
+    holiday_stale = evaluate(
+        gate_exit=10,
+        gate_decision="SKIPPED_NON_TRADING_DAY",
+        price_freshness_status="WARNING_CACHED",
+        price_stale_trading_days=2,
+        source_price_as_of="2026-09-23",
+        published_price_as_of="2026-09-22",
+    )
+    check(
+        "holiday newer but stale source waits",
+        holiday_stale["decision"] == "WAIT_STALE_GENERAL_DATA",
+    )
+
+    holiday_older = evaluate(
+        gate_exit=10,
+        gate_decision="SKIPPED_NON_TRADING_DAY",
+        price_freshness_status="PASS",
+        price_stale_trading_days=0,
+        source_price_as_of="2026-09-22",
+        published_price_as_of="2026-09-23",
+    )
+    check(
+        "holiday older source is NO_CHANGE",
+        holiday_older["decision"] == "SKIP_NON_TRADING_DAY",
+    )
+
+    holiday_missing_date = evaluate(
         gate_exit=10,
         gate_decision="SKIPPED_NON_TRADING_DAY",
         price_freshness_status="PASS",
         price_stale_trading_days=0,
     )
-    check("non-trading day still self-skips", weekend["decision"] == "SKIP_NON_TRADING_DAY")
+    check(
+        "holiday missing comparison date fails closed",
+        holiday_missing_date["decision"] == "BLOCKED_PRICE_DATE_COMPARISON_UNKNOWN",
+    )
 
     broken_gate = evaluate(
         gate_exit=2,
@@ -94,6 +153,21 @@ def main() -> int:
     check(
         "invalid HOLD policy stays blocked",
         broken_gate["decision"] == "BLOCKED_MAGIC_GATE" and broken_gate["verdict"] == "BLOCKED",
+    )
+
+    publish_script = (Path(__file__).resolve().parent / "publish-public-data.ps1").read_text(
+        encoding="utf-8"
+    )
+    check(
+        "publish wrapper passes source and deployed price dates",
+        "--source-price-as-of" in publish_script
+        and "--published-price-as-of" in publish_script,
+    )
+    check(
+        "general-only wrapper preserves committed Magic hash",
+        "$committedMagicOfficialHash" in publish_script
+        and "$magicBefore -ne $committedMagicOfficialHash" in publish_script
+        and "$magicAfter -ne $committedMagicOfficialHash" in publish_script,
     )
     return 0
 

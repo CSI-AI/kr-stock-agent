@@ -79,6 +79,34 @@ function Get-PublicSummary([string]$Path = "") {
   try { return (($raw | Out-String).Trim() | ConvertFrom-Json) } catch { return $null }
 }
 
+function Get-CommittedPublicSummary {
+  $tmp = Join-Path ([IO.Path]::GetTempPath()) ("wababa-published-{0}.json" -f [guid]::NewGuid().ToString("N"))
+  try {
+    $raw = & git show ("HEAD:{0}" -f $PublicRel) 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $raw) { return $null }
+    [IO.File]::WriteAllText($tmp, (($raw | Out-String).TrimEnd() + "`n"), (New-Object Text.UTF8Encoding($false)))
+    return Get-PublicSummary $tmp
+  } finally {
+    Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+  }
+}
+
+function Get-ValidatedPriceFreshness([string]$PriceAsOf) {
+  if (-not $PriceAsOf) { return $null }
+  $repo2Scripts = "C:\work\kr-stock-agent-data-new\scripts"
+  $referenceDate = (Get-Date).ToString("yyyy-MM-dd")
+  $code = @'
+import json, sys
+from datetime import date
+sys.path.insert(0, sys.argv[1])
+from build_recommendation_history import evaluate_price_freshness
+print(json.dumps(evaluate_price_freshness(sys.argv[2], date.fromisoformat(sys.argv[3]), {}), ensure_ascii=False))
+'@
+  $raw = & $script:pyExe @script:pyPre -c $code $repo2Scripts $PriceAsOf $referenceDate 2>$null
+  if ($LASTEXITCODE -ne 0 -or -not $raw) { return $null }
+  try { return (($raw | Out-String).Trim() | ConvertFrom-Json) } catch { return $null }
+}
+
 # 매 종료 경로에서 홈페이지 반영 결과를 기록한다(성공·no-change·BLOCKED 모두).
 # 실패해도 본 작업 exit code 를 바꾸지 않는다(보고용 부가 산출물).
 function Write-PublishStatus {
@@ -239,12 +267,20 @@ if (Test-Path -LiteralPath $gateScript) {
   # Magic lane과 일반 가격·추천 lane을 분리한다. intentional HOLD만 예외이며,
   # HOLD 정책 손상이나 Auto Apply 실패를 일반 publish로 우회시키지는 않는다.
   $prePublicSummary = Get-PublicSummary
+  $committedSummary = Get-CommittedPublicSummary
+  if (-not $committedSummary) {
+    Stop-Fail "BLOCKED_PUBLISHED_SUMMARY_UNREADABLE - 현재 배포 기준 public 요약을 읽을 수 없음"
+  }
   # 현재 공개 파일이 오래된 것은 refresh가 필요한 이유이지, 새 canonical 원본까지
   # 오래됐다는 뜻이 아니다. publish 여부는 read-only 내부 원본 freshness로 판정한다.
   $internalHistory = "C:\work\kr-stock-agent-data-new\recommendation-history.json"
   $sourceSummary = Get-PublicSummary $internalHistory
-  $priceStatus = if ($sourceSummary) { "$($sourceSummary.priceFreshnessStatus)" } else { "" }
-  $priceStaleDays = if ($sourceSummary -and $null -ne $sourceSummary.priceStaleTradingDays) { "$($sourceSummary.priceStaleTradingDays)" } else { "" }
+  $validatedFreshness = if ($sourceSummary) { Get-ValidatedPriceFreshness "$($sourceSummary.priceBasisDate)" } else { $null }
+  if (-not $validatedFreshness) {
+    Stop-Fail "BLOCKED_GENERAL_DATA_FRESHNESS_UNKNOWN - 공용 KRX 휴장표 기반 가격 freshness 판정 실패"
+  }
+  $priceStatus = "$($validatedFreshness.priceFreshnessStatus)"
+  $priceStaleDays = if ($null -ne $validatedFreshness.priceStaleTradingDays) { "$($validatedFreshness.priceStaleTradingDays)" } else { "" }
   $modeScript = Join-Path $PSScriptRoot "evaluate_public_publish_mode.py"
   if (-not (Test-Path -LiteralPath $modeScript)) {
     Stop-Fail "BLOCKED_PUBLISH_MODE_POLICY_MISSING - publish lane 분리 정책 스크립트 없음"
@@ -253,7 +289,9 @@ if (Test-Path -LiteralPath $gateScript) {
     $modeScript,
     "--gate-exit", "$gateExit",
     "--gate-decision", "$gateDecision",
-    "--price-freshness-status", "$priceStatus"
+    "--price-freshness-status", "$priceStatus",
+    "--source-price-as-of", "$($sourceSummary.priceBasisDate)",
+    "--published-price-as-of", "$($committedSummary.priceBasisDate)"
   )
   if ($priceStaleDays) { $modeArgs += @("--price-stale-trading-days", "$priceStaleDays") }
   $modeRaw = & $pyExe @pyPre @modeArgs 2>&1
@@ -317,13 +355,19 @@ $postSummary = Get-PublicSummary
 if (-not $postSummary) {
   Stop-Fail "BLOCKED_PUBLIC_SUMMARY_UNREADABLE - 재생성 후 public 요약을 읽을 수 없음"
 }
-$postPriceStatus = "$($postSummary.priceFreshnessStatus)"
-$postPriceStaleDays = if ($null -ne $postSummary.priceStaleTradingDays) { "$($postSummary.priceStaleTradingDays)" } else { "" }
+$postValidatedFreshness = Get-ValidatedPriceFreshness "$($postSummary.priceBasisDate)"
+if (-not $postValidatedFreshness) {
+  Stop-Fail "BLOCKED_GENERAL_DATA_FRESHNESS_UNKNOWN - 재생성 후 공용 KRX 휴장표 기반 freshness 판정 실패"
+}
+$postPriceStatus = "$($postValidatedFreshness.priceFreshnessStatus)"
+$postPriceStaleDays = if ($null -ne $postValidatedFreshness.priceStaleTradingDays) { "$($postValidatedFreshness.priceStaleTradingDays)" } else { "" }
 $postModeArgs = @(
   $modeScript,
   "--gate-exit", "$gateExit",
   "--gate-decision", "$gateDecision",
-  "--price-freshness-status", "$postPriceStatus"
+  "--price-freshness-status", "$postPriceStatus",
+  "--source-price-as-of", "$($postSummary.priceBasisDate)",
+  "--published-price-as-of", "$($committedSummary.priceBasisDate)"
 )
 if ($postPriceStaleDays) { $postModeArgs += @("--price-stale-trading-days", "$postPriceStaleDays") }
 $postModeRaw = & $pyExe @pyPre @postModeArgs 2>&1
@@ -347,10 +391,12 @@ if ($postModeExit -ne 0 -or "$($postMode.decision)" -ne "$($mode.decision)") {
 # GENERAL_DATA_ONLY에서는 refresh가 Magic 장부 표현을 단 한 바이트 의미도 바꾸지
 # 않았음을 canonical JSON hash로 확인한다. Magic HOLD/주문 상태는 그대로다.
 if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
+  $committedMagicOfficialHash = "$($committedSummary.magicOfficialContentSha256)"
   $magicBefore = if ($prePublicSummary) { "$($prePublicSummary.magicOfficialContentSha256)" } else { "" }
   $magicAfter = "$($postSummary.magicOfficialContentSha256)"
-  if (-not $magicBefore -or -not $magicAfter -or $magicBefore -ne $magicAfter) {
-    Stop-Fail "BLOCKED_MAGIC_CONTENT_CHANGED - GENERAL_DATA_ONLY refresh 중 Magic 공개 키 변경 감지"
+  if (-not $committedMagicOfficialHash -or -not $magicBefore -or -not $magicAfter -or `
+      $magicBefore -ne $committedMagicOfficialHash -or $magicAfter -ne $committedMagicOfficialHash) {
+    Stop-Fail "BLOCKED_MAGIC_CONTENT_CHANGED - GENERAL_DATA_ONLY에서 배포본 대비 Magic 공개 키 변경 감지"
   }
   Write-Log "GENERAL_DATA_ONLY 검증: Magic 공개 키 hash 불변 · 실주문/브로커 호출 0"
 }
