@@ -2,9 +2,9 @@
   "baseDate": "2026-09-25",
   "generatedAt": "2026-09-25 08:45:03",
   "priceAsOf": "2026-09-23",
-  "priceStaleTradingDays": 2,
-  "priceFreshnessStatus": "WARNING_CACHED",
-  "priceFreshnessReason": "2거래일 지난 캐시 시세 사용",
+  "priceStaleTradingDays": 0,
+  "priceFreshnessStatus": "PASS",
+  "priceFreshnessReason": "최근 거래일(2026-09-23) 시세",
   "priceSource": "pykrx-daily-fast+cached-opendart-financials+selective-dart-refresh",
   "portfolioSummary": {
     "initialCapital": 50000000.0,
