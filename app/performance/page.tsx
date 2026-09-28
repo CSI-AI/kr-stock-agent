@@ -11,7 +11,9 @@ import {
   parseMagicOfficialPortfolio,
 } from "../_dashboard/magic-official";
 
-export const dynamic = "force-dynamic";
+// 공개 장부는 배포 시 함께 갱신된다. 요청마다 2.6MB JSON과 전체 거래표를
+// 다시 서버 렌더링하지 않고 정적 결과를 CDN/Next 라우터 prefetch로 재사용한다.
+export const dynamic = "force-static";
 
 // 성과분석 — 마법공식펀드 상세 이력 전용. 공식 운용 성과·보유 종목·거래일별 기록 + 넘긴 종목.
 // 대시보드와 겹치는 요약(상태·수치표·차트)·매수근거·공식설명 블럭은 대시보드로 일원화했다.
