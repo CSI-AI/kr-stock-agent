@@ -336,7 +336,9 @@ if ($branch -ne "master") { Stop-Fail "현재 브랜치가 master가 아님: '$b
 #  08:45 이 쓰는 것과 동일한 공식 함수를 재사용한다(매매 로직 0, 수기 JSON 0).
 $refreshScript = "C:\work\kr-stock-agent-data-new\scripts\refresh_public_from_canonical.py"
 if (Test-Path -LiteralPath $refreshScript) {
-  $refreshRaw = & $pyExe @pyPre $refreshScript 2>&1
+  $refreshArgs = @($refreshScript)
+  if ($script:publishMode -eq "GENERAL_DATA_ONLY") { $refreshArgs += "--freeze-magic" }
+  $refreshRaw = & $pyExe @pyPre @refreshArgs 2>&1
   if ($LASTEXITCODE -ne 0) {
     Stop-Fail "BLOCKED_PUBLIC_REFRESH_FAILED - canonical 기준 public 재생성 실패: $(($refreshRaw | Out-String).Trim())"
   }

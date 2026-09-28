@@ -169,6 +169,11 @@ def main() -> int:
         and "$magicBefore -ne $committedMagicOfficialHash" in publish_script
         and "$magicAfter -ne $committedMagicOfficialHash" in publish_script,
     )
+    check(
+        "general-only wrapper requests atomic Magic freeze",
+        '$script:publishMode -eq "GENERAL_DATA_ONLY"' in publish_script
+        and '$refreshArgs += "--freeze-magic"' in publish_script,
+    )
     return 0
 
 
