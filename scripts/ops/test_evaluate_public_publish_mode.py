@@ -166,13 +166,27 @@ def main() -> int:
     check(
         "general-only wrapper preserves committed Magic hash",
         "$committedMagicOfficialHash" in publish_script
-        and "$magicBefore -ne $committedMagicOfficialHash" in publish_script
         and "$magicAfter -ne $committedMagicOfficialHash" in publish_script,
     )
     check(
-        "general-only wrapper requests atomic Magic freeze",
+        "general-only wrapper freezes from committed public baseline",
         '$script:publishMode -eq "GENERAL_DATA_ONLY"' in publish_script
-        and '$refreshArgs += "--freeze-magic"' in publish_script,
+        and 'git show ("HEAD:{0}" -f $PublicRel)' in publish_script
+        and '@("--freeze-magic", "--public-path", $frozenPublicPath)' in publish_script
+        and "BLOCKED_COMMITTED_MAGIC_FREEZE_MISMATCH" in publish_script,
+    )
+    check(
+        "general-only wrapper restores deployed Magic when working derivation is newer",
+        "미승인 working Magic을 배포 HEAD 기준으로 복원" in publish_script,
+    )
+    check(
+        "general-only wrapper removes temporary public baseline on every failure path",
+        publish_script.count(
+            "Remove-Item -LiteralPath $frozenPublicPath -Force -ErrorAction SilentlyContinue"
+        )
+        >= 3
+        and "finally {" in publish_script
+        and "BLOCKED_PUBLIC_REFRESH_REPLACE_FAILED" in publish_script,
     )
     return 0
 

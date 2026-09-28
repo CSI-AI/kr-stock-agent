@@ -337,13 +337,51 @@ if ($branch -ne "master") { Stop-Fail "현재 브랜치가 master가 아님: '$b
 $refreshScript = "C:\work\kr-stock-agent-data-new\scripts\refresh_public_from_canonical.py"
 if (Test-Path -LiteralPath $refreshScript) {
   $refreshArgs = @($refreshScript)
-  if ($script:publishMode -eq "GENERAL_DATA_ONLY") { $refreshArgs += "--freeze-magic" }
+  $frozenPublicPath = ""
+  if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
+    # Auto Daily may already have derived a newer, not-yet-public Magic state into the
+    # working public file. Public approval is still false, so freeze from the deployed
+    # HEAD baseline rather than from that mutable working file.
+    $frozenPublicPath = Join-Path (Split-Path -Parent (Join-Path $Repo $PublicRel)) `
+      (".recommendation-history.committed-magic-{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $committedRaw = & git show ("HEAD:{0}" -f $PublicRel) 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $committedRaw) {
+      Stop-Fail "BLOCKED_COMMITTED_PUBLIC_BASELINE_MISSING - GENERAL_DATA_ONLY 배포 기준본을 읽을 수 없음"
+    }
+    [IO.File]::WriteAllText(
+      $frozenPublicPath,
+      (($committedRaw | Out-String).TrimEnd() + "`n"),
+      (New-Object Text.UTF8Encoding($false))
+    )
+    $refreshArgs += @("--freeze-magic", "--public-path", $frozenPublicPath)
+  }
   $refreshRaw = & $pyExe @pyPre @refreshArgs 2>&1
   if ($LASTEXITCODE -ne 0) {
+    if ($frozenPublicPath) { Remove-Item -LiteralPath $frozenPublicPath -Force -ErrorAction SilentlyContinue }
     Stop-Fail "BLOCKED_PUBLIC_REFRESH_FAILED - canonical 기준 public 재생성 실패: $(($refreshRaw | Out-String).Trim())"
   }
   $refresh = $null
   try { $refresh = (($refreshRaw | Out-String) -split "`n" | Where-Object { $_.Trim().StartsWith('{') } | Select-Object -Last 1).Trim() | ConvertFrom-Json } catch {}
+  if ($frozenPublicPath) {
+    $frozenSummary = Get-PublicSummary $frozenPublicPath
+    $committedMagicOfficialHash = "$($committedSummary.magicOfficialContentSha256)"
+    if (-not $frozenSummary -or -not $committedMagicOfficialHash -or `
+        "$($frozenSummary.magicOfficialContentSha256)" -ne $committedMagicOfficialHash) {
+      Remove-Item -LiteralPath $frozenPublicPath -Force -ErrorAction SilentlyContinue
+      Stop-Fail "BLOCKED_COMMITTED_MAGIC_FREEZE_MISMATCH - GENERAL_DATA_ONLY 임시 산출물이 배포 Magic 기준과 다름"
+    }
+    $replaceError = ""
+    try {
+      Move-Item -LiteralPath $frozenPublicPath -Destination (Join-Path $Repo $PublicRel) -Force
+    } catch {
+      $replaceError = $_.Exception.Message
+    } finally {
+      Remove-Item -LiteralPath $frozenPublicPath -Force -ErrorAction SilentlyContinue
+    }
+    if ($replaceError) {
+      Stop-Fail "BLOCKED_PUBLIC_REFRESH_REPLACE_FAILED - 검증된 GENERAL_DATA_ONLY 산출물 교체 실패: $replaceError"
+    }
+  }
   if ($refresh) {
     Write-Log "public 재생성: changed=$($refresh.changed) 장부기준일=$($refresh.ledgerBasisDate) seq=$($refresh.officialSequence) lot=$($refresh.openItemLotCount) 고유=$($refresh.uniqueHoldings)"
   }
@@ -396,9 +434,12 @@ if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
   $committedMagicOfficialHash = "$($committedSummary.magicOfficialContentSha256)"
   $magicBefore = if ($prePublicSummary) { "$($prePublicSummary.magicOfficialContentSha256)" } else { "" }
   $magicAfter = "$($postSummary.magicOfficialContentSha256)"
-  if (-not $committedMagicOfficialHash -or -not $magicBefore -or -not $magicAfter -or `
-      $magicBefore -ne $committedMagicOfficialHash -or $magicAfter -ne $committedMagicOfficialHash) {
+  if (-not $committedMagicOfficialHash -or -not $magicAfter -or `
+      $magicAfter -ne $committedMagicOfficialHash) {
     Stop-Fail "BLOCKED_MAGIC_CONTENT_CHANGED - GENERAL_DATA_ONLY에서 배포본 대비 Magic 공개 키 변경 감지"
+  }
+  if ($magicBefore -and $magicBefore -ne $committedMagicOfficialHash) {
+    Write-Log "GENERAL_DATA_ONLY 검증: 미승인 working Magic을 배포 HEAD 기준으로 복원"
   }
   Write-Log "GENERAL_DATA_ONLY 검증: Magic 공개 키 hash 불변 · 실주문/브로커 호출 0"
 }
