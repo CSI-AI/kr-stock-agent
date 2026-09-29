@@ -6,6 +6,7 @@ import hashlib
 import json
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -66,6 +67,51 @@ class ActiveLedgerEvidenceTest(unittest.TestCase):
         self.assertTrue(all(checks.values()), checks)
         self.assertEqual(evidence["officialSequence"], 66)
         self.assertEqual(before, hashlib.sha256(self.original.read_bytes()).hexdigest())
+
+    def test_default_resolver_uses_500m_source_for_500m_active(self):
+        legacy_source = Path(self.temp.name) / "legacy-source.json"
+        legacy = fixture(); legacy["ledgerIdentity"] = "LEGACY_50M"
+        legacy_source.write_text(json.dumps(legacy), encoding="utf-8")
+        fake = types.SimpleNamespace(
+            ACTIVE_PATH=self.active, CAPITAL_V2_ACTIVE_PATH=self.active,
+            CAPITAL_V2_SOURCE_PATH=self.source,
+            RECONSTRUCTION_SOURCE_PATH=legacy_source,
+            ORIGINAL_PATH=self.original,
+            ORIGINAL_PRESERVED_SHA256=self.original_sha,
+        )
+        with patch.dict(sys.modules, {"magic_active_paper": fake}):
+            evidence = V._active_ledger_evidence()
+        self.assertEqual(evidence["ledgerIdentity"], fixture()["ledgerIdentity"])
+
+    def test_missing_identity_is_accepted_only_with_apply_and_snapshot_witness(self):
+        active = fixture(); active.pop("ledgerIdentity")
+        active["officialSequence"] = 67
+        active["dailyLedger"] = [{"date": "2026-09-19", "runStatus": "COMPLETED"}]
+        self.active.write_text(json.dumps(active), encoding="utf-8")
+        active_sha = hashlib.sha256(self.active.read_bytes()).hexdigest()
+        source_sha = hashlib.sha256(self.source.read_bytes()).hexdigest()
+        status = Path(self.temp.name) / "status.json"
+        status.write_text(json.dumps({
+            "status": "APPLIED_AUTOMATICALLY", "verdict": "PASS",
+            "canonicalSha256Before": source_sha, "canonicalSha256After": active_sha,
+            "officialSequence": 67,
+        }), encoding="utf-8")
+        snaps = Path(self.temp.name) / "snapshots"; snaps.mkdir()
+        (snaps / "2026-09-19.json").write_text(json.dumps({
+            "canonicalStateSha256": active_sha, "officialSequence": 67,
+        }), encoding="utf-8")
+        evidence = V._active_ledger_evidence(
+            active_path=self.active, source_path=self.source, original_path=self.original,
+            expected_original_sha=self.original_sha, status_path=status, snapshot_dir=snaps)
+        self.assertTrue(evidence["identityRecoveredFromWitness"])
+        self.assertEqual(evidence["ledgerIdentity"], fixture()["ledgerIdentity"])
+
+        bad = json.loads(status.read_text(encoding="utf-8")); bad["canonicalSha256After"] = "0" * 64
+        status.write_text(json.dumps(bad), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "witness mismatch"):
+            V._active_ledger_evidence(
+                active_path=self.active, source_path=self.source, original_path=self.original,
+                expected_original_sha=self.original_sha, status_path=status, snapshot_dir=snaps)
 
     def test_served_43_is_not_current_active_paper(self):
         evidence = self.evidence()

@@ -68,14 +68,19 @@ def _strip_html(h: str) -> str:
 
 
 def _active_ledger_evidence(*, active_path=None, source_path=None, original_path=None,
-                            expected_original_sha=None) -> dict:
+                            expected_original_sha=None, status_path=None, snapshot_dir=None) -> dict:
     """Use the same active-paper resolver as public generation; fail closed on drift."""
     if any(value is None for value in
            (active_path, source_path, original_path, expected_original_sha)):
         sys.path.insert(0, str(DATA_ROOT / "scripts"))
         import magic_active_paper as active_paper
         active_path = active_path or active_paper.ACTIVE_PATH
-        source_path = source_path or active_paper.RECONSTRUCTION_SOURCE_PATH
+        if source_path is None:
+            capital_v2_active = getattr(active_paper, "CAPITAL_V2_ACTIVE_PATH", None)
+            source_path = (getattr(active_paper, "CAPITAL_V2_SOURCE_PATH", None)
+                           if capital_v2_active is not None
+                           and Path(active_path) == Path(capital_v2_active)
+                           else active_paper.RECONSTRUCTION_SOURCE_PATH)
         original_path = original_path or active_paper.ORIGINAL_PATH
         expected_original_sha = (expected_original_sha or
                                  active_paper.ORIGINAL_PRESERVED_SHA256)
@@ -83,15 +88,13 @@ def _active_ledger_evidence(*, active_path=None, source_path=None, original_path
         Path, (active_path, source_path, original_path))
     active_bytes = active_path.read_bytes()
     active = json.loads(active_bytes)
-    source = json.loads(source_path.read_text(encoding="utf-8"))
+    source_bytes = source_path.read_bytes()
+    source = json.loads(source_bytes)
     original_sha = hashlib.sha256(original_path.read_bytes()).hexdigest()
     if original_sha != expected_original_sha.lower():
         raise ValueError("preserved original hash changed")
     if not isinstance(active, dict) or not isinstance(source, dict):
         raise ValueError("active or reconstruction source is not an object")
-    identity = active.get("ledgerIdentity")
-    if not isinstance(identity, str) or not identity or identity != source.get("ledgerIdentity"):
-        raise ValueError("active paper ledger identity mismatch")
     sequence = active.get("officialSequence")
     if type(sequence) is not int or sequence < 1:
         raise ValueError("active paper sequence invalid")
@@ -100,9 +103,37 @@ def _active_ledger_evidence(*, active_path=None, source_path=None, original_path
                  and row.get("date")]
     if not completed:
         raise ValueError("active paper completed ledger absent")
+    active_sha = hashlib.sha256(active_bytes).hexdigest()
+    identity = active.get("ledgerIdentity")
+    source_identity = source.get("ledgerIdentity")
+    recovered_from_witness = False
+    if not isinstance(identity, str) or not identity or identity != source_identity:
+        # seq70 저장기의 메타데이터 누락은 거래내용을 다시 쓰지 않고, 적용 전 source hash와
+        # 적용 후 durable status + immutable snapshot의 연속 증거가 모두 맞을 때만 복구 판정한다.
+        if identity not in (None, "") or not isinstance(source_identity, str) or not source_identity:
+            raise ValueError("active paper ledger identity mismatch")
+        status_path = Path(status_path or DATA_ROOT / "reports" / "magic-auto-apply-status-latest.json")
+        snapshot_dir = Path(snapshot_dir or DATA_ROOT / "data" / "magic-formula-official" / "snapshots")
+        status = json.loads(status_path.read_text(encoding="utf-8"))
+        snapshot = json.loads((snapshot_dir / f"{max(completed)}.json").read_text(encoding="utf-8"))
+        source_sha = hashlib.sha256(source_bytes).hexdigest()
+        witness_ok = all((
+            status.get("status") == "APPLIED_AUTOMATICALLY",
+            status.get("verdict") == "PASS",
+            status.get("canonicalSha256Before") == source_sha,
+            status.get("canonicalSha256After") == active_sha,
+            status.get("officialSequence") == sequence,
+            snapshot.get("canonicalStateSha256") == active_sha,
+            snapshot.get("officialSequence") == sequence,
+        ))
+        if not witness_ok:
+            raise ValueError("active paper ledger identity witness mismatch")
+        identity = source_identity
+        recovered_from_witness = True
     return {"officialSequence": sequence, "sourceStateSha256":
-            hashlib.sha256(active_bytes).hexdigest(), "ledgerIdentity": identity,
-            "lastCompletedDate": max(completed), "originalPreserved": True}
+            active_sha, "ledgerIdentity": identity,
+            "lastCompletedDate": max(completed), "originalPreserved": True,
+            "identityRecoveredFromWitness": recovered_from_witness}
 
 
 def _hold_decision() -> str:
