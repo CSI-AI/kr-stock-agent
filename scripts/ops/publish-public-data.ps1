@@ -264,6 +264,31 @@ if (Test-Path -LiteralPath $gateScript) {
     Write-Log "선행 gate 출력 파싱 실패(exit $gateExit): $(($gateRaw | Out-String).Trim())"
   }
 
+  # 거래일 당일 종가는 08:45 생산 시점에 아직 없을 수 있다. Auto Apply가 정상 완료된
+  # FULL publish 경로에서만 기존 공식 KRX 생산기를 data-only/no-trade로 정확히 1회 재사용한다.
+  # 새 scheduler·DART 갱신·주문·재시도는 없으며, 당일 종가 미도착/생산 오류/보호파일 변화는
+  # 스크립트가 입력 파일을 실행 전 바이트로 복원한 뒤 fail-closed 한다.
+  if ($gateExit -eq 0 -and $gateDecision -eq "PROCEED" -and -not $ManualTargetDate) {
+    $postCloseScript = "C:\work\kr-stock-agent-data-new\scripts\post_close_price_refresh.py"
+    if (-not (Test-Path -LiteralPath $postCloseScript)) {
+      Stop-Fail "BLOCKED_POST_CLOSE_PRICE_REFRESH_MISSING - 가격 전용 갱신 스크립트 없음"
+    }
+    $preCloseSource = Get-PublicSummary "C:\work\kr-stock-agent-data-new\recommendation-history.json"
+    if ($preCloseSource -and "$($preCloseSource.priceBasisDate)" -eq $publishTarget) {
+      Write-Log "장마감 가격 갱신 SKIP: 내부 가격 기준일이 이미 target=$publishTarget (중복 수집 0)"
+    } else {
+      $postCloseRaw = & $pyExe @pyPre $postCloseScript --target-date $publishTarget 2>&1
+      $postCloseExit = $LASTEXITCODE
+      $postClose = $null
+      try { $postClose = (($postCloseRaw | Out-String) -split "`n" | Where-Object { $_.Trim().StartsWith('{') } | Select-Object -Last 1).Trim() | ConvertFrom-Json } catch {}
+      if ($postCloseExit -ne 0 -or -not $postClose -or "$($postClose.status)" -ne "PASS") {
+        $why = if ($postClose) { "$($postClose.reason)" } else { (($postCloseRaw | Out-String).Trim()) }
+        Stop-Fail "BLOCKED_POST_CLOSE_PRICE_REFRESH - $why"
+      }
+      Write-Log "장마감 가격 갱신 PASS: priceAsOf=$($postClose.priceAsOf) sourceUpdatedAt=$($postClose.sourceUpdatedAt) rankingChanged=$($postClose.rankingContentChanged) DART=0 주문=0 재시도=0"
+    }
+  }
+
   # Magic lane과 일반 가격·추천 lane을 분리한다. intentional HOLD만 예외이며,
   # HOLD 정책 손상이나 Auto Apply 실패를 일반 publish로 우회시키지는 않는다.
   $prePublicSummary = Get-PublicSummary
