@@ -7,6 +7,7 @@ import {
 import {
   parseMagicOfficialTradeDays,
   isMagicReconstruction,
+  usesMagicReconstructedSource,
   MagicFormulaExplainer,
   type MagicOfficialBuyTrade,
 } from "../../_dashboard/magic-official";
@@ -71,7 +72,7 @@ type OfficialRankings = {
   isGlobal: boolean;
 };
 function parseRankings(history: Rec): OfficialRankings | null {
-  const r = isMagicReconstruction(history) ? history.magicReconstructedRankings : history.magicOfficialRankings;
+  const r = usesMagicReconstructedSource(history) ? history.magicReconstructedRankings : history.magicOfficialRankings;
   if (!r || typeof r !== "object" || Array.isArray(r)) return null;
   const ro = r as Rec;
   const mapItem = (x: Rec): RankingItem => ({

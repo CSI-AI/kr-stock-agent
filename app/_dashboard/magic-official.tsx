@@ -25,10 +25,30 @@ function boolOrNull(v: unknown): boolean | null {
 }
 export function isMagicReconstruction(history: Rec): boolean {
   const meta = obj(history.magicReconstructionMeta);
-  return meta.actualExecution === false && Object.keys(obj(history.magicReconstructedSummary)).length > 0;
+  const official = obj(history.magicOfficialSummary);
+  return meta.actualExecution === false && (
+    Object.keys(obj(history.magicReconstructedSummary)).length > 0
+    || official.actualExecution === false
+    || str(official.paperLedgerKind).startsWith("SEPARATE_")
+  );
+}
+export function usesMagicReconstructedSource(history: Rec): boolean {
+  const reconstructed = obj(history.magicReconstructedSummary);
+  if (Object.keys(reconstructed).length === 0) return false;
+  const official = obj(history.magicOfficialSummary);
+  if (Object.keys(official).length === 0) return true;
+
+  const reconstructedSequence = num(reconstructed.officialSequence);
+  const officialSequence = num(official.officialSequence);
+  if (reconstructedSequence !== null && officialSequence !== null) {
+    return reconstructedSequence > officialSequence;
+  }
+  const reconstructedDate = str(reconstructed.dataDate || reconstructed.latestTradingDate);
+  const officialDate = str(official.dataDate || official.latestTradingDate);
+  return reconstructedDate > officialDate;
 }
 function magicSource(history: Rec, reconstructedKey: string, officialKey: string): unknown {
-  return isMagicReconstruction(history) ? history[reconstructedKey] : history[officialKey];
+  return usesMagicReconstructedSource(history) ? history[reconstructedKey] : history[officialKey];
 }
 // 비율(EBIT/EV, EBIT/투입자본) → 백분율 표시. 0.4522 → "45.2%".
 function ratioPct(v: number | null): string {
@@ -648,7 +668,7 @@ export type MagicOfficialBenchmark = {
 };
 
 export function parseMagicOfficialBenchmark(history: Rec): MagicOfficialBenchmark | null {
-  const raw = isMagicReconstruction(history)
+  const raw = usesMagicReconstructedSource(history)
     ? history?.["magicReconstructedBenchmark"]
     : history?.["magicOfficialBenchmark"];
   if (!raw || typeof raw !== "object") return null;
@@ -700,7 +720,7 @@ export type MagicOfficialBenchmarkMulti = {
 };
 
 export function parseMagicOfficialBenchmarkMulti(history: Rec): MagicOfficialBenchmarkMulti | null {
-  const root = isMagicReconstruction(history)
+  const root = usesMagicReconstructedSource(history)
     ? history?.["magicReconstructedBenchmark"]
     : history?.["magicOfficialBenchmark"];
   if (!root || typeof root !== "object") return null;

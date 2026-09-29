@@ -3,6 +3,8 @@
 // 와바바/AI/마법공식을 동일 카드 구조로 표시한다. 마법공식은 약한 accent만 유지.
 // 데이터가 없거나 0보유여도 깨지지 않고 "운용대기 / 데이터 대기"로 표시.
 
+import { isMagicReconstruction, usesMagicReconstructedSource } from "./magic-official";
+
 type Rec = Record<string, unknown>;
 export type FundKey = "wababa" | "ai" | "magic";
 
@@ -72,24 +74,24 @@ export function toFundView(history: Rec, key: FundKey): FundView {
   if (key === "magic") {
     // [45-E9] OFFICIAL(공식 운용) 우선. magicOfficialSummary가 있으면 그것을 기준으로,
     // 없으면 legacy PILOT(magicPortfolioSummary)로 fallback하며 "(파일럿)" 표시. PILOT/OFFICIAL 미혼합.
+    const useReconstructedSource = usesMagicReconstructedSource(history);
     const reconstructed = obj(history.magicReconstructedSummary);
-    const useReconstruction = obj(history.magicReconstructionMeta).actualExecution === false && Object.keys(reconstructed).length > 0;
-    const off = useReconstruction ? reconstructed : obj(history.magicOfficialSummary);
+    const off = useReconstructedSource ? reconstructed : obj(history.magicOfficialSummary);
     const hasOfficial = str(off.officialStartDate) !== "" && (num(off.officialSequence) ?? 0) >= 1;
     if (hasOfficial) {
       const totalAsset = num(off.totalAsset);
       const cash = num(off.totalCash);
-      const initial = num(off.totalAsset) !== null ? 50000000 : null;
+      const initial = num(off.initialCapital) ?? (num(off.totalAsset) !== null ? 50000000 : null);
       return {
         ...base,
-        statusLabel: useReconstruction ? "별도 복구 가상장부" : "운용 중",
+        statusLabel: isMagicReconstruction(history) ? "별도 복구 가상장부" : "운용 중",
         statusTone: a.primary,
         totalAsset,
         totalProfit: totalAsset !== null && initial !== null ? totalAsset - initial : null,
         totalProfitRate: num(off.cumulativeReturn),
         // '보유종목 수' 는 고유 종목 수여야 한다. openItemLotCount 는 날짜별 누적 lot(예: 190)이라
         // 그대로 쓰면 고유 14종목을 190종목으로 오표시한다. 고유 종목은 portfolio.holdings 길이.
-        holdingCount: arr(obj(useReconstruction ? history.magicReconstructedPortfolio : history.magicOfficialPortfolio).holdings).length,
+        holdingCount: arr(obj(useReconstructedSource ? history.magicReconstructedPortfolio : history.magicOfficialPortfolio).holdings).length,
         cash,
         cashRate: cash !== null && totalAsset ? (cash / totalAsset) * 100 : null,
       };
