@@ -3,8 +3,8 @@
   안전하게 commit/push 한다. (Phase 41-C)
 
   흐름(WABABA-AUTO-PUBLISH-SAME-DAY-SCHEDULE-ALIGNMENT — 거래 당일 반영):
-        15:40 Signal -> 15:45 Dry Run -> 16:05 Status -> 16:20 Fund Plan Preview
-        -> 16:25 Auto Apply(canonical) -> **17:00 이 스크립트** -> 다음 날 08:40 Founder 종합보고
+        15:40 Signal -> 17:00 Dry Run -> 17:10 Status
+        -> 17:20 Auto Apply(canonical) -> **17:50 이 스크립트** -> 다음 날 08:40 Founder 종합보고
         같은 실제 거래일 저녁에 홈페이지 반영을 끝내므로, 다음 날 08:40 보고가 전날 전체
         결과(장부+홈페이지+commit/push+배포+라이브검증)를 완결해 담는다.
         (구 계약인 "다음 날 08:55 publish" 는 폐기 — 08:40 보고가 publish 보다 먼저 돌아 미완결이었다.)
@@ -209,6 +209,8 @@ function Stop-Fail {
 
 Set-Location $Repo
 $env:PYTHONIOENCODING = "utf-8"
+# post_close_price_refresh.py 의 subprocess(text=True)도 Windows CP949 대신 UTF-8로 디코딩한다.
+$env:PYTHONUTF8 = "1"
 # PS 5.1 은 자식 프로세스 stdout 을 [Console]::OutputEncoding 으로 디코딩한다. 바로 위에서
 # Python 에 UTF-8 출력을 시켰으므로 여기도 UTF-8 로 맞추지 않으면 비대화형 스케줄러 기본값
 # (CP949)으로 읽혀 **캡처 순간** 한글이 깨진다. 2026-08-12 실측 피해 두 가지:
@@ -238,7 +240,7 @@ Write-Log "=== Wababa Auto Publish 시작 (Commit=$Commit Push=$Push) ==="
 Write-Log "python interpreter: $pyExe $($pyPre -join ' ')"
 
 # ── 0-A) Auto Apply 선행 gate (WABABA-AUTO-PUBLISH-SAME-DAY-SCHEDULE-ALIGNMENT) ──
-#  거래 당일 17:00 실행. "평일" 이라는 달력 조건만으로 publish 하지 않는다.
+#  거래 당일 17:50 실행. "평일" 이라는 달력 조건만으로 publish 하지 않는다.
 #  REPO2 gate 가 실제 거래일 + 당일 Auto Apply 선행 완료 + canonical 정합을 판정한다(read-only).
 #    exit 0 = PROCEED / 10 = 정상 self-skip(휴장) / 그 외 = 선행 미완료(non-success)
 #  선행 미완료를 NO_CHANGE 성공으로 위장하지 않는다 — 구분 가능한 BLOCKED 로 기록하고 exit 1.
@@ -356,7 +358,7 @@ $branch = (& git rev-parse --abbrev-ref HEAD 2>$null).Trim()
 if ($branch -ne "master") { Stop-Fail "현재 브랜치가 master가 아님: '$branch'" }
 
 # ── 0-B) 거래 당일 public 산출물 재생성 ──
-#  Auto Daily(08:45)는 16:25 Auto Apply *이전*에 돌아 그 거래일 장부가 빠져 있다.
+#  Auto Daily(08:45)는 17:20 Auto Apply *이전*에 돌아 그 거래일 장부가 빠져 있다.
 #  같은 거래일 저녁에 홈페이지를 반영하려면 publish 직전 canonical 기준으로 다시 파생해야 한다.
 #  08:45 이 쓰는 것과 동일한 공식 함수를 재사용한다(매매 로직 0, 수기 JSON 0).
 $refreshScript = "C:\work\kr-stock-agent-data-new\scripts\refresh_public_from_canonical.py"

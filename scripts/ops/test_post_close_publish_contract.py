@@ -5,12 +5,13 @@ from pathlib import Path
 def main() -> int:
     source = (Path(__file__).with_name("publish-public-data.ps1")).read_text(encoding="utf-8-sig")
     checks = {
-        "existing 17:00 wrapper only": "post_close_price_refresh.py" in source,
+        "existing same-day wrapper only": "post_close_price_refresh.py" in source,
         "trading-day proceed only": '$gateDecision -eq "PROCEED"' in source,
         "manual recovery excluded": "-not $ManualTargetDate" in source,
         "target date explicit": "--target-date $publishTarget" in source,
         "duplicate collection skipped": "중복 수집 0" in source,
         "failure closes publish": 'Stop-Fail "BLOCKED_POST_CLOSE_PRICE_REFRESH' in source,
+        "Windows subprocess UTF-8": '$env:PYTHONUTF8 = "1"' in source,
         "no new scheduler": "Register-ScheduledTask" not in source,
     }
     for name, ok in checks.items():
