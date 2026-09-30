@@ -22,7 +22,7 @@
      장부가 없으므로 publish 직전 canonical 기준으로 공식 함수로 다시 파생한다.
    - 브랜치가 master가 아니면 중단
    - freshness gate(--allow-unpublished) FAIL이면 중단
-   - 허용 외 dirty/untracked가 있으면 중단 (허용: public JSON, next-env.d.ts)
+   - 다른 파일의 작업 중 변경은 보존하고, staged 변경이 public JSON 밖에 있으면 중단
    - 공개 JSON에 C:\ / tradeHistoryPath / kr-stock-agent-data-new 가 있으면 중단
    - origin/master 대비 diverged(behind>0)이면 중단
    - public JSON 변경이 없으면 정상 종료(커밋 안 함)
@@ -474,21 +474,12 @@ if ($script:publishMode -eq "GENERAL_DATA_ONLY") {
 if ($LASTEXITCODE -ne 0) { Stop-Fail "freshness gate FAIL (exit $LASTEXITCODE) - 누출/sanitize/원본불일치 의심" }
 Write-Log "freshness gate PASS"
 
-# 3) dirty/untracked 검사 - 허용: public JSON, Next 생성파일, 실행에 영향 없는 작업지침.
-# stage 검사는 아래에서 public JSON 1개만 다시 강제한다.
-$allowed = @($PublicRel, "next-env.d.ts", "AGENTS.md")
-$publicChanged = $false
-$unexpected = @()
-$porcelain = & git status --porcelain
-foreach ($entry in $porcelain) {
-  if ([string]::IsNullOrWhiteSpace($entry)) { continue }
-  $path = $entry.Substring(3).Trim().Trim('"')
-  $norm = $path -replace '\\', '/'
-  if ($norm -eq $PublicRel) { $publicChanged = $true; continue }
-  if ($allowed -contains $norm) { continue }
-  $unexpected += $norm
-}
-if ($unexpected.Count -gt 0) { Stop-Fail "예상 외 변경/untracked 파일: $($unexpected -join ', ')" }
+# 3) 공개 파일만 이번 commit 대상이다. 다른 세션의 unstaged 작업은 그대로 보존한다.
+# 이미 staged 된 다른 파일은 commit 경합 위험이 있으므로 중단하고, stage 후에도 재검증한다.
+$publicChanged = [bool]((& git status --porcelain -- $PublicRel) -join '')
+$stagedBefore = @(& git diff --cached --name-only | ForEach-Object { ($_ -replace '\\','/').Trim() } | Where-Object { $_ })
+$unexpectedStaged = @($stagedBefore | Where-Object { $_ -ne $PublicRel })
+if ($unexpectedStaged.Count -gt 0) { Stop-Fail "public JSON 외 staged 파일: $($unexpectedStaged -join ', ')" }
 
 # 4) 공개 JSON 내부 경로/민감 문자열 직접 검사 (gate와 별개의 belt-and-suspenders)
 $publicText = Get-Content -Raw -Encoding utf8 (Join-Path $Repo $PublicRel)
