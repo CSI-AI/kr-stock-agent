@@ -4,11 +4,13 @@ import {
   readRecommendationHistory,
   formatShortDate,
 } from "../_dashboard/kit";
+import { MagicHowItWorks } from "../_dashboard/magic-first-page";
+import { MagicFormulaExplainer } from "../_dashboard/magic-official";
 
 export const dynamic = "force-dynamic";
 
-// 설정 — 연락처 이메일만 두는 읽기 전용 안내 페이지(Phase MF-UI-MASTER-REFINE).
-// 3펀드 운용원칙·A/B/C 자동화 게이트 등 중복/불필요 블럭은 제거했다. 저장 기능 없음.
+// 설정 — 1호 운용 설명·선정 산식과 연락처를 제공하는 읽기 전용 안내 페이지.
+// 저장 기능이나 2호 보류 해제 기능은 없다.
 const CONTACT_EMAIL = "duria2002@gmail.com";
 
 export default function SettingsPage() {
@@ -24,6 +26,16 @@ export default function SettingsPage() {
           설정
         </h1>
         <p style={{ margin: 0, fontSize: 13, color: "#94a3b8" }}>읽기 전용 안내 페이지입니다(저장 기능 없음).</p>
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">마법공식 1호 운용규칙</h2>
+        <MagicHowItWorks />
+      </section>
+
+      <section className="dashSection">
+        <h2 className="dashSectionTitle">종목 선정 방법</h2>
+        <MagicFormulaExplainer />
       </section>
 
       <section className="dashSection">

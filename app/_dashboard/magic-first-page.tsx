@@ -128,10 +128,16 @@ export function MagicHoldingsAndTrades({ history }: { history: Rec }) {
   const summary = parseMagicOfficialSummary(history);
   const holdings = parseMagicOfficialPortfolio(history).holdings;
   const days = parseMagicOfficialTradeDays(history);
-  const latest = days[0];
+  const lastBuyDay = days.find((d) => d.buys.length > 0) ?? null;
   // 최근 매도 = 실제로 매도가 있었던 가장 최근 거래일. 없으면 거짓 placeholder 대신 사실을 쓴다.
   const lastSellDay = days.find((d) => d.sells.length > 0) ?? null;
   const topHoldings = [...holdings].sort((a, b) => (b.marketValue ?? 0) - (a.marketValue ?? 0));
+  const sumKnown = (values: Array<number | null>) => values.length > 0 && values.every((v) => v !== null)
+    ? values.reduce((total, value) => total + (value ?? 0), 0) : null;
+  const holdingInvested = sumKnown(topHoldings.map((h) => h.totalInvested));
+  const holdingValue = sumKnown(topHoldings.map((h) => h.marketValue));
+  const buyAmount = sumKnown(lastBuyDay?.buys.map((b) => b.amount) ?? []);
+  const sellAmount = sumKnown(lastSellDay?.sells.map((s) => s.amount) ?? []);
 
   const card: React.CSSProperties = { background: "#fff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "12px 13px", minWidth: 0 };
   const h3: React.CSSProperties = { fontSize: 13, fontWeight: 900, color: "#0f172a", margin: "0 0 8px" };
@@ -157,7 +163,7 @@ export function MagicHoldingsAndTrades({ history }: { history: Rec }) {
           {topHoldings.length ? (
             <>
               <div style={{ display: "grid", gap: 5 }}>
-                {topHoldings.slice(0, 5).map((h) => (
+                {topHoldings.map((h) => (
                   <div key={h.code} style={line}>
                     <span style={nameCell}>{h.name}</span>
                     <span style={{ flexShrink: 0, fontWeight: 800, color: h.returnRate !== null ? tone(h.returnRate) : "#64748b" }}>
@@ -166,23 +172,10 @@ export function MagicHoldingsAndTrades({ history }: { history: Rec }) {
                   </div>
                 ))}
               </div>
-              {topHoldings.length > 5 ? (
-                <details style={{ marginTop: 8 }}>
-                  <summary style={{ cursor: "pointer", fontSize: 11.5, fontWeight: 800, color: ACCENT.text }}>
-                    나머지 {topHoldings.length - 5}종목 보기
-                  </summary>
-                  <div style={{ display: "grid", gap: 5, marginTop: 7 }}>
-                    {topHoldings.slice(5).map((h) => (
-                      <div key={h.code} style={line}>
-                        <span style={{ ...nameCell, fontWeight: 700, color: "#334155" }}>{h.name}</span>
-                        <span style={{ flexShrink: 0, fontWeight: 800, color: h.returnRate !== null ? tone(h.returnRate) : "#64748b" }}>
-                          {h.returnRate !== null ? pct(h.returnRate) : "-"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              ) : null}
+              <div style={{ borderTop: "1px solid #e2e8f0", marginTop: 9, paddingTop: 8, fontSize: 12, fontWeight: 800, color: "#334155" }}>
+                <div style={line}><span>투자금액 합계</span><span>{krw(holdingInvested)}</span></div>
+                <div style={line}><span>평가금액 합계</span><span>{krw(holdingValue)}</span></div>
+              </div>
             </>
           ) : (
             <div style={{ fontSize: 12.5, color: "#94a3b8" }}>보유 종목 없음</div>
@@ -192,24 +185,20 @@ export function MagicHoldingsAndTrades({ history }: { history: Rec }) {
         {/* 최근 매수 */}
         <div style={card}>
           <div style={h3}>최근 매수</div>
-          {latest && latest.buys.length ? (
+          {lastBuyDay ? (
             <>
               <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700, marginBottom: 8 }}>
-                {fmtDate(latest.date)} · {latest.buys.length} lot 매수
+                {fmtDate(lastBuyDay.date)} · {lastBuyDay.buys.length} lot 매수
               </div>
               <div style={{ display: "grid", gap: 5 }}>
-                {latest.buys.slice(0, 5).map((b) => (
+                {lastBuyDay.buys.map((b) => (
                   <div key={b.tradeId || b.lotId} style={line}>
                     <span style={nameCell}>{b.name}</span>
-                    <span style={{ flexShrink: 0, fontWeight: 700, color: "#64748b" }}>{b.rank !== null ? `${b.rank}위` : "-"}</span>
+                    <span style={{ flexShrink: 0, fontWeight: 700, color: "#64748b" }}>{krw(b.amount)}</span>
                   </div>
                 ))}
               </div>
-              {latest.buys.length > 5 ? (
-                <div style={{ fontSize: 11.5, color: "#94a3b8", fontWeight: 700, marginTop: 7 }}>
-                  외 {latest.buys.length - 5}종목 — 아래 매수 근거에서 전체 확인
-                </div>
-              ) : null}
+              <div style={{ ...line, borderTop: "1px solid #e2e8f0", marginTop: 9, paddingTop: 8, fontWeight: 800, color: "#334155" }}><span>매수금액 합계</span><span>{krw(buyAmount)}</span></div>
             </>
           ) : (
             <div style={{ fontSize: 12.5, color: "#94a3b8" }}>최근 매수 없음</div>
@@ -225,15 +214,14 @@ export function MagicHoldingsAndTrades({ history }: { history: Rec }) {
                 {fmtDate(lastSellDay.date)} · {lastSellDay.sells.length} lot 매도
               </div>
               <div style={{ display: "grid", gap: 5 }}>
-                {lastSellDay.sells.slice(0, 5).map((s) => (
+                {lastSellDay.sells.map((s) => (
                   <div key={s.tradeId || s.lotId} style={line}>
                     <span style={nameCell}>{s.name}</span>
-                    <span style={{ flexShrink: 0, fontWeight: 800, color: s.realizedReturn !== null ? tone(s.realizedReturn) : "#64748b" }}>
-                      {s.realizedReturn !== null ? pct(s.realizedReturn) : "-"}
-                    </span>
+                    <span style={{ flexShrink: 0, fontWeight: 800, color: "#64748b" }}>{krw(s.amount)}</span>
                   </div>
                 ))}
               </div>
+              <div style={{ ...line, borderTop: "1px solid #e2e8f0", marginTop: 9, paddingTop: 8, fontWeight: 800, color: "#334155" }}><span>매도금액 합계</span><span>{krw(sellAmount)}</span></div>
             </>
           ) : (
             <>
