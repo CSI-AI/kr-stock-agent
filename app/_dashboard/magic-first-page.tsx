@@ -19,6 +19,7 @@ import {
   fmtDate,
   isMagicReconstruction,
   krw,
+  magicAnnualizedReturn,
   parseMagicOfficialBenchmark,
   parseMagicOfficialBenchmarkMulti,
   parseMagicOfficialPortfolio,
@@ -38,6 +39,12 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
   const benchOk = benchmarkUsable(bench) && bench!.latest !== null;
   const benchName = bench?.benchmark ?? "KOSPI";
   const cum = summary.cumulativeReturn;
+  const annualized = magicAnnualizedReturn(summary);
+  const returnLabel = summary.initialCapital === 500_000_000
+    ? "누적수익률 (기초 5억원 대비)"
+    : summary.initialCapital !== null
+      ? `누적수익률 (기초 ${krw(summary.initialCapital)} 대비)`
+      : "누적수익률 (기초금 미확인)";
   const reconstructed = isMagicReconstruction(history);
   // 메인 그래프에 그리는 지수와 **같은 목록**을 카드로도 보여준다. 그래프는
   // Fund/KOSPI/KOSDAQ 인데 요약만 KOSPI 하나면 두 영역의 benchmark 구성이
@@ -71,7 +78,7 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
 
       {/* 누적수익률 — 화면 최대 시각요소 */}
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>누적수익률</span>
+        <span style={{ fontSize: 13, fontWeight: 800, color: "#64748b" }}>{returnLabel}</span>
         <span style={{ fontSize: "clamp(38px, 11vw, 58px)", fontWeight: 900, lineHeight: 1.05, color: tone(cum), letterSpacing: "-0.02em" }}>
           {pct(cum)}
         </span>
@@ -85,6 +92,10 @@ export function MagicPerformanceHero({ history }: { history: Rec }) {
 
       {/* 벤치마크 / 초과 / 총자산 — 누적수익률 바로 아래 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
+        <OMetric label="연환산 수익률 (참고)"
+                 value={annualized.value === null ? "산출 불가" : pct(annualized.value)}
+                 color={annualized.value === null ? undefined : tone(annualized.value)}
+                 sub={annualized.value === null ? "기초금·평가기준일 확인 필요" : `${annualized.days}일 경과 · 365일 환산 · 1년 미만 · 미래 수익 예측 아님`} />
         {shownBenchmarks.length > 0 ? (
           <>
             {/* 지수 누적수익률 — 그래프에 그리는 지수와 같은 목록·같은 순서 */}
