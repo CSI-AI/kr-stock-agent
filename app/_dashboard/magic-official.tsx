@@ -124,6 +124,7 @@ export type MagicOfficialSummary = {
   totalCash: number | null;
   holdingsMarketValue: number | null;
   totalAsset: number | null;
+  initialCapital: number | null;
   cumulativeReturn: number | null;
   pilotExcluded: boolean;
 };
@@ -179,9 +180,36 @@ export function parseMagicOfficialSummary(history: Rec): MagicOfficialSummary | 
     totalCash: num(s.totalCash),
     holdingsMarketValue: num(s.holdingsMarketValue),
     totalAsset: num(s.totalAsset),
+    initialCapital: optionalNum(s.initialCapital),
     cumulativeReturn: num(s.cumulativeReturn),
     pilotExcluded: s.pilotExcluded === true,
   };
+}
+export function isMagicVirtualRuleReplay(history: Rec): boolean {
+  if (usesMagicReconstructedSource(history)) return false;
+  const summary = obj(history.magicOfficialSummary);
+  const days = arr(history.magicOfficialTradeDays).filter((d) => d.runStatus === "COMPLETED");
+  return summary.actualExecution === false && summary.naturalPaperFrom == null &&
+    days.length > 0 && days.every((d) => d.notActualExecution === true);
+}
+// No external cash flows in this separate paper ledger. For periods shorter
+// than a year this is a calendar-day annualization, not observed annual profit.
+export function magicAnnualizedReturn(summary: MagicOfficialSummary): { value: number | null; days: number } {
+  const toDay = (value: string): number | null => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const ms = Date.parse(`${value}T00:00:00Z`);
+    return Number.isFinite(ms) && new Date(ms).toISOString().slice(0, 10) === value ? ms / 86_400_000 : null;
+  };
+  const start = toDay(summary.officialStartDate);
+  const end = toDay(summary.dataDate);
+  const days = start === null || end === null ? 0 : end - start;
+  if (days <= 0 || summary.initialCapital === null || summary.initialCapital <= 0 ||
+      summary.totalAsset === null || summary.totalAsset <= 0) return { value: null, days };
+  return { value: (Math.pow(summary.totalAsset / summary.initialCapital, 365 / days) - 1) * 100, days };
+}
+function magicInitialReturnLabel(summary: MagicOfficialSummary): string {
+  return summary.initialCapital === 500_000_000 ? "누적수익률 (기초 5억원 대비)" :
+    summary.initialCapital !== null ? `누적수익률 (기초 ${krw(summary.initialCapital)} 대비)` : "누적수익률 (기초금 미확인)";
 }
 export function parseMagicOfficialPortfolio(history: Rec): MagicOfficialPortfolio {
   return {
@@ -339,6 +367,7 @@ function Placeholder({ note }: { note: string }) {
 export function MagicOfficialCard({ history }: { history: Rec }) {
   const summary = parseMagicOfficialSummary(history);
   if (!summary) return <Placeholder note="공식 운용 데이터가 아직 준비되지 않았어요." />;
+  const annualized = magicAnnualizedReturn(summary);
   const portfolio = parseMagicOfficialPortfolio(history);
   const tradeDays = parseMagicOfficialTradeDays(history);
   const holdings = portfolio.holdings;
@@ -346,6 +375,8 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
   const marketValueTotal = sumKnown(holdings.map((h) => h.marketValue));
   const unrealizedTotal = sumKnown(holdings.map((h) => h.unrealizedProfit));
   const reconstructed = isMagicReconstruction(history);
+  const virtualRuleReplay = isMagicVirtualRuleReplay(history);
+  const virtual = reconstructed || virtualRuleReplay;
   const holdCols: Array<[string, "left" | "right"]> = [["종목명", "left"], ["lot", "right"], ["수량", "right"], ["평균매수가", "right"], ["현재가", "right"], ["투자금액", "right"], ["평가금액", "right"], ["평가손익", "right"], ["수익률", "right"]];
 
   return (
@@ -354,22 +385,25 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>와바바 마법공식 펀드 · {reconstructed ? "별도 복구 가상장부" : "공식 운용"}</div>
+            <div style={{ fontSize: 15, fontWeight: 900, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>와바바 마법공식 펀드 · {virtualRuleReplay ? "별도 규칙 재생 가상장부" : reconstructed ? "별도 복구 가상장부" : "공식 운용"}</div>
             <div style={{ fontSize: 12, color: "#94a3b8" }}>공식 시작일 {fmtDate(summary.officialStartDate)} · 자동반영 {summary.officialSequence}회차</div>
           </div>
         </div>
-        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: reconstructed ? "#92400e" : ACCENT.primary, background: reconstructed ? "#fffbeb" : ACCENT.soft, border: `1px solid ${reconstructed ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>{reconstructed ? "실거래와 분리" : "운용 중"}</span>
+        <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: virtual ? "#92400e" : ACCENT.primary, background: virtual ? "#fffbeb" : ACCENT.soft, border: `1px solid ${virtual ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 9px" }}>{virtual ? "실거래와 분리" : "운용 중"}</span>
       </div>
 
-      {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-        2026.06.17~09.18의 실제 66거래일을 다시 맞춘 별도 가상장부입니다. 기존 실행일의 선택은 보존하고, 누락일은 보존 재무입력과 전 거래일 공식 종가로 재계산했습니다. 매수일을 1일째로 세어 51거래일째 시가에 교체하며 실제 주문·브로커 거래는 0건입니다.
+      {virtual ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
+        {virtualRuleReplay ? `${fmtDate(summary.officialStartDate)}~${fmtDate(summary.dataDate)}의 보존된 종목·가격으로 매수예산 규칙을 사후 재계산한 별도 가상장부입니다. 과거 실제 운용성과가 아니며 일부 원천의 독립 시점 검증에는 한계가 있습니다. 실제 주문·브로커 거래는 0건입니다.` : "2026.06.17~09.18의 실제 66거래일을 다시 맞춘 별도 가상장부입니다. 기존 실행일의 선택은 보존하고, 누락일은 보존 재무입력과 전 거래일 공식 종가로 재계산했습니다. 매수일을 1일째로 세어 51거래일째 시가에 교체하며 실제 주문·브로커 거래는 0건입니다."}
       </p> : null}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))", gap: 8, marginBottom: 12 }}>
         <OMetric label="총자산" value={krw(summary.totalAsset)} />
         <OMetric label="총현금" value={krw(summary.totalCash)} />
         <OMetric label="보유평가액" value={krw(summary.holdingsMarketValue)} />
-        <OMetric label="누적수익률" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)} />
+        <OMetric label={magicInitialReturnLabel(summary)} value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)} />
+        <OMetric label="연환산 수익률 (참고)" value={annualized.value === null ? "산출 불가" : pct(annualized.value)}
+                 color={annualized.value === null ? undefined : tone(annualized.value)}
+                 sub={annualized.days > 0 ? `${annualized.days}일 경과 · 365일 환산${annualized.days < 365 ? " · 1년 미만" : ""} · 미래 수익 예측 아님` : "기준일 확인 필요"} />
         <OMetric label="매수배치" value={`${summary.openBatchCount}개`} sub={`종료 ${summary.closedBatchCount}`} />
         <OMetric label="보유 lot" value={`${summary.openItemLotCount}개`} />
         <OMetric label="누적 매수" value={`${summary.totalBuyCount}건`} />
@@ -562,6 +596,7 @@ function rankAvg(v: number | null): string {
 export function MagicStatusStrip({ history }: { history: Rec }) {
   const summary = parseMagicOfficialSummary(history);
   if (!summary) return null;
+  const annualized = magicAnnualizedReturn(summary);
   const bench = parseMagicOfficialBenchmark(history);
   const benchOk = benchmarkUsable(bench) && bench!.latest !== null;
   const benchName = bench?.benchmark ?? "KOSPI";
@@ -571,6 +606,8 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
   const latest = days[0];
   const holdings = parseMagicOfficialPortfolio(history).holdings;
   const reconstructed = isMagicReconstruction(history);
+  const virtualRuleReplay = isMagicVirtualRuleReplay(history);
+  const virtual = reconstructed || virtualRuleReplay;
   const investRate = summary.totalAsset && summary.holdingsMarketValue !== null ? (summary.holdingsMarketValue / summary.totalAsset) * 100 : null;
   // 공식 펀드의 평가가격 기준일 = 장부 기준일(= 그 거래일 종가).
   //   canonical 불변식: 최신 evaluationSnapshot(evalPriceSource=official_close) 의 자산값이
@@ -590,7 +627,7 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flexWrap: "wrap" }}>
           <span style={{ width: 8, height: 8, borderRadius: 99, background: ACCENT.primary, flexShrink: 0 }} />
           <span style={{ fontSize: 15, fontWeight: 900, color: "#0f172a" }}>MAGIC FORMULA CORE</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: reconstructed ? "#92400e" : ACCENT.text, background: reconstructed ? "#fffbeb" : ACCENT.soft, border: `1px solid ${reconstructed ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>{reconstructed ? "별도 복구 가상장부" : "운용 중"}</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: virtual ? "#92400e" : ACCENT.text, background: virtual ? "#fffbeb" : ACCENT.soft, border: `1px solid ${virtual ? "#fde68a" : ACCENT.border}`, borderRadius: 99, padding: "2px 8px" }}>{virtualRuleReplay ? "별도 규칙 재생 가상장부" : reconstructed ? "별도 복구 가상장부" : "운용 중"}</span>
           <span style={{ fontSize: 12, color: "#94a3b8", fontWeight: 700 }}>
             장부 기준일 {fmtDate(summary.dataDate)} · 자동반영 {summary.officialSequence}회차{latest?.buyBatchId ? ` · ${latest.buyBatchId}` : ""}
           </span>
@@ -611,13 +648,16 @@ export function MagicStatusStrip({ history }: { history: Rec }) {
         </div>
         <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 800, color: "#64748b", background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 99, padding: "2px 9px" }}>실주문 0건 · 모의장부</span>
       </div>
-      {reconstructed ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-        누락된 정상 기능을 복원한 별도 가상 성과입니다. 6월 17일부터 실제 66거래일을 사용했고 첫 교체 매도는 51거래일째인 8월 28일입니다. 원본 운용 성과·실거래와 혼합하지 않습니다.
+      {virtual ? <p style={{ margin: "-2px 0 12px", fontSize: 12, color: "#92400e", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
+        {virtualRuleReplay ? `${fmtDate(summary.officialStartDate)}~${fmtDate(summary.dataDate)} 보존 입력 기반 사후 규칙 재생입니다. 실제 운용성과·원본 장부와 분리하며 일부 가격 기준일의 독립 검증에는 한계가 있습니다.` : "누락된 정상 기능을 복원한 별도 가상 성과입니다. 6월 17일부터 실제 66거래일을 사용했고 첫 교체 매도는 51거래일째인 8월 28일입니다. 원본 운용 성과·실거래와 혼합하지 않습니다."}
       </p> : null}
       {/* 대표 3수치 — 펀드 / 같은 기간 벤치마크 / 초과(%p). source of truth 는 public payload 다. */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, marginBottom: 8 }}>
-        <OMetric label="누적수익률 (마법공식)" value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)}
+        <OMetric label={magicInitialReturnLabel(summary)} value={pct(summary.cumulativeReturn)} color={tone(summary.cumulativeReturn)}
                  sub={`시작 ${fmtDate(summary.officialStartDate)}`} />
+        <OMetric label="연환산 수익률 (참고)" value={annualized.value === null ? "산출 불가" : pct(annualized.value)}
+                 color={annualized.value === null ? undefined : tone(annualized.value)}
+                 sub={annualized.days > 0 ? `${annualized.days}일 경과 · 365일 환산${annualized.days < 365 ? " · 1년 미만" : ""} · 미래 수익 예측 아님` : "기준일 확인 필요"} />
         {multiOk ? (
           multi!.benchmarks.map((b) => (
             <OMetric key={b.key} label={`같은 기간 ${b.name}`} value={pct(b.latestReturnPct)}
