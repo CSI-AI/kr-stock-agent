@@ -17,6 +17,9 @@ function num(v: unknown): number | null {
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
+function optionalNum(v: unknown): number | null {
+  return v === null || v === undefined || v === "" ? null : num(v);
+}
 function str(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
@@ -184,9 +187,9 @@ export function parseMagicOfficialPortfolio(history: Rec): MagicOfficialPortfoli
   return {
     holdings: arr(obj(magicSource(history, "magicReconstructedPortfolio", "magicOfficialPortfolio")).holdings).map((h) => ({
       code: str(h.code), name: str(h.name) || str(h.code), openLotCount: num(h.openLotCount) ?? 0,
-      totalQuantity: num(h.totalQuantity), totalInvested: num(h.totalInvested),
+      totalQuantity: num(h.totalQuantity), totalInvested: optionalNum(h.totalInvested),
       averageBuyPrice: num(h.averageBuyPrice), currentPrice: num(h.currentPrice),
-      marketValue: num(h.marketValue), unrealizedProfit: num(h.unrealizedProfit), returnRate: num(h.returnRate),
+      marketValue: optionalNum(h.marketValue), unrealizedProfit: optionalNum(h.unrealizedProfit), returnRate: num(h.returnRate),
     })),
   };
 }
@@ -203,7 +206,7 @@ export function parseMagicOfficialTradeDays(history: Rec): MagicOfficialTradeDay
     buys: arr(d.buys).map((b) => ({
       tradeId: str(b.tradeId), batchId: str(b.batchId), lotId: str(b.lotId), rank: num(b.rank),
       code: str(b.code), name: str(b.name) || str(b.code), executionPrice: num(b.executionPrice),
-      quantity: num(b.quantity), amount: num(b.amount), signalAsOfDate: str(b.signalAsOfDate),
+      quantity: num(b.quantity), amount: optionalNum(b.amount), signalAsOfDate: str(b.signalAsOfDate),
       executionDate: str(b.executionDate), priceSource: str(b.priceSource),
       finalRank: num(b.finalRank) ?? num(b.rank), cheapRank: num(b.cheapRank), qualityRank: num(b.qualityRank),
       magicScore: num(b.magicScore), earningsYield: num(b.earningsYield), returnOnCapital: num(b.returnOnCapital),
@@ -215,7 +218,7 @@ export function parseMagicOfficialTradeDays(history: Rec): MagicOfficialTradeDay
       tradeId: str(b.tradeId), batchId: str(b.batchId), lotId: str(b.lotId), code: str(b.code),
       name: str(b.name) || str(b.code), originalBuyDate: str(b.originalBuyDate),
       originalBuyPrice: num(b.originalBuyPrice), executionPrice: num(b.executionPrice),
-      quantity: num(b.quantity), amount: num(b.amount), realizedProfit: num(b.realizedProfit),
+      quantity: num(b.quantity), amount: optionalNum(b.amount), realizedProfit: optionalNum(b.realizedProfit),
       realizedReturn: num(b.realizedReturn), holdingTradingDays: num(b.holdingTradingDays),
       sellReason: str(b.sellReason), executionDate: str(b.executionDate), priceSource: str(b.priceSource),
     })).sort((x, y) => (x.code < y.code ? -1 : x.code > y.code ? 1 : x.lotId < y.lotId ? -1 : 1)),
@@ -242,9 +245,13 @@ const TH = (align: "left" | "right"): React.CSSProperties => ({
 const TD = (align: "left" | "right"): React.CSSProperties => ({
   padding: "8px 9px", fontSize: 12.5, textAlign: align, whiteSpace: "nowrap", fontWeight: 700,
 });
+const sumKnown = (values: Array<number | null>): number | null =>
+  values.length > 0 && values.every((value) => value !== null)
+    ? values.reduce((sum, value) => sum + (value ?? 0), 0) : null;
 
 function BuySection({ buys }: { buys: MagicOfficialBuyTrade[] }) {
   const cols: Array<[string, "left" | "right"]> = [["순위", "right"], ["종목명", "left"], ["매수가", "right"], ["수량", "right"], ["매수금액", "right"]];
+  const buyTotal = sumKnown(buys.map((b) => b.amount));
   return (
     <div style={{ marginTop: 10 }}>
       <div style={{ fontSize: 12.5, fontWeight: 800, color: "#334155", margin: "0 0 6px" }}>매수 {buys.length}건</div>
@@ -266,6 +273,10 @@ function BuySection({ buys }: { buys: MagicOfficialBuyTrade[] }) {
               </tr>
             ))}
           </tbody>
+          <tfoot><tr style={{ borderTop: "2px solid #cbd5e1", background: "#f8fafc" }}>
+            <th colSpan={4} style={TH("left")}>매수금액 합계</th>
+            <td style={TD("right")}>{krw(buyTotal)}</td>
+          </tr></tfoot>
         </table>
       </div>
     </div>
@@ -274,6 +285,8 @@ function BuySection({ buys }: { buys: MagicOfficialBuyTrade[] }) {
 
 function SellSection({ sells }: { sells: MagicOfficialSellTrade[] }) {
   const cols: Array<[string, "left" | "right"]> = [["종목명", "left"], ["최초매수일", "right"], ["최초매수가", "right"], ["매도가", "right"], ["수량", "right"], ["매도금액", "right"], ["실현손익", "right"], ["실현수익률", "right"], ["보유", "right"], ["사유", "left"]];
+  const proceeds = sumKnown(sells.map((s) => s.amount));
+  const realized = sumKnown(sells.map((s) => s.realizedProfit));
   return (
     <div style={{ marginTop: 10 }}>
       <div style={{ fontSize: 12.5, fontWeight: 800, color: "#ea580c", margin: "0 0 6px" }}>매도 {sells.length}건</div>
@@ -299,6 +312,12 @@ function SellSection({ sells }: { sells: MagicOfficialSellTrade[] }) {
               </tr>
             ))}
           </tbody>
+          <tfoot><tr style={{ borderTop: "2px solid #cbd5e1", background: "#f8fafc" }}>
+            <th colSpan={5} style={TH("left")}>매도금액·실현손익 합계</th>
+            <td style={TD("right")}>{krw(proceeds)}</td>
+            <td style={{ ...TD("right"), color: tone(realized) }}>{krwSigned(realized)}</td>
+            <td colSpan={3} style={TD("right")}></td>
+          </tr></tfoot>
         </table>
       </div>
     </div>
@@ -323,6 +342,9 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
   const portfolio = parseMagicOfficialPortfolio(history);
   const tradeDays = parseMagicOfficialTradeDays(history);
   const holdings = portfolio.holdings;
+  const investedTotal = sumKnown(holdings.map((h) => h.totalInvested));
+  const marketValueTotal = sumKnown(holdings.map((h) => h.marketValue));
+  const unrealizedTotal = sumKnown(holdings.map((h) => h.unrealizedProfit));
   const reconstructed = isMagicReconstruction(history);
   const holdCols: Array<[string, "left" | "right"]> = [["종목명", "left"], ["lot", "right"], ["수량", "right"], ["평균매수가", "right"], ["현재가", "right"], ["투자금액", "right"], ["평가금액", "right"], ["평가손익", "right"], ["수익률", "right"]];
 
@@ -377,6 +399,13 @@ export function MagicOfficialCard({ history }: { history: Rec }) {
                 </tr>
               ))}
             </tbody>
+            <tfoot><tr style={{ borderTop: "2px solid #cbd5e1", background: "#f8fafc" }}>
+              <th colSpan={5} style={TH("left")}>보유 종목 합계</th>
+              <td style={TD("right")}>{krw(investedTotal)}</td>
+              <td style={TD("right")}>{krw(marketValueTotal)}</td>
+              <td style={{ ...TD("right"), color: tone(unrealizedTotal) }}>{krwSigned(unrealizedTotal)}</td>
+              <td style={TD("right")}>-</td>
+            </tr></tfoot>
           </table>
         </div>
       ) : (

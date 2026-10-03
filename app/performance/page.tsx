@@ -6,6 +6,7 @@ import {
 } from "../_dashboard/kit";
 import {
   MagicOfficialCard,
+  MagicTodayPicks,
   isMagicReconstruction,
   parseMagicOfficialTradeDays,
   parseMagicOfficialPortfolio,
@@ -16,7 +17,7 @@ import {
 export const dynamic = "force-static";
 
 // 성과분석 — 마법공식펀드 상세 이력 전용. 공식 운용 성과·보유 종목·거래일별 기록 + 넘긴 종목.
-// 대시보드와 겹치는 요약(상태·수치표·차트)·매수근거·공식설명 블럭은 대시보드로 일원화했다.
+// 대시보드와 겹치는 요약(상태·수치표·차트)은 제외하고 상세 매수 근거를 함께 둔다.
 export default function PerformancePage() {
   const history = readRecommendationHistory();
   const magicDays = parseMagicOfficialTradeDays(history);
@@ -37,6 +38,10 @@ export default function PerformancePage() {
           {reconstructed ? "별도 복구 가상장부 성과" : "공식 운용 성과"} · 고유 보유종목 {holdings.length} · 기록 {magicDays.length}회차
         </h2>
         <MagicOfficialCard history={history} />
+      </section>
+
+      <section className="dashSection">
+        <MagicTodayPicks history={history} />
       </section>
 
       <section className="dashSection">
